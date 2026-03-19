@@ -50,9 +50,9 @@ function ClientsTable() {
     const [NewForm, setNewForm] = useState(false); // state to control rendering
 
   return (
-   <div className="client-container">
+   <div className="client-container flex flex-col items-start py-4 px-4 bg-gray-50 mt-4 rounded">
         <div className='btn_container'>
-            <button className="add_client" onClick={() => setNewForm(prev => !prev)}>
+            <button className="add_client text-white bg-blue-500 hover:bg-blue-700 py-2 px-4 rounded" onClick={() => setNewForm(prev => !prev)}>
                 {NewForm ? "Close" : "Add Client"}
             </button>
         </div>
