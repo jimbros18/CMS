@@ -2,6 +2,30 @@
 @tailwind components;
 @tailwind utilities;
 
+.btn {
+  @apply rounded-lg font-medium transition inline-flex items-center justify-center;
+}
+
+.btn-sm {
+  @apply px-2 py-1 text-sm;
+}
+
+.btn-md {
+  @apply px-4 py-2 text-base;
+}
+
+.btn-lg {
+  @apply px-6 py-3 text-lg;
+}
+
+.section {
+  @apply w-full flex flex-col items-start text-gray-800 gap-1 mb-10 mt-10 border-t border-gray-300 pt-4;
+}
+
+.input {
+  @apply rounded border bg-gray-700 text-white px-4 py-1 w-full focus:outline-none focus:ring-2 focus:ring-blue-500;
+}
+
 :root {
   --text: #6b6375;
   --text-h: #08060d;

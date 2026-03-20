@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-// import './styles/clientForm.css';
-// import './styles/index.css';
+import { Save, Trash, Pencil, Plus, XCircle } from "lucide-react";
+import Charges from './otherCharges';
 
 const Coffin_info = [
   { Plan: 'OPHIR', Coffin: 'Ogoy Plain', Amount: 17000 },
@@ -69,7 +69,7 @@ function ClientForm() {
     setDswd((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Other Charges row change
+  // ==================== Other Charges row change ====================
   const handleChargeChange = (index, field, value) => {
     const newCharges = [...otherCharges];
     newCharges[index][field] = value;
@@ -80,7 +80,10 @@ function ClientForm() {
     setOtherCharges([...otherCharges, { item: 'Lapida', details: '', amount: '' }]);
   };
 
-  // Transaction row change
+  const [showCharge, setShowCharge] = useState(false);
+
+
+  // ====================== Transaction row change ========================
   const handleTransactionChange = (index, field, value) => {
     const newTrans = [...transactions];
     newTrans[index][field] = value;
@@ -104,18 +107,16 @@ function ClientForm() {
   };
 
   return (
-    <div className='form-container w-full'>
+    <div className='form-container w-3/5 items-center justify-center'>  
       <form className='w-full flex flex-col items-start text-left;' onSubmit={handleSubmit}>
 
       {/* ================= CLIENT SECTION ================= */}
       <section className="w-full text-gray-800">
         <h2 className="text-gray-800 mb-4 text-left">New Client Information</h2>
-
         <div className="w-full px-4 py-3 rounded">
-          {/* Grid: 2 columns on medium+ screens, 1 column on small screens */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            
-            {/* Date Serviced */}
+          
+          {/* Date Serviced */}
             <div className="flex flex-col gap-1 text-left">
               <label>Date Serviced</label>
               <input
@@ -124,7 +125,7 @@ function ClientForm() {
                 value={clientData.dateServiced}
                 onChange={handleClientChange}
                 required
-                className="w-full rounded px-2 py-1 bg-gray-700 text-white"
+                className="rounded px-2 bg-gray-700 text-white"
               />
             </div>
 
@@ -240,70 +241,22 @@ function ClientForm() {
         </div>
       </section>
 {/* ================= OTHER CHARGES ================= */} 
-<section className="form-section w-full flex flex-col items-start text-gray-800 gap-1 mb-10 mt-10 border-t border-gray-300 pt-4">
-  <h2 className="text-gray-800 mb-2">Other Charges</h2>
-
-  <table className="w-full border-collapse">
-    <thead>
-      <tr >
-        <th className="text-left px-2 py-1">Item/Service</th>
-        <th className="text-left px-2 py-1">Details</th>
-        <th className="text-left px-2 py-1">Amount</th>
-      </tr>
-    </thead>
-    <tbody>
-      {otherCharges.map((charge, index) => (
-        <tr key={index} className=" border-gray-300">
-          <td className="px-2 py-1">
-            <select
-              className="w-full rounded px-2 py-1 bg-gray-700 text-white"
-              value={charge.item}
-              onChange={(e) => handleChargeChange(index, 'item', e.target.value)}
-            >
-              <option value="Lapida">Lapida</option>
-              <option value="Candle">Candle</option>
-              <option value="Lettering">Lettering</option>
-              <option value="Bulak">Bulak</option>
-              <option value="Tarpaulin">Tarpaulin</option>
-              <option value="Video">Video</option>
-            </select>
-          </td>
-          <td className="px-2 py-1">
-            <input
-              type="text"
-              className="w-full rounded px-2 py-1 bg-gray-700 text-white"
-              value={charge.details}
-              onChange={(e) => handleChargeChange(index, 'details', e.target.value)}
-              placeholder="Description"
-            />
-          </td>
-          <td className="px-2 py-1">
-            <input
-              type="number"
-              className="w-full rounded px-2 py-1 bg-gray-700 text-white"
-              value={charge.amount}
-              onChange={(e) => handleChargeChange(index, 'amount', e.target.value)}
-              placeholder="0.00"
-              min="0"
-              step="0.01"
-            />
-          </td>
-        </tr>
-      ))}
-    </tbody>
-  </table>
-
-  <button
-    type="button"
-    className="mt-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded transition-colors duration-300"
-    onClick={addChargeRow}
-  >
-    + Add Item
-  </button>
+<section className="section ">
+    <h2 className="text-gray-800 mb-2">Other Charges</h2>
+      <div className='flex flex-col-reverse items-start'>
+        <button
+          type="button"
+          className="ml-5 mt-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded transition-colors duration-300"
+          onClick={()=>setShowCharge(!showCharge)}
+        >
+            {showCharge ? <Save size={16} /> : <Plus size={16} />}
+        </button>
+            {showCharge && <Charges />}
+      </div>
 </section>
 
         {/* ================= DSWD SECTION ================= */}
-      <section className="form-section w-full flex flex-col items-start gap-2 mb-10 mt-10 border-t border-gray-300 pt-4">
+      <section className="section">
         <h2 className="text-gray-800 mb-2">DSWD / Assistance</h2>
         <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="flex flex-col items-start gap-1">
@@ -381,11 +334,11 @@ function ClientForm() {
       </section>
 
         {/* ================= TRANSACTIONS / PAYMENTS ================= */}
- <section className="form-section w-full flex flex-col items-start gap-2 mb-10 mt-10 border-t border-gray-300 pt-2">
+ <section className="section">
   <h2 className="text-gray-800 mb-2">Payments / Transactions</h2>
   <table className="w-full border-collapse">
     <thead>
-      <tr className="bg-gray-200">
+      <tr className="text-gray-800">
         <th className="text-left px-2 py-1">Date Paid</th>
         <th className="text-left px-2 py-1">Amount Paid</th>
         <th className="text-left px-2 py-1">Details</th>
@@ -437,7 +390,7 @@ function ClientForm() {
     className="mt-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded transition-colors duration-300"
     onClick={addTransactionRow}
   >
-    + Add Payment
+    <Plus size={16} />
   </button>
 </section>
 
@@ -447,7 +400,7 @@ function ClientForm() {
         type="submit"
         className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded transition-colors duration-300"
       >
-        Save Client Record
+        Save
       </button>
     </div>
       </form>
