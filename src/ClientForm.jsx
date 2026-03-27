@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import ClientsTable from './ClientTable';
 import { Save, Trash, Pencil, Plus, XCircle } from 'lucide-react';
-import {postData} from './API/server_api';
+import {addClient, getClients} from './API/server_api';
 import {
     Charges,
     ChargeTable,
@@ -178,15 +178,16 @@ const resetForm = () => {
       payments,
     };
 
-    const client = {
-    first: clientData.deceasedFirst,
-    middle: clientData.deceasedMiddle,
-    last: clientData.deceasedLast,
-    address: clientData.address,
-};
+//     const client = {
+//     first: clientData.deceasedFirst,
+//     middle: clientData.deceasedMiddle,
+//     last: clientData.deceasedLast,
+//     address: clientData.address,
+// };
 
     setSubmitStatus('Saving client data...');
-    postData(client);
+    console.log(payload);
+    addClient(clientData);
     setTimeout(() => setSubmitStatus(''), 3000);
   };
 
