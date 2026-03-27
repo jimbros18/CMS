@@ -1,107 +1,106 @@
 .client-container {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  flex-direction: column;
-  align-items: left;
-  width: 100%;
-  position: absolute;
-
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    flex-direction: column;
+    align-items: left;
+    width: 100%;
+    position: absolute;
 }
 
 .btn-container {
-  display: flex;
-  align-items: left;
-  justify-content: left;
-  /* margin-bottom: 0.5rem; */
+    display: flex;
+    align-items: left;
+    justify-content: left;
+    /* margin-bottom: 0.5rem; */
 }
-
 
 .table-container {
-  /* display: flex;
+    /* display: flex;
   flex-wrap: wrap;
   justify-content: space-between;  */
-  width: 98%;
-  overflow-x: auto; /* horizontal scroll on small screens */
-  margin: 1.5rem 0;
-  /* box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); */
-  border-radius: 8px;
-  /* background-color: #fff; */
-  padding: 1rem;
+    width: 98%;
+    overflow-x: auto; /* horizontal scroll on small screens */
+    margin: 1.5rem 0;
+    /* box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); */
+    border-radius: 8px;
+    /* background-color: #fff; */
+    padding: 1rem;
 }
 .add_client {
-  font-size: 0.9rem;
-  padding: 0.5rem 0.5rem;
-  background-color: #373a3d;
-  border-radius: 8px;
-  margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    padding: 0.5rem 0.5rem;
+    background-color: #373a3d;
+    border-radius: 8px;
+    margin-bottom: 0.5rem;
 }
 
 .clients-table {
-  width: 100%;
-  border-collapse: collapse;
-  border-spacing: 5px 0px;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  min-width: 600px;
+    width: 100%;
+    border-collapse: collapse;
+    border-spacing: 5px 0px;
+    font-family:
+        -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    min-width: 600px;
 }
 
 .clients-table th,
 .clients-table td {
-  padding: 5px 10px;
-  text-align: left;
-  border-bottom: 1px solid #e0e0e0;
+    padding: 5px 10px;
+    text-align: left;
+    border-bottom: 1px solid #e0e0e0;
 }
 
 .clients-table th {
-  background-color: #373a3d;
-  color: #fdf8f8;
-  font-weight: 600;
-  text-transform: uppercase;
-  font-size: 0.85rem;
-  letter-spacing: 0.4px;
+    background-color: #373a3d;
+    color: #fdf8f8;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.4px;
 }
 
 .clients-table td {
-  color: #444;
-  font-size: 0.8rem;
+    color: #444;
+    font-size: 0.8rem;
 }
 
 .clients-table tr:hover {
-  background-color: #f9f9f9;
-  transition: background-color 0.12s ease;
+    background-color: #f9f9f9;
+    transition: background-color 0.12s ease;
 }
 
 /* Right-align numeric amounts */
 .amount {
-  text-align: right;
-  font-variant-numeric: tabular-nums;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 /* Optional striped rows */
 .clients-table tbody tr:nth-child(odd) {
-  background-color: #fafafa;
+    background-color: #fafafa;
 }
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
-  .clients-table {
-    font-size: 0.8rem;
-    min-width: 0; /* allows table to shrink */
-  }
+    .clients-table {
+        font-size: 0.8rem;
+        min-width: 0; /* allows table to shrink */
+    }
 
-  .clients-table th,
-  .clients-table td {
-    padding: 6px 8px;
-  }
-  
-  /* Optional: reduce font-size for very small screens */
+    .clients-table th,
+    .clients-table td {
+        padding: 6px 8px;
+    }
+
+    /* Optional: reduce font-size for very small screens */
 }
 
 @media (max-width: 480px) {
-  .clients-table th,
-  .clients-table td {
-    padding: 4px 6px;
-    font-size: 0.75rem;
-  }
+    .clients-table th,
+    .clients-table td {
+        padding: 4px 6px;
+        font-size: 0.75rem;
+    }
 }

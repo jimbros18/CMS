@@ -1,411 +1,297 @@
 import React, { useState } from 'react';
-import { Save, Trash, Pencil, Plus, XCircle } from "lucide-react";
-import Charges from './otherCharges';
+import ClientsTable from './ClientTable';
+import { Save, Trash, Pencil, Plus, XCircle } from 'lucide-react';
+import {postData} from './API/server_api';
+import {
+    Charges,
+    ChargeTable,
+    ClientInfo,
+    Payments,
+    PaymentsTable,
+    DSWDInfo,
+} from './formSections';
 
 const Coffin_info = [
-  { Plan: 'OPHIR', Coffin: 'Ogoy Plain', Amount: 17000 },
-  { Plan: 'GOODLIFE', Coffin: 'Ogoy Plain', Amount: 17000 },
-  { Plan: 'BETTERLIFE', Coffin: 'Ogoy Plain', Amount: 17000 },
-  { Plan: 'FREEDOMLIFE', Coffin: 'Ogoy Plain', Amount: 17000 },
-  { Plan: 'SAN ROQUE DAYONG', Coffin: 'Ogoy Plain', Amount: 17000 },
-  { Plan: 'HJV', Coffin: 'Ogoy Plain', Amount: 17000 },
-  { Plan: 'None', Coffin: 'Ordinary', Amount: 15000 },
-  { Plan: 'None', Coffin: 'Ordinary 3ft', Amount: 15000 },
-  { Plan: 'None', Coffin: 'Ordinary 5ft', Amount: 15000 },
-  { Plan: 'None', Coffin: 'Urgoy', Amount: 30000 },
-  { Plan: 'None', Coffin: 'Urgoy 3ft', Amount: 30000 },
-  { Plan: 'None', Coffin: 'Urgoy 5ft', Amount: 30000 },
-  { Plan: 'None', Coffin: 'Ogoy Plain', Amount: 40000 },
-  { Plan: 'None', Coffin: 'Ogoy Plain 3ft', Amount: 40000 },
-  { Plan: 'None', Coffin: 'Ogoy Plain 5ft', Amount: 40000 },
-  { Plan: 'None', Coffin: 'Ogoy Stoko', Amount: 42000 },
-  { Plan: 'None', Coffin: 'Ogoy Stoko 3ft', Amount: 42000 },
-  { Plan: 'None', Coffin: 'Ogoy Stoko 5ft', Amount: 42000 },
-  { Plan: 'None', Coffin: 'Metal', Amount: 50000 }
+    { Coffin: 'Ogoy Plain Plan', Amount: 17000 },
+    { Coffin: 'Ordinary', Amount: 15000 },
+    { Coffin: 'Ordinary 3ft', Amount: 15000 },
+    { Coffin: 'Ordinary 5ft', Amount: 15000 },
+    { Coffin: 'Quadrado', Amount: 23000 },
+    { Coffin: 'Urgoy', Amount: 30000 },
+    { Coffin: 'Urgoy 3ft', Amount: 30000 },
+    { Coffin: 'Urgoy 5ft', Amount: 30000 },
+    { Coffin: 'Ogoy Plain', Amount: 40000 },
+    { Coffin: 'Ogoy Plain 3ft', Amount: 40000 },
+    { Coffin: 'Ogoy Plain 5ft', Amount: 40000 },
+    { Coffin: 'Ogoy Stoko', Amount: 42000 },
+    { Coffin: 'Ogoy Stoko 3ft', Amount: 42000 },
+    { Coffin: 'Ogoy Stoko 5ft', Amount: 42000 },
+    { Coffin: 'Metal', Amount: 50000 },
 ];
 
-function ClientForm() {
-  // Main client section
-  const [clientData, setClientData] = useState({
-    dateServiced: new Date().toISOString().slice(0, 10), // today's date by default
-    deceased: '',
-    address: '',
-    plan: '',
-    coffin: '',
-    coffinAmount: 0,
-    notes: '',
-  });
+// ================ CLIENT INFO ===================
+function ClientForm({ onFormSubmitted }) {
+    const initialClientData = {
+        dateServiced: new Date().toISOString().slice(0, 10), // today's date by default
+        deceasedFirst: '',
+        deceasedMiddle: '',
+        deceasedLast: '',
+        address: '',
+        cell_number: '',
+        Facebook: '',
+        plan: '',
+        coffin: '',
+        coffinAmount: 0,
+        notes: '',
+    };
 
-  // Other charges - array of items
-  const [otherCharges, setOtherCharges] = useState([
-    { item: 'Lapida', details: '', amount: '' },
-  ]);
+    const [clientData, setClientData] = useState(initialClientData);
 
-  // DSWD section
-  const [dswd, setDswd] = useState({
-    glDate: '',
+    const handleClientChange = (e) => {
+        const { name, value } = e.target;
+        setClientData((prev) => {
+            const updated = { ...prev, [name]: value };
+            if (name === 'coffin') {
+                const matching = Coffin_info.find(
+                    (info) => info.Coffin === updated.coffin,
+                );
+                updated.coffinAmount = matching ? matching.Amount : 0;
+            }
+            if (
+                ['deceasedFirst', 'deceasedMiddle', 'deceasedLast'].includes(
+                    name,
+                )
+            ) {
+                updated.deceased = [
+                    updated.deceasedFirst,
+                    updated.deceasedMiddle,
+                    updated.deceasedLast,
+                ]
+                    .filter(Boolean)
+                    .join(' ');
+            }
+            return updated;
+        });
+    };
+
+    // ==================== DSWD Section ====================
+const initialDswd = {
+    glDate: new Date().toISOString().slice(0, 10),
     ciNumber: '',
     processor: '',
-    deceased: '',
-    deceasedAddress: '',
     amount: '',
     status: 'Pending',
     notes: '',
-  });
-
-  // Transactions - payment records
-  const [transactions, setTransactions] = useState([
-    { datePaid: '', amountPaid: '', details: '' },
-  ]);
-
-  // Handlers
-  const handleClientChange = (e) => {
-    const { name, value } = e.target;
-    setClientData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleDswdChange = (e) => {
-    const { name, value } = e.target;
-    setDswd((prev) => ({ ...prev, [name]: value }));
+  const [dswd, setDswd] = useState(initialDswd);
+
+    const handleDswdChange = (e) => {
+        const { name, value } = e.target;
+        setDswd((prev) => ({ ...prev, [name]: value }));
+    };
+
+    // ==================== Other Charges row change ====================
+    const [showCharge, setShowCharge] = useState(false);
+    const [otherCharges, setOtherCharges] = useState([]);
+
+    const addCharge = () => {
+        if (chargeData.item && chargeData.amount) {
+            setOtherCharges((prev) => [...prev, { ...chargeData }]);
+        }
+        setchargeData({ item: '', amount: '', notes: '' }); // reset in all cases
+        setShowCharge(false);
+    };
+
+    const deleteCharge = (index) => {
+        setOtherCharges((prev) => prev.filter((_, i) => i !== index));
+    };
+
+    const [chargeData, setchargeData] = useState({
+        item: '',
+        amount: '',
+        notes: '',
+    });
+    const updateChargeData = (newItems) => {
+        setchargeData((prev) => {
+            const updated = { ...prev, ...newItems };
+            console.log(updated);
+            return updated;
+        });
+    };
+
+    // ====================== Payment row change ========================
+    const [payments, setPayments] = useState([]);
+    const [paymentData, setpaymentData] = useState({
+        datePaid: new Date().toISOString().slice(0, 10),
+        amountPaid: '',
+        details: '',
+    });
+    const [showPayment, setShowPayment] = useState(false);
+    const [submitStatus, setSubmitStatus] = useState('');
+
+    const updatepaymentData = (newItems) => {
+        setpaymentData((prev) => ({ ...prev, ...newItems }));
+    };
+
+    const savePayment = () => {
+        if (paymentData.datePaid && paymentData.amountPaid) {
+            setPayments((prev) => [...prev, { ...paymentData }]);
+        }
+        setpaymentData({
+            datePaid: new Date().toISOString().slice(0, 10),
+            amountPaid: '',
+            details: '',
+        });
+        setShowPayment(false);
+    };
+
+    const deletePayment = (index) => {
+        setPayments((prev) => prev.filter((_, i) => i !== index));
+    };
+
+    {
+        /* ================= SUBMIT ================= */
+    }
+const resetForm = () => {
+    setClientData(initialClientData);
+    setDswd(initialDswd);
+    setOtherCharges([]);
+    setchargeData({ item: '', amount: '', notes: '' });
+    setPayments([]);
+    setpaymentData({
+      datePaid: new Date().toISOString().slice(0, 10),
+      amountPaid: '',
+      details: '',
+    });
+    setShowCharge(false);
+    setShowPayment(false);
   };
+ // ===================== SUBMIT =======================
+  const handleSubmit = async (e) => {
+    if (e && e.preventDefault) e.preventDefault();
 
-  // ==================== Other Charges row change ====================
-  const handleChargeChange = (index, field, value) => {
-    const newCharges = [...otherCharges];
-    newCharges[index][field] = value;
-    setOtherCharges(newCharges);
-  };
-
-  const addChargeRow = () => {
-    setOtherCharges([...otherCharges, { item: 'Lapida', details: '', amount: '' }]);
-  };
-
-  const [showCharge, setShowCharge] = useState(false);
-
-
-  // ====================== Transaction row change ========================
-  const handleTransactionChange = (index, field, value) => {
-    const newTrans = [...transactions];
-    newTrans[index][field] = value;
-    setTransactions(newTrans);
-  };
-
-  const addTransactionRow = () => {
-    setTransactions([...transactions, { datePaid: '', amountPaid: '', details: '' }]);
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log('Form data:', {
+    const payload = {
       client: clientData,
       otherCharges,
       dswd,
-      transactions,
-    });
-    // Here you would normally send to backend / save to state / etc.
-    alert('Form submitted (check console)');
+      payments,
+    };
+
+    const client = {
+    first: clientData.deceasedFirst,
+    middle: clientData.deceasedMiddle,
+    last: clientData.deceasedLast,
+    address: clientData.address,
+};
+
+    setSubmitStatus('Saving client data...');
+    postData(client);
+    setTimeout(() => setSubmitStatus(''), 3000);
   };
 
   return (
-    <div className='form-container w-3/5 items-center justify-center'>  
-      <form className='w-full flex flex-col items-start text-left;' onSubmit={handleSubmit}>
-
-      {/* ================= CLIENT SECTION ================= */}
-      <section className="w-full text-gray-800">
-        <h2 className="text-gray-800 mb-4 text-left">New Client Information</h2>
-        <div className="w-full px-4 py-3 rounded">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          
-          {/* Date Serviced */}
-            <div className="flex flex-col gap-1 text-left">
-              <label>Date Serviced</label>
-              <input
-                type="date"
-                name="dateServiced"
-                value={clientData.dateServiced}
-                onChange={handleClientChange}
-                required
-                className="rounded px-2 bg-gray-700 text-white"
-              />
-            </div>
-
-            {/* Deceased - split into 3 inputs */}
-            <div className="flex flex-col gap-1 col-span-full text-left">
-              <label>Deceased</label>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-                <input
-                  type="text"
-                  name="deceasedFirst"
-                  value={clientData.deceasedFirst}
-                  onChange={handleClientChange}
-                  placeholder="First Name"
-                  className="w-full rounded px-2 py-1 bg-gray-700 text-white"
-                  required
-                />
-                <input
-                  type="text"
-                  name="deceasedMiddle"
-                  value={clientData.deceasedMiddle}
-                  onChange={handleClientChange}
-                  placeholder="Middle Name"
-                  className="w-full rounded px-2 py-1 bg-gray-700 text-white"
-                />
-                <input
-                  type="text"
-                  name="deceasedLast"
-                  value={clientData.deceasedLast}
-                  onChange={handleClientChange}
-                  placeholder="Last Name"
-                  className="w-full rounded px-2 py-1 bg-gray-700 text-white"
-                  required
-                />
-              </div>
-            </div>
-
-            {/* Address */}
-            <div className="flex flex-col gap-1 col-span-full text-left">
-              <label>Address</label>
-              <input
-                type="text"
-                name="address"
-                value={clientData.address}
-                onChange={handleClientChange}
-                placeholder="Purok, Barangay, Municipality"
-                className="w-full rounded px-2 py-1 bg-gray-700 text-white"
-              />
-            </div>
-
-            {/* Plan */}
-            <div className="flex flex-col gap-1 text-left">
-              <label>Plan</label>
-              <select
-                name="plan"
-                value={clientData.plan}
-                onChange={handleClientChange}
-                className="w-full rounded px-2 py-1 bg-gray-700 text-white"
-              >
-                <option value='null'>None</option>
-                <option value="Goodlife">Goodlife</option>
-                <option value="Betterlife">Betterlife</option>
-                <option value="Dreamlife">Dreamlife</option>
-                <option value="Ophir">Ophir</option>
-                <option value="San Roque Dayong">San Roque Dayong</option>
-              </select>
-            </div>
-
-            {/* Coffin */}
-            <div className="flex flex-col gap-1 text-left">
-              <label>Coffin</label>
-              <select
-                name="coffin"
-                value={clientData.coffin}
-                onChange={handleClientChange}
-                className="w-full rounded px-2 py-1 bg-gray-700 text-white"
-              >
-                <option value="Ordinary">Ordinary</option>
-                <option value="Ordinary">Ordinary 3ft</option>
-                <option value="Quadrado">Quadrado</option>
-                <option value="Urgoy">Urgoy</option>
-                <option value="Urgoy">Urgoy 3ft</option>
-                <option value="Urgoy">Urgoy 5ft</option>
-                <option value="Ogoy Stoko">Ogoy Stoko</option>
-                <option value="Ogoy Plain">Ogoy Plain</option>
-                <option value="Ogoy Plain">Ogoy Plain 3ft</option>
-                <option value="Ogoy Plain">Ogoy Plain 5ft</option>
-                <option value="Metal">Metal</option>
-              </select>
-            </div>
-
-            {/* Coffin Amount */}
-            <div className="flex flex-col gap-1 text-left">
-              <label>Coffin Amount</label>
-              <div className="w-full rounded px-2 py-1 bg-gray-700 text-white">
-                ₱ {Number(clientData.coffinAmount).toLocaleString()}
-              </div>
-            </div>
-
-            {/* Notes */}
-            <div className="flex flex-col gap-1 col-span-full text-left">
-              <label>Notes</label>
-              <textarea
-                name="notes"
-                value={clientData.notes}
-                onChange={handleClientChange}
-                rows={3}
-                placeholder="Additional instructions, requests, etc."
-                className="w-full rounded px-2 py-1 bg-gray-700 text-white"
-              />
-            </div>
-
-          </div>
-        </div>
-      </section>
-{/* ================= OTHER CHARGES ================= */} 
-<section className="section ">
-    <h2 className="text-gray-800 mb-2">Other Charges</h2>
-      <div className='flex flex-col-reverse items-start'>
-        <button
-          type="button"
-          className="ml-5 mt-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded transition-colors duration-300"
-          onClick={()=>setShowCharge(!showCharge)}
-        >
-            {showCharge ? <Save size={16} /> : <Plus size={16} />}
-        </button>
-            {showCharge && <Charges />}
-      </div>
-</section>
-
-        {/* ================= DSWD SECTION ================= */}
-      <section className="section">
-        <h2 className="text-gray-800 mb-2">DSWD / Assistance</h2>
-        <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="flex flex-col items-start gap-1">
-            <label>GL Date</label>
-            <input
-              type="date"
-              name="glDate"
-              value={dswd.glDate}
-              onChange={handleDswdChange}
-              className="w-full rounded px-2 py-1 bg-gray-700 text-white"
-            />
-          </div>
-
-          <div className="flex flex-col items-start gap-1">
-            <label>CI Number</label>
-            <input
-              type="text"
-              name="ciNumber"
-              value={dswd.ciNumber}
-              onChange={handleDswdChange}
-              className="w-full rounded px-2 py-1 bg-gray-700 text-white"
-            />
-          </div>
-
-          <div className="flex flex-col items-start gap-1">
-            <label>Processor</label>
-            <input
-              type="text"
-              name="processor"
-              value={dswd.processor}
-              onChange={handleDswdChange}
-              className="w-full rounded px-2 py-1 bg-gray-700 text-white"
-            />
-          </div>
-
-          <div className="flex flex-col items-start gap-1">
-            <label>Amount</label>
-            <input
-              type="number"
-              name="amount"
-              value={dswd.amount}
-              onChange={handleDswdChange}
-              min="0"
-              step="0.01"
-              className="w-full rounded px-2 py-1 bg-gray-700 text-white"
-            />
-          </div>
-
-          <div className="flex flex-col items-start gap-1">
-            <label>Status</label>
-            <select
-              name="status"
-              value={dswd.status}
-              onChange={handleDswdChange}
-              className="w-full rounded px-2 py-1 bg-gray-700 text-white"
+        <div className="form-container w-3/5 items-center justify-center">
+            <form
+                className="w-full flex flex-col items-start text-left;"
+                onSubmit={handleSubmit}
             >
-              <option value="Pending">Pending</option>
-              <option value="Approved">Approved</option>
-              <option value="Released">Released</option>
-              <option value="Denied">Denied</option>
-            </select>
-          </div>
+                <ClientInfo
+                    clientData={clientData}
+                    handleClientChange={handleClientChange}
+                    coffinInfo={Coffin_info}
+                />
+                <div />
 
-          <div className="flex flex-col items-start gap-1 col-span-full">
-            <label>Notes</label>
-            <textarea
-              name="notes"
-              value={dswd.notes}
-              onChange={handleDswdChange}
-              rows={2}
-              className="w-full rounded px-2 py-1 bg-gray-700 text-white"
-            />
-          </div>
+                {submitStatus && (
+                    <div className="mb-4 w-full rounded border border-green-300 bg-green-50 px-3 py-2 text-green-700">
+                        {submitStatus}
+                    </div>
+                )}
+
+                {/* ================= OTHER CHARGES ================= */}
+                <section className="section flex flex-col-reverse items-start">
+                    <h2 className="text-gray-800 mb-2">Other Charges</h2>
+                    <ChargeTable
+                        otherCharges={otherCharges}
+                        onDeleteCharge={deleteCharge}
+                    />
+                    <div className="flex flex-col-reverse items-start">
+                        <button
+                            type="button"
+                            className="ml-5 mt-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded transition-colors duration-300"
+                            onClick={() =>
+                                showCharge ? addCharge() : setShowCharge(true)
+                            }
+                        >
+                            {showCharge ? (
+                                <Save size={16} />
+                            ) : (
+                                <Plus size={16} />
+                            )}
+                        </button>
+                        {showCharge && (
+                            <Charges
+                                chargeData={chargeData}
+                                updateChargeData={updateChargeData}
+                            />
+                        )}
+                    </div>
+                </section>
+
+                {/* ================= DSWD SECTION ================= */}
+                <section className="section">
+                    <h2 className="text-gray-800 mb-2">DSWD Assistance</h2>
+                    <DSWDInfo dswd={dswd} handleDswdChange={handleDswdChange} />
+                </section>
+
+                {/* ================= PAYMENTS ================= */}
+                <section className="section">
+                    <h2 className="text-gray-800 mb-2">Payments</h2>
+
+                    <PaymentsTable
+                        payments={payments}
+                        onDeletePayment={deletePayment}
+                    />
+
+                    <div className="flex flex-col-reverse items-start">
+                        <button
+                            type="button"
+                            className="mt-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded transition-colors duration-300"
+                            onClick={() =>
+                                showPayment
+                                    ? savePayment()
+                                    : setShowPayment(true)
+                            }
+                        >
+                            {showPayment ? (
+                                <Save size={16} />
+                            ) : (
+                                <Plus size={16} />
+                            )}
+                        </button>
+                        {showPayment && (
+                            <Payments
+                                paymentData={paymentData}
+                                updatepaymentData={updatepaymentData}
+                            />
+                        )}
+                    </div>
+                </section>
+
+                {/* ================= FORM ACTIONS ================= */}
+                <div className="form-actions mt-4">
+                    <button
+                        type="submit"
+                        className="bg-green-500 hover:bg-green-600 disabled:bg-gray-400 disabled:cursor-not-allowed text-white px-4 py-2 rounded transition-colors duration-300"
+                        disabled={!clientData.dateServiced || !clientData.deceasedFirst || !clientData.deceasedLast}
+                    >
+                        Save
+                    </button>
+                </div>
+            </form>
         </div>
-      </section>
-
-        {/* ================= TRANSACTIONS / PAYMENTS ================= */}
- <section className="section">
-  <h2 className="text-gray-800 mb-2">Payments / Transactions</h2>
-  <table className="w-full border-collapse">
-    <thead>
-      <tr className="text-gray-800">
-        <th className="text-left px-2 py-1">Date Paid</th>
-        <th className="text-left px-2 py-1">Amount Paid</th>
-        <th className="text-left px-2 py-1">Details</th>
-      </tr>
-    </thead>
-    <tbody>
-      {transactions.map((trans, index) => (
-        <tr key={index} className="border-b border-gray-300">
-          <td className="px-2 py-1">
-            <input
-              type="date"
-              value={trans.datePaid}
-              onChange={(e) =>
-                handleTransactionChange(index, 'datePaid', e.target.value)
-              }
-              className="w-full rounded px-2 py-1 bg-gray-700 text-white"
-            />
-          </td>
-          <td className="px-2 py-1">
-            <input
-              type="number"
-              value={trans.amountPaid}
-              onChange={(e) =>
-                handleTransactionChange(index, 'amountPaid', e.target.value)
-              }
-              min="0"
-              step="0.01"
-              placeholder="0.00"
-              className="w-full rounded px-2 py-1 bg-gray-700 text-white"
-            />
-          </td>
-          <td className="px-2 py-1">
-            <input
-              type="text"
-              value={trans.details}
-              onChange={(e) =>
-                handleTransactionChange(index, 'details', e.target.value)
-              }
-              placeholder="OR#, Check#, Cash, etc."
-              className="w-full rounded px-2 py-1 bg-gray-700 text-white"
-            />
-          </td>
-        </tr>
-      ))}
-    </tbody>
-  </table>
-  <button
-    type="button"
-    className="mt-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded transition-colors duration-300"
-    onClick={addTransactionRow}
-  >
-    <Plus size={16} />
-  </button>
-</section>
-
-{/* ================= FORM ACTIONS ================= */}
-    <div className="form-actions mt-4">
-      <button
-        type="submit"
-        className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded transition-colors duration-300"
-      >
-        Save
-      </button>
-    </div>
-      </form>
-    </div>
-  );
+    );
 }
 
 export default ClientForm;
