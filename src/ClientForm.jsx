@@ -186,9 +186,20 @@ const resetForm = () => {
 // };
 
     setSubmitStatus('Saving client data...');
-    console.log(payload);
-    addClient(clientData);
-    setTimeout(() => setSubmitStatus(''), 3000);
+    try {
+      console.log(payload);
+      await addClient(clientData);
+      setSubmitStatus('Client data saved.');
+      resetForm();
+      if (typeof onFormSubmitted === 'function') {
+        onFormSubmitted();
+      }
+    } catch (error) {
+      console.error('Save failed:', error);
+      setSubmitStatus('Failed to save client data.');
+    } finally {
+      setTimeout(() => setSubmitStatus(''), 3000);
+    }
   };
 
   return (

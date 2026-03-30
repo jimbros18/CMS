@@ -8,35 +8,45 @@ function ClientsTable() {
     const [NewForm, setNewForm] = useState(false); // state to control rendering
     const [allClients, setAllClients] = useState([]);
 
+    const fetchClients = async () => {
+        const clients = await getClients();
+        setAllClients(clients);
+    };
+
     useEffect(() => {
-        const fetchClients = async () => {
-            const clients = await getClients();
-            setAllClients(clients);
-        };
         fetchClients();
     }, []);
-    // console.log(allClients);
-    const columns = [
-    "id",
-    "dateServiced",
-    "deceasedFirst",
-    "deceasedLast",
-    "deceasedMiddle",
-    "cellNumber",
-    "facebook",
-    "address",
-    "plan",
-    "coffin",
-    "coffinAmount",
-    "notes"
-]
+
+    const columns = {
+  'ID': 0,
+  'Date': 1,
+  "First": 2,
+  "Last": 3,
+  "Middle": 4,
+  "Cell Number": 5,
+  "Facebook": 6,
+  "Address": 7,
+  "Plan": 8,
+  "Coffin": 9,
+  "Amount": 10,
+  "Notes": 11
+};
 
     return (
-        <div className="client-container flex flex-col items-start py-4 px-4 bg-gray-50 mt-4 rounded">
+        <div className="client-container w-[84%] flex flex-col items-start ml-[300px] py-4 px-4 bg-gray-50 mt-1 rounded">
             <div className="btn_container">
                 <button
                     className="add_client text-white bg-blue-500 hover:bg-blue-700 py-2 px-6 rounded"
-                    onClick={() => setNewForm((prev) => !prev)}
+                    onClick={() => {
+                        setNewForm((prev) => {
+                            const nextForm = !prev;
+                            if (prev) {
+                                // was open and now closing (X clicked)
+                                fetchClients();
+                            }
+                            return nextForm;
+                        });
+                    }}
                 >
                     {NewForm ? (
                         <X className="hover:bg-red-700" size={16} />
@@ -50,26 +60,35 @@ function ClientsTable() {
                     <ClientForm onFormSubmitted={() => setNewForm(false)} />
                 )}
                 {!NewForm && (
-                    <table className="clients-table">
+                    <table
+                        className="clients-table"
+                        tabIndex={0}
+                        onFocus={fetchClients}
+                    >
                         <thead>
                             <tr>
-                                {columns.map((key, index) => (
-                                    <th key={index}>{key.charAt(0).toUpperCase() + key.slice(1)}</th>
+                                {Object.keys(columns).map((header, index) => (
+                                <th key={index}>{header}</th>
                                 ))}
                             </tr>
                         </thead>
                         <tbody>
-                            {allClients.map((client, rowIndex) => (
+                            {allClients.map((row, rowIndex) => (
                                 <tr key={rowIndex}>
-                                    {columns.map((key, colIndex) => (
+                                {Object.keys(columns).map((key, colIndex) => {
+                                    const value = row[columns[key]]; // use index from columns
+                                    return (
                                     <td key={colIndex}>
-                                        {key === 'coffinAmount'
-                                        ? (client[key] != null ? client[key].toLocaleString() : 0)
-                                        : client[key] || ""}
+                                        {key === "Amount"
+                                        ? value != null
+                                            ? value.toLocaleString()
+                                            : 0
+                                        : value || ""}
                                     </td>
-                                    ))}
+                                    );
+                                })}
                                 </tr>
-                                ))}
+                            ))}
                         </tbody>
                     </table>
                 )}

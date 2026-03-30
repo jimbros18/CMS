@@ -1,6 +1,6 @@
 export async function addClient(client) {
   try {
-    const response = await fetch("http://192.168.0.116:9000/addclient", {
+    const response = await fetch("http://10.0.2.88:9000/+client", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -17,7 +17,7 @@ export async function addClient(client) {
 
 export async function getClients() {
   try {
-    const response = await fetch("http://192.168.0.116:9000/clients", {
+    const response = await fetch("http://10.0.2.88:9000/clients", {
       method: "GET",
       headers: {
         "Content-Type": "application/json"
@@ -25,7 +25,7 @@ export async function getClients() {
     });
 
     const clients = await response.json();
-    console.log(clients);
+    console.log(`SERVER: ${JSON.stringify(clients)}`);
     return clients;
   } catch (error) {
     console.error("Error:", error);

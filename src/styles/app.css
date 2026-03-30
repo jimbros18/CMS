@@ -1,13 +1,14 @@
-.main-content {
-    width: 170vh;
-    position: absolute;
+/* .main-content {
+    width: 100%;
+    min-width: 100%;
+    position: relative;
     display: flex;
     flex-direction: column;
-    align-items: left;
-    justify-content: left;
-    left: 16%;
-    top: 5px;
-}
+    align-items: flex-start;
+    justify-content: flex-start;
+    margin: 0;
+    padding: 0;
+} */
 
 .counter {
     font-size: 16px;

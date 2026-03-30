@@ -15,7 +15,7 @@ function App() {
     return (
         <>
             <Sidebar activeKey={activeKey} onItemClick={handleItemClick} />
-            <main className="main-content">
+            <main className="main content flex-1 w-full min-h-screen p-4 bg-gray-800">
                 <Content activeKey={activeKey} />
             </main>
         </>
