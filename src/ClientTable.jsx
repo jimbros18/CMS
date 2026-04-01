@@ -7,6 +7,7 @@ import { getClients } from './API/server_api';
 function ClientsTable() {
     const [NewForm, setNewForm] = useState(false); // state to control rendering
     const [allClients, setAllClients] = useState([]);
+    const [activeRow, setActiveRow] = useState(null);
 
     const fetchClients = async () => {
         const clients = await getClients();
@@ -17,20 +18,24 @@ function ClientsTable() {
         fetchClients();
     }, []);
 
+    const handleRowClick = (index ) => {
+        setActiveRow(index === activeRow ? null : index); // toggle active row
+        console.log(index);
+    }
+
+
     const columns = {
   'ID': 0,
   'Date': 1,
   "First": 2,
   "Last": 3,
   "Middle": 4,
-  "Cell Number": 5,
-  "Facebook": 6,
-  "Address": 7,
-  "Plan": 8,
-  "Coffin": 9,
-  "Amount": 10,
-  "Notes": 11
+  "Address": 5,
+  "Plan": 6,
+  "Coffin": 7,
+  "actions": 8
 };
+
 
     return (
         <div className="client-container w-[84%] flex flex-col items-start ml-[300px] py-4 px-4 bg-gray-50 mt-1 rounded">
@@ -55,30 +60,60 @@ function ClientsTable() {
                     )}
                 </button>
             </div>
-            <div className="table-container flex items-center justify-center">
+            <div className="table-container flex items-center justify-center w-full">
                 {NewForm && (
                     <ClientForm onFormSubmitted={() => setNewForm(false)} />
                 )}
                 {!NewForm && (
                     <table
-                        className="clients-table"
+                        className="clients-table gap-4 w-full gap-y-2 text-left "
                         tabIndex={0}
-                        onFocus={fetchClients}
                     >
-                        <thead>
+                        <thead className='text-left align-middle ml-50'>
                             <tr>
-                                {Object.keys(columns).map((header, index) => (
-                                <th key={index}>{header}</th>
-                                ))}
+                                {Object.keys(columns).map((header, index) => {
+                                    if (header === "actions") {
+                                    return (
+                                        <th 
+                                        key={index} 
+                                        className="px-4 py-2 font-semibold text-gray-700 text-center"
+                                        >
+                                        Actions
+                                        </th>
+                                    );
+                                    } 
+                                    else {
+                                    return (
+                                        <th 
+                                        key={index} 
+                                        className="px-4 py-2 text-left font-semibold text-gray-700"
+                                        >
+                                        {header}
+                                        </th>
+                                    );
+                                    }
+                                })}
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody className="odd:bg-white even:bg-gray-200" hover:bg-sky-800 transition-colors duration-150>
                             {allClients.map((row, rowIndex) => (
-                                <tr key={rowIndex}>
+                                <tr key={rowIndex} onClick={() => handleRowClick(row)}>
                                 {Object.keys(columns).map((key, colIndex) => {
-                                    const value = row[columns[key]]; // use index from columns
+                                    const value = row[columns[key]];
+                                    if (key === "actions") {
+                                        return (
+                                            <td key={colIndex} className="flex justify-center items-center gap-5 py-1 px-[10px]">
+                                                <button className="bg-green-500 hover:bg-green-700 text-white py-1 px-2 rounded">
+                                                    <Pencil size={16} />
+                                                </button>
+                                                <button className="bg-red-500 hover:bg-red-700 text-white py-1 px-2 rounded">
+                                                    <Trash size={16} />
+                                                </button>
+                                            </td>
+                                        );
+                                    }
                                     return (
-                                    <td key={colIndex}>
+                                    <td key={colIndex} className="px-[10px] py-1 text-left">
                                         {key === "Amount"
                                         ? value != null
                                             ? value.toLocaleString()

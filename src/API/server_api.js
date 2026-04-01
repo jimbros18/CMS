@@ -1,6 +1,8 @@
+const ip = "192.168.0.116"
+
 export async function addClient(client) {
   try {
-    const response = await fetch("http://10.0.2.88:9000/+client", {
+    const response = await fetch(`http://${ip}:9000/+client`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -17,7 +19,7 @@ export async function addClient(client) {
 
 export async function getClients() {
   try {
-    const response = await fetch("http://10.0.2.88:9000/clients", {
+    const response = await fetch(`http://${ip}:9000/clients`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json"
