@@ -19,7 +19,7 @@ export async function addClient(client) {
 
 export async function getClients() {
   try {
-    const response = await fetch(`http://${ip}:9000/clients`, {
+    const response = await fetch(`http://${ip}:9000/*clients`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json"
@@ -34,3 +34,19 @@ export async function getClients() {
     return [];
   }
 }
+
+export async function deleteClient(clientId) {
+  try {
+    const response = await fetch(`http://${ip}:9000/-client/${clientId}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json"
+      },
+    });
+
+    const res = await response.json();
+    console.log(res);
+  } catch (error) {
+    console.error("Error:", error);
+  }
+    }; 
