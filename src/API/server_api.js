@@ -1,4 +1,4 @@
-const ip = "192.168.0.116"
+const ip = "10.0.2.88"
 
 export async function addClient(client) {
   try {

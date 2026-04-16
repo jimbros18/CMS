@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import ClientsTable from './ClientTable';
+// import {fetchClients} from './ClientTable';
 import { Save, Trash, Pencil, Plus, XCircle } from 'lucide-react';
 import {addClient, getClients} from './API/server_api';
 import {
@@ -37,8 +37,8 @@ function ClientForm({ onFormSubmitted }) {
         deceasedMiddle: '',
         deceasedLast: '',
         address: '',
-        cell_number: '',
-        Facebook: '',
+        cellNumber: '',
+        facebook: '',
         plan: '',
         coffin: '',
         coffinAmount: 0,
@@ -79,7 +79,7 @@ const initialDswd = {
     glDate: new Date().toISOString().slice(0, 10),
     ciNumber: '',
     processor: '',
-    amount: '',
+    amount: null,
     status: 'Pending',
     notes: '',
   };
@@ -96,10 +96,14 @@ const initialDswd = {
     const [otherCharges, setOtherCharges] = useState([]);
 
     const addCharge = () => {
-        if (chargeData.item && chargeData.amount) {
-            setOtherCharges((prev) => [...prev, { ...chargeData }]);
+        const hasValidAmount = chargeData.amount !== null && chargeData.amount !== '';
+        if (chargeData.item?.trim() && hasValidAmount) {
+            setOtherCharges((prev) => [
+                ...prev,
+                { ...chargeData, amount: Number(chargeData.amount) },
+            ]);
         }
-        setchargeData({ item: '', amount: '', notes: '' }); // reset in all cases
+        setchargeData({ item: '', amount: null, notes: '' }); // reset in all cases
         setShowCharge(false);
     };
 
@@ -109,7 +113,7 @@ const initialDswd = {
 
     const [chargeData, setchargeData] = useState({
         item: '',
-        amount: '',
+        amount: null,
         notes: '',
     });
     const updateChargeData = (newItems) => {
@@ -124,7 +128,7 @@ const initialDswd = {
     const [payments, setPayments] = useState([]);
     const [paymentData, setpaymentData] = useState({
         datePaid: new Date().toISOString().slice(0, 10),
-        amountPaid: '',
+        amountPaid: null,
         details: '',
     });
     const [showPayment, setShowPayment] = useState(false);
@@ -140,7 +144,7 @@ const initialDswd = {
         }
         setpaymentData({
             datePaid: new Date().toISOString().slice(0, 10),
-            amountPaid: '',
+            amountPaid: null,
             details: '',
         });
         setShowPayment(false);
@@ -157,11 +161,11 @@ const resetForm = () => {
     setClientData(initialClientData);
     setDswd(initialDswd);
     setOtherCharges([]);
-    setchargeData({ item: '', amount: '', notes: '' });
+    setchargeData({ item: '', amount: null, notes: '' });
     setPayments([]);
     setpaymentData({
       datePaid: new Date().toISOString().slice(0, 10),
-      amountPaid: '',
+      amountPaid: null,
       details: '',
     });
     setShowCharge(false);
@@ -178,17 +182,10 @@ const resetForm = () => {
       payments,
     };
 
-//     const client = {
-//     first: clientData.deceasedFirst,
-//     middle: clientData.deceasedMiddle,
-//     last: clientData.deceasedLast,
-//     address: clientData.address,
-// };
-
     setSubmitStatus('Saving client data...');
     try {
       console.log(payload);
-      await addClient(clientData);
+      await addClient(payload);
       setSubmitStatus('Client data saved.');
       resetForm();
       if (typeof onFormSubmitted === 'function') {

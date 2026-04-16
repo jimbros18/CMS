@@ -260,7 +260,6 @@ export function Charges({
                     value={chargeData.item || ''}
                     onChange={(e) =>
                         updateChargeData({
-                            ...chargeData,
                             [e.target.name]: e.target.value,
                         })
                     }
@@ -272,10 +271,9 @@ export function Charges({
                 <input
                     type="number"
                     name="amount"
-                    value={chargeData.amount || ''}
+                    value={chargeData.amount ?? ''}
                     onChange={(e) =>
                         updateChargeData({
-                            ...chargeData,
                             [e.target.name]: e.target.value,
                         })
                     }
@@ -290,7 +288,6 @@ export function Charges({
                     value={chargeData.notes || ''}
                     onChange={(e) =>
                         updateChargeData({
-                            ...chargeData,
                             [e.target.name]: e.target.value,
                         })
                     }
