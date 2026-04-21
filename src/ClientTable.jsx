@@ -2,10 +2,13 @@ import { Save, Trash, Pencil, Plus, X } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import './styles/client_table.css';
 import ClientForm from './ClientForm';
-import { getClients, deleteClient } from './API/server_api';
+import UpdateForm from './updateForm';
+import { getClients, deleteClient, getClient } from './API/server_api';
 
 function ClientsTable() {
     const [NewForm, setNewForm] = useState(false); // state to control rendering
+    const [updateForm, setUpdateForm] = useState(false);
+    const [selectedClient, setSelectedClient] = useState(null);
     const [allClients, setAllClients] = useState([]);
     const [activeRow, setActiveRow] = useState(null);
 
@@ -69,17 +72,30 @@ function ClientsTable() {
             </div>
             <div className="table-container flex items-center justify-center w-full h-full ">
                 {NewForm && (
-                    <ClientForm onFormSubmitted={() => {
-                        setNewForm(false);
-                        fetchClients();
-                    }} />
-                    
+                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                        <div className="bg-white p-4 rounded shadow-lg max-w-4xl w-full max-h-screen overflow-y-auto">
+                            <ClientForm onFormSubmitted={() => {
+                                setNewForm(false);
+                                fetchClients();
+                            }} />
+                        </div>
+                    </div>
                 )}
-                {!NewForm && (
-                    <table
-                        className="clients-table gap-4 w-full gap-y-2 text-left "
-                        tabIndex={0}
-                    >
+                {updateForm && selectedClient && (
+                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                        <div className="bg-white p-4 rounded shadow-lg max-w-4xl w-full max-h-screen overflow-y-auto">
+                            <UpdateForm data={selectedClient} onFormSubmitted={() => {
+                                setUpdateForm(false);
+                                setSelectedClient(null);
+                                fetchClients();
+                            }} />
+                        </div>
+                    </div>
+                )}
+                <table
+                    className="clients-table gap-4 w-full gap-y-2 text-left "
+                    tabIndex={0}
+                >
                         <thead className='text-left align-middle ml-50'>
                             <tr>
                                 {Object.keys(columns).map((header, index) => {
@@ -117,7 +133,13 @@ function ClientsTable() {
                                                         return (
                                                             <td key={colIndex} className="flex justify-center items-center gap-5 py-1 px-[10px]">
                                                                 <button className="bg-green-500 hover:bg-green-700 text-white py-1 px-2 rounded"
-                                                                onClick={() => console.log(row)}>
+                                                                onClick={async () => {
+                                                                    const data = await getClient(row[0]);
+                                                                    if (data) {
+                                                                        setSelectedClient(data);
+                                                                        setUpdateForm(true);    
+                                                                    }
+                                                                }}>
                                                                     <Pencil size={16} />
                                                                 </button>
                                                                 <button className="bg-red-500 hover:bg-red-700 text-white py-1 px-2 rounded"
@@ -142,7 +164,6 @@ function ClientsTable() {
                             ))}
                         </tbody>
                     </table>
-                )}
             </div>
         </div>
     );

@@ -14,7 +14,7 @@ export function ClientInfo({ clientData, handleClientChange }) {
                         <input
                             type="date"
                             name="dateServiced"
-                            value={clientData.dateServiced}
+                            value={clientData.dateServiced || ''}
                             onChange={handleClientChange}
                             required
                             className="rounded px-2 bg-gray-700 text-white"
@@ -28,7 +28,7 @@ export function ClientInfo({ clientData, handleClientChange }) {
                             <input
                                 type="text"
                                 name="deceasedFirst"
-                                value={clientData.deceasedFirst}
+                                value={clientData.deceasedFirst || ''}
                                 onChange={handleClientChange}
                                 placeholder="First Name"
                                 className="w-full rounded px-2 py-1 bg-gray-700 text-white"
@@ -37,7 +37,7 @@ export function ClientInfo({ clientData, handleClientChange }) {
                             <input
                                 type="text"
                                 name="deceasedMiddle"
-                                value={clientData.deceasedMiddle}
+                                value={clientData.deceasedMiddle || ''}
                                 onChange={handleClientChange}
                                 placeholder="Middle Name"
                                 className="w-full rounded px-2 py-1 bg-gray-700 text-white"
@@ -45,7 +45,7 @@ export function ClientInfo({ clientData, handleClientChange }) {
                             <input
                                 type="text"
                                 name="deceasedLast"
-                                value={clientData.deceasedLast}
+                                value={clientData.deceasedLast || '' }
                                 onChange={handleClientChange}
                                 placeholder="Last Name"
                                 className="w-full rounded px-2 py-1 bg-gray-700 text-white"
@@ -60,7 +60,7 @@ export function ClientInfo({ clientData, handleClientChange }) {
                         <input
                             type="text"
                             name="address"
-                            value={clientData.address}
+                            value={clientData.address || ''}
                             onChange={handleClientChange}
                             placeholder="Purok, Barangay, Municipality"
                             className="w-full rounded px-2 py-1 bg-gray-700 text-white"
@@ -73,16 +73,16 @@ export function ClientInfo({ clientData, handleClientChange }) {
                         <div className="flex flex-row gap-2 col-span-full text-left">
                             <input
                                 type="text"
-                                name="cell_number"
-                                value={clientData.cell_number}
+                                name="cellNumber"
+                                value={clientData.cellNumber || ''}
                                 onChange={handleClientChange}
                                 placeholder="Cellphone Number"
                                 className="w-full rounded px-2 py-1 bg-gray-700 text-white"
                             />
                             <input
                                 type="text"
-                                name="Facebook"
-                                value={clientData.Facebook}
+                                name="facebook"
+                                value={clientData.facebook || ''}
                                 onChange={handleClientChange}
                                 placeholder="Facebook"
                                 className="w-full rounded px-2 py-1 bg-gray-700 text-white"
@@ -97,7 +97,7 @@ export function ClientInfo({ clientData, handleClientChange }) {
                                 <label className="text-sm">Plan</label>
                                 <select
                                     name="plan"
-                                    value={clientData.plan}
+                                    value={clientData.plan || 'None'}
                                     onChange={handleClientChange}
                                     className="w-full rounded px-2 py-1 bg-gray-700 text-white"
                                 >
@@ -117,7 +117,7 @@ export function ClientInfo({ clientData, handleClientChange }) {
                                 <label className="text-sm">Coffin</label>
                                 <select
                                     name="coffin"
-                                    value={clientData.coffin}
+                                    value={clientData.coffin || ''}
                                     onChange={handleClientChange}
                                     className="w-full rounded px-2 py-1 bg-gray-700 text-white"
                                 >
@@ -155,7 +155,7 @@ export function ClientInfo({ clientData, handleClientChange }) {
                                 <div className="w-full rounded px-2 py-1 bg-gray-700 text-white">
                                     ₱{' '}
                                     {Number(
-                                        clientData.coffinAmount,
+                                        clientData.coffinAmount || 0,
                                     ).toLocaleString()}
                                 </div>
                             </div>
@@ -167,7 +167,7 @@ export function ClientInfo({ clientData, handleClientChange }) {
                         <label>Notes</label>
                         <textarea
                             name="notes"
-                            value={clientData.notes}
+                            value={clientData.notes || ''}
                             onChange={handleClientChange}
                             rows={3}
                             placeholder="Additional instructions, requests, etc."
@@ -193,7 +193,7 @@ export function ChargeTable({ otherCharges = [], onDeleteCharge }) {
                             Amount
                         </th>
                         <th className="border border-gray-300 px-2 py-1 text-left">
-                            Notes
+                            Details
                         </th>
                         <th className="border border-gray-300 px-2 py-1 text-left">
                             Actions
@@ -217,13 +217,13 @@ export function ChargeTable({ otherCharges = [], onDeleteCharge }) {
                                 className={`${idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}
                             >
                                 <td className="border border-gray-300 px-2 py-1">
-                                    {charge.item || '-'}
+                                    {charge.item_service || '-'}
                                 </td>
                                 <td className="border border-gray-300 px-2 py-1">
                                     {charge.amount || '-'}
                                 </td>
                                 <td className="border border-gray-300 px-2 py-1">
-                                    {charge.notes || '-'}
+                                    {charge.details || '-'}
                                 </td>
                                 <td className="border border-gray-300 px-2 py-1">
                                     <button
@@ -247,7 +247,7 @@ export function ChargeTable({ otherCharges = [], onDeleteCharge }) {
 }
 
 export function Charges({
-    chargeData = { item: '', amount: '', notes: '' },
+    chargeData = {item_service: '', amount: 0, details: '' },
     updateChargeData,
 }) {
     return (
@@ -256,8 +256,8 @@ export function Charges({
                 <label>Items/Service</label>
                 <input
                     type="text"
-                    name="item"
-                    value={chargeData.item || ''}
+                    name="item_service"
+                    value={chargeData.item_service || ''}
                     onChange={(e) =>
                         updateChargeData({
                             [e.target.name]: e.target.value,
@@ -271,10 +271,10 @@ export function Charges({
                 <input
                     type="number"
                     name="amount"
-                    value={chargeData.amount ?? ''}
+                    value={chargeData.amount ?? 0}
                     onChange={(e) =>
                         updateChargeData({
-                            [e.target.name]: e.target.value,
+                            [e.target.name]: parseFloat(e.target.value) || 0,
                         })
                     }
                     className="input"
@@ -284,8 +284,8 @@ export function Charges({
                 <label>Notes</label>
                 <input
                     type="text"
-                    name="notes"
-                    value={chargeData.notes || ''}
+                    name="details"
+                    value={chargeData.details || ''}
                     onChange={(e) =>
                         updateChargeData({
                             [e.target.name]: e.target.value,
@@ -473,7 +473,7 @@ export function DSWDInfo({
                     <input
                         type="number"
                         name="amount"
-                        value={dswd.amount}
+                        value={dswd.amount || ''} 
                         onChange={handleDswdChange}
                         min="0"
                         step="0.01"

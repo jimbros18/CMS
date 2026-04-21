@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 // import {fetchClients} from './ClientTable';
 import { Save, Trash, Pencil, Plus, XCircle } from 'lucide-react';
-import {addClient, getClients} from './API/server_api';
+import {updateClient, getClients} from './API/server_api';
 import {
     Charges,
     ChargeTable,
@@ -29,24 +29,9 @@ const Coffin_info = [
     { Coffin: 'Metal', Amount: 50000 },
 ];
 
-// ================ CLIENT INFO ===================
-function ClientForm({ onFormSubmitted }) {
-    const initialClientData = {
-        dateServiced: new Date().toISOString().slice(0, 10), // today's date by default
-        deceasedFirst: '',
-        deceasedMiddle: '',
-        deceasedLast: '',
-        address: '',
-        cellNumber: '',
-        facebook: '',
-        plan: '',
-        coffin: '',
-        coffinAmount: 0,
-        notes: '',
-    };
-
-    const [clientData, setClientData] = useState(initialClientData);
-
+// ================ UPDATE CLIENT FORM ===================
+function UpdateForm({ data, onFormSubmitted }) {
+    const [client, setClient] = useState(data.client || {});
     const handleClientChange = (e) => {
         const { name, value } = e.target;
         setClientData((prev) => {
@@ -73,28 +58,21 @@ function ClientForm({ onFormSubmitted }) {
             return updated;
         });
     };
-
-    // ==================== DSWD Section ====================
-// const initialDswd = {
-//     glDate: new Date().toISOString().slice(0, 10),
-//     ciNumber: '',
-//     processor: '',
-//     amount: 0,
-//     status: 'Pending',
-//     notes: '',
-//   };
-
-  const [dswd, setDswd] = useState([]);
-
+// ===================== DSWD SECTION CHANGE =======================
+    const [dswd, setDswd] = useState(data.dswd || {});
     const handleDswdChange = (e) => {
         const { name, value } = e.target;
         setDswd((prev) => ({ ...prev, [name]: value }));
     };
 
     // ==================== Other Charges row change ====================
-    const [chargeData, setchargeData] = useState([]);
     const [showCharge, setShowCharge] = useState(false);
-    const [otherCharges, setOtherCharges] = useState([]);
+    const [otherCharges, setOtherCharges] = useState(data.otherCharges || []);
+    const [chargeData, setchargeData] = useState({
+        item_service: '',
+        amount: 0,
+        details: '',
+    });
 
     const addCharge = () => {
         const hasValidAmount = chargeData.amount !== null && chargeData.amount !== '';
@@ -104,8 +82,7 @@ function ClientForm({ onFormSubmitted }) {
                 { ...chargeData, amount: Number(chargeData.amount) },
             ]);
         }
-        setchargeData({ item_service: '', amount: 0, details: '' }); // reset in all cases
-        // setOtherCharges((prev) => [...prev, { ...chargeData}]);  
+        setchargeData({ item_service: '', amount: 0, details: '' });
         setShowCharge(false);
     };
 
@@ -121,7 +98,7 @@ function ClientForm({ onFormSubmitted }) {
     };
 
     // ====================== Payment row change ========================
-    const [payments, setPayments] = useState([]);
+    const [payments, setPayments] = useState(data.payments || []);
     const [tempPaymentData, setTempPaymentData] = useState({
         datePaid: new Date().toISOString().slice(0, 10),
         amountPaid: 0,
@@ -150,59 +127,42 @@ function ClientForm({ onFormSubmitted }) {
         setPayments((prev) => prev.filter((_, i) => i !== index));
     };
 
-    {
-        /* ================= SUBMIT ================= */
-    }
-const resetForm = () => {
-    setClientData(initialClientData);
-    // setDswd(initialDswd);
-    setOtherCharges([{ item_service: '', amount: 0, details: '' }]);
-    setchargeData({ item_service: '', amount: 0, details: '' });
-    setPayments([{ datePaid: '', amountPaid: 0, details: '' }]);
-    setTempPaymentData({
-      datePaid: new Date().toISOString().slice(0, 10),
-      amountPaid: 0,
-      details: '',
-    });
-    setShowCharge(false);
-    setShowPayment(false);
-  };
- // ===================== SUBMIT =======================
-  const handleSubmit = async (e) => {
-    if (e && e.preventDefault) e.preventDefault();
+    // ===================== SUBMIT =======================
+    const handleSubmit = async (e) => {
+        if (e && e.preventDefault) e.preventDefault();
 
-    const payload = {
-      client: clientData,
-      otherCharges,
-      dswd,
-      payments,
+        const payload = {
+            client: (({ id, ...rest }) => rest)(client),
+            otherCharges: otherCharges.map(({ id, ...rest }) => rest),
+            payments: payments.map(({ id, ...rest }) => rest),
+            dswd: dswd
+        };
+
+        setSubmitStatus('Updating client data...');
+        try {
+            console.log(payload);
+            await updateClient(client.id, payload);
+            setSubmitStatus('Client data updated.');
+            if (typeof onFormSubmitted === 'function') {
+                onFormSubmitted();
+            }
+        } catch (error) {
+            console.error('Update failed:', error);
+            setSubmitStatus('Failed to update client data.');
+        } finally {
+            setTimeout(() => setSubmitStatus(''), 3000);
+        }
     };
 
-    setSubmitStatus('Saving client data...');
-    try {
-      console.log(payload);
-      await addClient(payload);
-      setSubmitStatus('Client data saved.');
-      resetForm();
-      if (typeof onFormSubmitted === 'function') {
-        onFormSubmitted();
-      }
-    } catch (error) {
-      console.error('Save failed:', error);
-      setSubmitStatus('Failed to save client data.');
-    } finally {
-      setTimeout(() => setSubmitStatus(''), 3000);
-    }
-  };
-
-  return (
+    return (
         <div className="form-container w-3/5 items-center justify-center">
             <form
                 className="w-full flex flex-col items-start text-left;"
                 onSubmit={handleSubmit}
             >
                 <ClientInfo
-                    clientData={clientData}
+                    const 
+                    clientData={client}
                     handleClientChange={handleClientChange}
                     coffinInfo={Coffin_info}
                 />
@@ -253,12 +213,10 @@ const resetForm = () => {
                 {/* ================= PAYMENTS ================= */}
                 <section className="section">
                     <h2 className="text-gray-800 mb-2">Payments</h2>
-
                     <PaymentsTable
                         payments={payments}
                         onDeletePayment={deletePayment}
                     />
-
                     <div className="flex flex-col-reverse items-start">
                         <button
                             type="button"
@@ -289,9 +247,9 @@ const resetForm = () => {
                     <button
                         type="submit"
                         className="bg-green-500 hover:bg-green-600 disabled:bg-gray-400 disabled:cursor-not-allowed text-white px-4 py-2 rounded transition-colors duration-300"
-                        disabled={!clientData.dateServiced || !clientData.deceasedFirst || !clientData.deceasedLast}
+                        disabled={!client.dateServiced || !client.deceasedFirst || !client.deceasedLast}
                     >
-                        Save
+                        Update
                     </button>
                 </div>
             </form>
@@ -299,4 +257,4 @@ const resetForm = () => {
     );
 }
 
-export default ClientForm;
+export default UpdateForm;
