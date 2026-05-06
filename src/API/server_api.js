@@ -27,7 +27,7 @@ export async function getClients() {
     });
 
     const clients = await response.json();
-    console.log(`SERVER: ${JSON.stringify(clients)}`);
+    // console.log(`SERVER: ${JSON.stringify(clients)}`);
     return clients;
   } catch (error) {
     console.error("Error:", error);

@@ -4,7 +4,7 @@ export function ClientInfo({ clientData, handleClientChange }) {
     return (
         <section className="w-full text-gray-800">
             <h2 className="text-gray-800 mb-4 text-left">
-                New Client Information
+                Client Information
             </h2>
             <div className="w-full px-4 py-3 rounded">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -335,10 +335,10 @@ export function PaymentsTable({ payments = [], onDeletePayment }) {
                                 className={`${idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}
                             >
                                 <td className="border border-gray-300 px-2 py-1">
-                                    {trans.datePaid || '-'}
+                                    {trans.date_paid || '-'}
                                 </td>
                                 <td className="border border-gray-300 px-2 py-1">
-                                    {trans.amountPaid || '-'}
+                                    {trans.amount_paid || '-'}
                                 </td>
                                 <td className="border border-gray-300 px-2 py-1">
                                     {trans.details || '-'}
@@ -365,7 +365,7 @@ export function PaymentsTable({ payments = [], onDeletePayment }) {
 }
 
 export function Payments({
-    paymentData = { datePaid: '', amountPaid: '', details: '' },
+    paymentData = { date_paid: '', amount_paid: '', details: '' },
     updatepaymentData,
 }) {
     return (
@@ -374,8 +374,8 @@ export function Payments({
                 <label>Date Paid</label>
                 <input
                     type="date"
-                    name="datePaid"
-                    value={paymentData.datePaid || ''}
+                    name="date_paid"
+                    value={paymentData.date_paid || ''}
                     onChange={(e) =>
                         updatepaymentData({
                             ...paymentData,
@@ -389,8 +389,8 @@ export function Payments({
                 <label>Amount Paid</label>
                 <input
                     type="number"
-                    name="amountPaid"
-                    value={paymentData.amountPaid || ''}
+                    name="amount_paid"
+                    value={paymentData.amount_paid || ''}
                     onChange={(e) =>
                         updatepaymentData({
                             ...paymentData,
@@ -419,16 +419,8 @@ export function Payments({
     );
 }
 
-export function DSWDInfo({
-    dswd = {
-        glDate: '',
-        ciNumber: '',
-        processor: '',
-        amount: '',
-        status: 'Pending',
-    },
-    handleDswdChange,
-}) {
+export function DSWDInfo({dswd, handleDswdChange,}) {
+    console.log('dswd:', dswd);
     return (
         <div className="flex flex-col items-start gap-4 w-full">
             <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -436,11 +428,11 @@ export function DSWDInfo({
                     <label>GL Date</label>
                     <input
                         type="date"
-                        name="glDate"
-                        value={dswd.glDate}
+                        name="gl_date"
+                        value={dswd?.gl_date ? new Date(dswd.gl_date).toISOString().split("T")[0] : ""}
                         onChange={handleDswdChange}
                         className="w-full rounded px-2 py-1 bg-gray-700 text-white"
-                        // required
+                        required
                     />
                 </div>
 
@@ -448,11 +440,11 @@ export function DSWDInfo({
                     <label>CI Number</label>
                     <input
                         type="text"
-                        name="ciNumber"
-                        value={dswd.ciNumber}
+                        name="ci_number"
+                        value={dswd?.ci_number || ''}
                         onChange={handleDswdChange}
                         className="w-full rounded px-2 py-1 bg-gray-700 text-white"
-                        // required
+                        required
                     />
                 </div>
 
@@ -461,10 +453,10 @@ export function DSWDInfo({
                     <input
                         type="text"
                         name="processor"
-                        value={dswd.processor}
+                        value={dswd?.processor || ''}
                         onChange={handleDswdChange}
                         className="w-full rounded px-2 py-1 bg-gray-700 text-white"
-                        // required
+                        required
                     />
                 </div>
 
@@ -473,12 +465,12 @@ export function DSWDInfo({
                     <input
                         type="number"
                         name="amount"
-                        value={dswd.amount || ''} 
+                        value={dswd?.amount || ''} 
                         onChange={handleDswdChange}
                         min="0"
                         step="0.01"
                         className="w-full rounded px-2 py-1 bg-gray-700 text-white"
-                        // required
+                        required
                     />
                 </div>
 
@@ -486,7 +478,7 @@ export function DSWDInfo({
                     <label>Status</label>
                     <select
                         name="status"
-                        value={dswd.status}
+                        value={dswd?.status || 'Pending'}
                         onChange={handleDswdChange}
                         className="w-full rounded px-2 py-1 bg-gray-700 text-white"
                     >
@@ -501,7 +493,7 @@ export function DSWDInfo({
                     <label>Notes</label>
                     <textarea
                         name="notes"
-                        value={dswd.notes}
+                        value={dswd?.notes || ''}
                         onChange={handleDswdChange}
                         rows={2}
                         className="w-full rounded px-2 py-1 bg-gray-700 text-white"

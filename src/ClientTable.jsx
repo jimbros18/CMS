@@ -70,20 +70,31 @@ function ClientsTable() {
                     )}
                 </button>
             </div>
-            <div className="table-container flex items-center justify-center w-full h-full ">
-                {NewForm && (
-                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                        <div className="bg-white p-4 rounded shadow-lg max-w-4xl w-full max-h-screen overflow-y-auto">
-                            <ClientForm onFormSubmitted={() => {
-                                setNewForm(false);
-                                fetchClients();
-                            }} />
-                        </div>
-                    </div>
-                )}
+                    {NewForm && (
+                        <div className="modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                            <div className="bg-white p-4 rounded shadow-lg max-w-4xl w-full max-h-screen overflow-y-auto relative flex items-start justify-center">
+                                    <button
+                                        className="absolute top-4 right-4 text-gray-500 hover:text-red-700"
+                                        onClick={() => setNewForm(false)}
+                                    >
+                                        <X className="hover:bg-red-700" size={16} />
+                                    </button>
+                                    <ClientForm onFormSubmitted={() => {
+                                        setNewForm(false);
+                                        fetchClients();
+                                    }} />
+                            </div>
+                         </div>
+                        )}             
                 {updateForm && selectedClient && (
-                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                        <div className="bg-white p-4 rounded shadow-lg max-w-4xl w-full max-h-screen overflow-y-auto">
+                    <div className="modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                        <div className="bg-white p-4 rounded shadow-lg max-w-4xl w-full max-h-screen overflow-y-auto relative flex items-start justify-center">
+                             <button
+                                className="absolute top-4 right-4 text-gray-500 hover:text-red-700"
+                                onClick={() => setUpdateForm(false)}
+                            >
+                                <X className="hover:bg-red-700" size={16} />
+                            </button>
                             <UpdateForm data={selectedClient} onFormSubmitted={() => {
                                 setUpdateForm(false);
                                 setSelectedClient(null);
@@ -92,6 +103,7 @@ function ClientsTable() {
                         </div>
                     </div>
                 )}
+        <div className="table-container flex items-center justify-center w-full h-full ">
                 <table
                     className="clients-table gap-4 w-full gap-y-2 text-left "
                     tabIndex={0}
@@ -137,7 +149,8 @@ function ClientsTable() {
                                                                     const data = await getClient(row[0]);
                                                                     if (data) {
                                                                         setSelectedClient(data);
-                                                                        setUpdateForm(true);    
+                                                                        setUpdateForm(true);
+                                                                        // console.log('Selected client data for update:', data);   
                                                                     }
                                                                 }}>
                                                                     <Pencil size={16} />

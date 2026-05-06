@@ -57,34 +57,25 @@ function ClientForm({ onFormSubmitted }) {
                 );
                 updated.coffinAmount = matching ? matching.Amount : 0;
             }
-            if (
-                ['deceasedFirst', 'deceasedMiddle', 'deceasedLast'].includes(
-                    name,
-                )
-            ) {
-                updated.deceased = [
-                    updated.deceasedFirst,
-                    updated.deceasedMiddle,
-                    updated.deceasedLast,
-                ]
-                    .filter(Boolean)
-                    .join(' ');
-            }
+            // if (
+            //     ['deceasedFirst', 'deceasedMiddle', 'deceasedLast'].includes(
+            //         name,
+            //     )
+            // ) {
+            //     updated.deceased = [
+            //         updated.deceasedFirst,
+            //         updated.deceasedMiddle,
+            //         updated.deceasedLast,
+            //     ]
+            //         .filter(Boolean)
+            //         .join(' ');
+            // }
             return updated;
         });
     };
 
     // ==================== DSWD Section ====================
-// const initialDswd = {
-//     glDate: new Date().toISOString().slice(0, 10),
-//     ciNumber: '',
-//     processor: '',
-//     amount: 0,
-//     status: 'Pending',
-//     notes: '',
-//   };
-
-  const [dswd, setDswd] = useState([]);
+    const [dswd, setDswd] = useState({});
 
     const handleDswdChange = (e) => {
         const { name, value } = e.target;
@@ -155,7 +146,7 @@ function ClientForm({ onFormSubmitted }) {
     }
 const resetForm = () => {
     setClientData(initialClientData);
-    // setDswd(initialDswd);
+    setDswd({});
     setOtherCharges([{ item_service: '', amount: 0, details: '' }]);
     setchargeData({ item_service: '', amount: 0, details: '' });
     setPayments([{ datePaid: '', amountPaid: 0, details: '' }]);

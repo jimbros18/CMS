@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react';
-// import {fetchClients} from './ClientTable';
-import { Save, Trash, Pencil, Plus, XCircle } from 'lucide-react';
+import React, { useState } from 'react';
+import { Save, Trash, Pencil, Plus, X, Circle } from 'lucide-react';
 import {updateClient, getClients} from './API/server_api';
 import {
     Charges,
@@ -32,9 +31,15 @@ const Coffin_info = [
 // ================ UPDATE CLIENT FORM ===================
 function UpdateForm({ data, onFormSubmitted }) {
     const [client, setClient] = useState(data.client || {});
+    const [dswd, setDswd] = useState(
+        Array.isArray(data.dswd) ? data.dswd[0] : data.dswd || {}
+    );
+    const [payments, setPayments] = useState(data.payments || []);
+    const [otherCharges, setOtherCharges] = useState(data.otherCharges || []);
+
     const handleClientChange = (e) => {
         const { name, value } = e.target;
-        setClientData((prev) => {
+        setClient((prev) => {
             const updated = { ...prev, [name]: value };
             if (name === 'coffin') {
                 const matching = Coffin_info.find(
@@ -42,24 +47,10 @@ function UpdateForm({ data, onFormSubmitted }) {
                 );
                 updated.coffinAmount = matching ? matching.Amount : 0;
             }
-            if (
-                ['deceasedFirst', 'deceasedMiddle', 'deceasedLast'].includes(
-                    name,
-                )
-            ) {
-                updated.deceased = [
-                    updated.deceasedFirst,
-                    updated.deceasedMiddle,
-                    updated.deceasedLast,
-                ]
-                    .filter(Boolean)
-                    .join(' ');
-            }
             return updated;
         });
     };
 // ===================== DSWD SECTION CHANGE =======================
-    const [dswd, setDswd] = useState(data.dswd || {});
     const handleDswdChange = (e) => {
         const { name, value } = e.target;
         setDswd((prev) => ({ ...prev, [name]: value }));
@@ -67,7 +58,6 @@ function UpdateForm({ data, onFormSubmitted }) {
 
     // ==================== Other Charges row change ====================
     const [showCharge, setShowCharge] = useState(false);
-    const [otherCharges, setOtherCharges] = useState(data.otherCharges || []);
     const [chargeData, setchargeData] = useState({
         item_service: '',
         amount: 0,
@@ -98,10 +88,9 @@ function UpdateForm({ data, onFormSubmitted }) {
     };
 
     // ====================== Payment row change ========================
-    const [payments, setPayments] = useState(data.payments || []);
     const [tempPaymentData, setTempPaymentData] = useState({
-        datePaid: new Date().toISOString().slice(0, 10),
-        amountPaid: 0,
+        date_paid: new Date().toISOString().slice(0, 10),
+        amount_paid: 0,
         details: '',
     });
     const [showPayment, setShowPayment] = useState(false);
@@ -112,12 +101,12 @@ function UpdateForm({ data, onFormSubmitted }) {
     };
 
     const savePayment = () => {
-        if (tempPaymentData.datePaid && tempPaymentData.amountPaid) {
+        if (tempPaymentData.date_paid && tempPaymentData.amount_paid) {
             setPayments((prev) => [...prev, { ...tempPaymentData }]);
         }
         setTempPaymentData({
-            datePaid: new Date().toISOString().slice(0, 10),
-            amountPaid: 0,
+            date_paid: new Date().toISOString().slice(0, 10),
+            amount_paid: 0,
             details: '',
         });
         setShowPayment(false);
@@ -131,16 +120,15 @@ function UpdateForm({ data, onFormSubmitted }) {
     const handleSubmit = async (e) => {
         if (e && e.preventDefault) e.preventDefault();
 
-        const payload = {
-            client: (({ id, ...rest }) => rest)(client),
-            otherCharges: otherCharges.map(({ id, ...rest }) => rest),
-            payments: payments.map(({ id, ...rest }) => rest),
-            dswd: dswd
+            const payload = {
+            client,
+            otherCharges,
+            payments,
+            dswd
         };
 
         setSubmitStatus('Updating client data...');
         try {
-            console.log(payload);
             await updateClient(client.id, payload);
             setSubmitStatus('Client data updated.');
             if (typeof onFormSubmitted === 'function') {
@@ -155,13 +143,12 @@ function UpdateForm({ data, onFormSubmitted }) {
     };
 
     return (
-        <div className="form-container w-3/5 items-center justify-center">
+        <div className="updateform-container flex w-3/5 items-center justify-center">
             <form
                 className="w-full flex flex-col items-start text-left;"
                 onSubmit={handleSubmit}
             >
                 <ClientInfo
-                    const 
                     clientData={client}
                     handleClientChange={handleClientChange}
                     coffinInfo={Coffin_info}
