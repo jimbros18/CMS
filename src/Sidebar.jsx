@@ -1,5 +1,4 @@
 import React from 'react';
-import './styles/sidebar.css';
 
 // Assuming these are your icon components (from lucide-react, heroicons, etc.)
 import { Home, CheckSquare, CreditCard, Settings } from 'lucide-react';
@@ -34,36 +33,42 @@ const menuItems = [
 
 function Sidebar({ activeKey, onItemClick }) {
     return (
-        <aside className="sidebar">
-            <div className="sidebar-header">
-                <h2>CMS</h2>
-            </div>
+        <aside className="fixed left-0 top-0 h-screen w-64 text-slate-200 border-r bg-gray-800">
+            <div className='mx-5 my-5 rounded bg-gray-900'>
+                    <div className="border-b border-slate-800 px-6 py-6">   
+                        <h2 className="text-2xl font-semibold text-sky-300">CMS</h2>
+                    </div>
 
-            <nav className="sidebar-nav">
-                <ul>
-                    {menuItems.map((item) => {
-                        const Icon = item.icon;
-                        const isActive = activeKey === item.key;
+                    <nav className="flex h-full flex-col overflow-y-auto py-4">
+                        <ul className="space-y-1">
+                            {menuItems.map((item) => {
+                                const Icon = item.icon;
+                                const isActive = activeKey === item.key;
 
-                        return (
-                            <li key={item.key}>
-                                <button
-                                    className={`nav-item ${isActive ? 'active' : ''}`}
-                                    onClick={() =>
-                                        onItemClick?.(item.key, item.func)
-                                    }
-                                    type="button"
-                                >
-                                    <Icon size={20} />
-                                    <span>{item.label}</span>
-                                </button>
-                            </li>
-                        );
-                    })}
-                </ul>
-            </nav>
+                                return (
+                                    <li key={item.key}>
+                                        <button
+                                            onClick={() => onItemClick?.(item.key, item.func)}
+                                            className={`relative flex w-full items-center gap-4 px-5 py-4 text-sm transition
+                                            ${
+                                                isActive
+                                                    ? 'bg-sky-600 text-white'
+                                                    : 'text-slate-300 hover:bg-slate-800'
+                                            }`}
+                                        >
+                                            {isActive && (
+                                                <span className="absolute left-0 top-0 h-full w-1 bg-sky-400" />
+                                            )}
+                                            <Icon size={20} />
+                                            <span className="font-medium">{item.label}</span>
+                                        </button>
+                                    </li>
+                                );
+                            })}
+                        </ul>
+                    </nav>
+            </div>  
         </aside>
     );
 }
-
 export default Sidebar;

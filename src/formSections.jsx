@@ -432,7 +432,7 @@ export function DSWDInfo({dswd, handleDswdChange,}) {
                         value={dswd?.gl_date ? new Date(dswd.gl_date).toISOString().split("T")[0] : ""}
                         onChange={handleDswdChange}
                         className="w-full rounded px-2 py-1 bg-gray-700 text-white"
-                        required
+                        // required
                     />
                 </div>
 
@@ -444,7 +444,7 @@ export function DSWDInfo({dswd, handleDswdChange,}) {
                         value={dswd?.ci_number || ''}
                         onChange={handleDswdChange}
                         className="w-full rounded px-2 py-1 bg-gray-700 text-white"
-                        required
+                        // required
                     />
                 </div>
 
@@ -456,7 +456,7 @@ export function DSWDInfo({dswd, handleDswdChange,}) {
                         value={dswd?.processor || ''}
                         onChange={handleDswdChange}
                         className="w-full rounded px-2 py-1 bg-gray-700 text-white"
-                        required
+                        // required
                     />
                 </div>
 
@@ -470,7 +470,7 @@ export function DSWDInfo({dswd, handleDswdChange,}) {
                         min="0"
                         step="0.01"
                         className="w-full rounded px-2 py-1 bg-gray-700 text-white"
-                        required
+                        // required
                     />
                 </div>
 
@@ -501,5 +501,51 @@ export function DSWDInfo({dswd, handleDswdChange,}) {
                 </div>
             </div>
         </div>
+    );
+}
+
+export function PriceBreakdown({client, dswd, payments, otherCharges}) {
+    console.log(payments);
+    return (
+    <div className='payment_details self-start flex flex-col items-start text-left border border-gray-300 rounded p-6 bg-white shadow-md ml-6 w-6/12 h-full'>
+                <h2 className="text-gray-800 mb-2">Price Breakdown</h2>
+                <div className='flex justify-between w-full'>
+                    <p>Coffin:</p>
+                    <p>{client?.coffinAmount ? Number(client.coffinAmount || 0).toLocaleString() : '0'}</p>
+                </div>
+                {otherCharges.map((charge, index) => (
+                    <div className='flex justify-between w-full' key={index}>
+                        <p className="capitalize">{charge.item_service}:</p>
+                        <p> { charge?.amount? Number(charge.amount || 0).toLocaleString() : '0'}</p>
+                    </div>                 
+                ))}
+                <div className='flex justify-between w-full'>
+                    <h3 className='text-gray-800 font-bold'>Total:</h3>
+                    <h3 className='text-gray-800 font-bold'>{Number(client?.coffinAmount + otherCharges?.reduce((sum, charge) => sum + charge?.amount, 0)).toLocaleString()}</h3>
+                </div>
+                <div className='flex justify-between w-full'>
+                    <h3 className='text-gray-800 font-bold'>DSWD:</h3>
+                    <h3 className='text-gray-800 font-bold'>{dswd?.amount ? `${Number(dswd.amount).toLocaleString()}` : 0}</h3>
+                </div>
+                <div className='flex justify-between w-full'>
+                    <h3 className='text-gray-800 font-bold'>Amount Paid:</h3>
+                    <h3 className='text-gray-800 font-bold'> {Number(payments?.reduce((sum, payment) => sum + Number(payment.amount_paid || 0),0)).toLocaleString()}</h3>
+                </div>
+                <div className='flex justify-between w-full'>
+                    <h3 className='text-gray-800 font-bold'>Balance:</h3>
+                    <h3 className='text-gray-800 font-bold'>
+                        {(
+                            Number(client?.coffinAmount || 0) +
+                            (otherCharges?.reduce((sum, charge) =>
+                                sum + Number(charge?.amount || 0), 0
+                            ) || 0) -
+                            Number(dswd?.amount || 0) -
+                            (payments?.reduce((sum, payment) =>
+                                sum + Number(payment?.amount_paid || 0), 0
+                            ) || 0)
+                        ).toLocaleString()}
+                    </h3>
+                </div>
+            </div>
     );
 }

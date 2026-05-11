@@ -9,6 +9,7 @@ import {
     Payments,
     PaymentsTable,
     DSWDInfo,
+    PriceBreakdown,
 } from './formSections';
 
 const Coffin_info = [
@@ -187,9 +188,9 @@ const resetForm = () => {
   };
 
   return (
-        <div className="form-container w-3/5 items-center justify-center">
+       <div className="newform-container flex flex-row px-4 py-6 items-start justify-start">
             <form
-                className="w-full flex flex-col items-start text-left;"
+                className="flex flex-col items-start text-left border border-gray-300 rounded p-6 bg-white shadow-md w-full"
                 onSubmit={handleSubmit}
             >
                 <ClientInfo
@@ -286,6 +287,13 @@ const resetForm = () => {
                     </button>
                 </div>
             </form>
+
+                <PriceBreakdown
+                    client={clientData}
+                    otherCharges={otherCharges}
+                    payments={payments}
+                    dswd={dswd}
+                />
         </div>
     );
 }

@@ -8,6 +8,7 @@ import {
     Payments,
     PaymentsTable,
     DSWDInfo,
+    PriceBreakdown,
 } from './formSections';
 
 const Coffin_info = [
@@ -31,9 +32,7 @@ const Coffin_info = [
 // ================ UPDATE CLIENT FORM ===================
 function UpdateForm({ data, onFormSubmitted }) {
     const [client, setClient] = useState(data.client || {});
-    const [dswd, setDswd] = useState(
-        Array.isArray(data.dswd) ? data.dswd[0] : data.dswd || {}
-    );
+    const [dswd, setDswd] = useState(Array.isArray(data.dswd) ? data.dswd[0] : data.dswd || {});
     const [payments, setPayments] = useState(data.payments || []);
     const [otherCharges, setOtherCharges] = useState(data.otherCharges || []);
 
@@ -131,6 +130,7 @@ function UpdateForm({ data, onFormSubmitted }) {
         try {
             await updateClient(client.id, payload);
             setSubmitStatus('Client data updated.');
+            
             if (typeof onFormSubmitted === 'function') {
                 onFormSubmitted();
             }
@@ -143,9 +143,8 @@ function UpdateForm({ data, onFormSubmitted }) {
     };
 
     return (
-        <div className="updateform-container flex w-3/5 items-center justify-center">
-            <form
-                className="w-full flex flex-col items-start text-left;"
+        <div className="updateform-container flex flex-row px-4 py-6 items-start justify-start">
+            <form className="flex flex-col items-start text-left border border-gray-300 rounded p-6 bg-white shadow-md w-full"
                 onSubmit={handleSubmit}
             >
                 <ClientInfo
@@ -240,7 +239,14 @@ function UpdateForm({ data, onFormSubmitted }) {
                     </button>
                 </div>
             </form>
+            <PriceBreakdown 
+                client={client}
+                dswd={dswd}
+                payments={payments}
+                otherCharges={otherCharges}
+            />
         </div>
+
     );
 }
 
