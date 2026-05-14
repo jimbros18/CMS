@@ -1,33 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Save, Trash, Pencil, Plus, X, Circle } from 'lucide-react';
-import {updateClient, getClients} from './API/server_api';
+import {updateClient, getClients, getCoffins} from './API/server_api';
+import { Inclussions, PriceBreakdown } from './ViewFormSections';
+
 import {
     Charges,
     ChargeTable,
     ClientInfo,
     Payments,
     PaymentsTable,
-    DSWDInfo,
-    PriceBreakdown,
+    DSWDInfo
 } from './formSections';
-
-const Coffin_info = [
-    { Coffin: 'Ogoy Plain Plan', Amount: 17000 },
-    { Coffin: 'Ordinary', Amount: 15000 },
-    { Coffin: 'Ordinary 3ft', Amount: 15000 },
-    { Coffin: 'Ordinary 5ft', Amount: 15000 },
-    { Coffin: 'Quadrado', Amount: 23000 },
-    { Coffin: 'Urgoy', Amount: 30000 },
-    { Coffin: 'Urgoy 3ft', Amount: 30000 },
-    { Coffin: 'Urgoy 5ft', Amount: 30000 },
-    { Coffin: 'Ogoy Plain', Amount: 40000 },
-    { Coffin: 'Ogoy Plain 3ft', Amount: 40000 },
-    { Coffin: 'Ogoy Plain 5ft', Amount: 40000 },
-    { Coffin: 'Ogoy Stoko', Amount: 42000 },
-    { Coffin: 'Ogoy Stoko 3ft', Amount: 42000 },
-    { Coffin: 'Ogoy Stoko 5ft', Amount: 42000 },
-    { Coffin: 'Metal', Amount: 50000 },
-];
 
 // ================ UPDATE CLIENT FORM ===================
 function UpdateForm({ data, onFormSubmitted }) {
@@ -41,10 +24,10 @@ function UpdateForm({ data, onFormSubmitted }) {
         setClient((prev) => {
             const updated = { ...prev, [name]: value };
             if (name === 'coffin') {
-                const matching = Coffin_info.find(
-                    (info) => info.Coffin === updated.coffin,
+                const matching = coffins.find(
+                    (info) => info.coffin_name === updated.coffin,
                 );
-                updated.coffinAmount = matching ? matching.Amount : 0;
+                updated.coffinAmount = matching ? matching.amount : 0;
             }
             return updated;
         });
@@ -142,6 +125,16 @@ function UpdateForm({ data, onFormSubmitted }) {
         }
     };
 
+        const [coffins, setCoffins] = useState([]);
+    
+        useEffect(() => {
+            const load = async () => {
+                const data = await getCoffins();
+                setCoffins(data);
+            };
+            load();
+        }, []);
+
     return (
         <div className="updateform-container flex flex-row px-4 py-6 items-start justify-start">
             <form className="flex flex-col items-start text-left border border-gray-300 rounded p-6 bg-white shadow-md w-full"
@@ -150,7 +143,7 @@ function UpdateForm({ data, onFormSubmitted }) {
                 <ClientInfo
                     clientData={client}
                     handleClientChange={handleClientChange}
-                    coffinInfo={Coffin_info}
+                    coffins={coffins}
                 />
                 <div />
 
@@ -159,6 +152,8 @@ function UpdateForm({ data, onFormSubmitted }) {
                         {submitStatus}
                     </div>
                 )}
+
+                <Inclussions xcoffin = {client["coffin"]}/>
 
                 {/* ================= OTHER CHARGES ================= */}
                 <section className="section flex flex-col-reverse items-start">

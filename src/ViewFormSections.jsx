@@ -1,3 +1,6 @@
+import { useState, useEffect } from 'react';
+import { getCoffins } from './API/server_api';
+
 export function ClientView({ client = {} }) {
     const displayValue = (value) => (value || '—');
 
@@ -110,6 +113,41 @@ export function ClientView({ client = {} }) {
 
                 </div>
             </section>
+    );
+}
+
+export function Inclussions({ xcoffin }) {
+    const [coffins, setCoffins] = useState([]);
+
+    useEffect(() => {
+        const load = async () => {
+            const data = await getCoffins();
+            setCoffins(data);
+        };
+        load();
+    }, []);
+    
+    // console.log(coffins)    
+    const match = coffins.find (
+        (c) => c.coffin_name === xcoffin
+    );
+    // console.log(match)
+    
+    const inclussions = match ? JSON.parse(match.items || []) : [];
+
+
+
+    return (
+        <div className="w-full text-gray-800 py-8">
+            <h2 className="text-gray-800 mb-4 text-left">Inclussions</h2>
+            <div className="w-full px-4 py-3 rounded">
+                <div className="flex flex-col text-sm">
+                    {inclussions.map((inc, i) => (
+                        <li key={i}>{inc}</li>
+                    ))}
+                </div>
+            </div>
+        </div>
     );
 }
 
@@ -287,5 +325,50 @@ export function PaymentsView({ payments = [] }) {
                 </tbody>
             </table>
         </div>
+    );
+}
+
+export function PriceBreakdown({client, dswd, payments, otherCharges}) {
+    return (
+    <div className='payment_details self-start flex flex-col items-start text-left border border-gray-300 rounded p-6 bg-white shadow-md ml-6 w-6/12 h-full'>
+                <h2 className="text-gray-800 mb-2">Price Breakdown</h2>
+                <div className='flex justify-between w-full'>
+                    <p>Coffin:</p>
+                    <p>{client?.coffinAmount ? Number(client.coffinAmount || 0).toLocaleString() : '0'}</p>
+                </div>
+                {otherCharges.map((charge, index) => (
+                    <div className='flex justify-between w-full' key={index}>
+                        <p className="capitalize">{charge.item_service}:</p>
+                        <p> { charge?.amount? Number(charge.amount || 0).toLocaleString() : '0'}</p>
+                    </div>                 
+                ))}
+                <div className='flex justify-between w-full'>
+                    <h3 className='text-gray-800 font-bold'>Total:</h3>
+                    <h3 className='text-gray-800 font-bold'>{Number(client?.coffinAmount + otherCharges?.reduce((sum, charge) => sum + charge?.amount, 0)).toLocaleString()}</h3>
+                </div>
+                <div className='flex justify-between w-full'>
+                    <h3 className='text-gray-800 font-bold'>DSWD:</h3>
+                    <h3 className='text-gray-800 font-bold'>{dswd?.amount ? `${Number(dswd.amount).toLocaleString()}` : 0}</h3>
+                </div>
+                <div className='flex justify-between w-full'>
+                    <h3 className='text-gray-800 font-bold'>Amount Paid:</h3>
+                    <h3 className='text-gray-800 font-bold'> {Number(payments?.reduce((sum, payment) => sum + Number(payment.amount_paid || 0),0)).toLocaleString()}</h3>
+                </div>
+                <div className='flex justify-between w-full'>
+                    <h3 className='text-gray-800 font-bold'>Balance:</h3>
+                    <h3 className='text-gray-800 font-bold'>
+                        {(
+                            Number(client?.coffinAmount || 0) +
+                            (otherCharges?.reduce((sum, charge) =>
+                                sum + Number(charge?.amount || 0), 0
+                            ) || 0) -
+                            Number(dswd?.amount || 0) -
+                            (payments?.reduce((sum, payment) =>
+                                sum + Number(payment?.amount_paid || 0), 0
+                            ) || 0)
+                        ).toLocaleString()}
+                    </h3>
+                </div>
+            </div>
     );
 }

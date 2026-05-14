@@ -1,3 +1,5 @@
+import { useState, useEffect } from 'react';
+
 const ip = "10.0.2.88"
 
 export async function addClient(client) {
@@ -86,3 +88,51 @@ export async function getClient(clientId) {
     return null;
   }
 } 
+
+export async function getCoffins() {
+  try {
+    const response = await fetch(`http://${ip}:9000/coffins`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json"
+      }
+    });
+
+    const coffins = await response.json();
+    return coffins;
+  } catch (error) {
+    console.error("Error:", error);
+    return [];
+  }
+}
+
+// const fetch_coffins = async (params) => {
+//   try {
+//     const response = await fetch(`http://${ip}:9000/coffins`, {
+//       method: "GET",
+//       headers: {
+//         "Content-Type": "application/json"
+//       }
+//     });
+
+//     const coffins = await response.json();
+//     return coffins;
+//   } catch (error) {
+//     console.error("Error:", error);
+//     return [];
+//   }
+// }
+
+// export async function getCoffins() {
+//   const [coffins, setCoffins] = useState([]);
+
+//    useEffect(() => {
+//               const load = async () => {
+//                   const data = await getCoffins();
+//                   setCoffins(data);
+//               };
+//               load();
+//           }, []);
+//     return coffins 
+//     // return await fetch_coffins();
+// }

@@ -1,12 +1,25 @@
 import { Save, Trash, Pencil, Plus, XCircle } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { getCoffins } from './API/server_api';
+
 
 export function ClientInfo({ clientData, handleClientChange }) {
+    const [coffins, setCoffins] = useState([]);
+
+    useEffect(() => {
+        const load = async () => {
+            const data = await getCoffins();
+            setCoffins(data);
+        };
+        load();
+    }, []);
+
     return (
         <section className="w-full text-gray-800">
             <h2 className="text-gray-800 mb-4 text-left">
                 Client Information
             </h2>
-            <div className="w-full px-4 py-3 rounded">
+            <div className="w-full py-2 rounded">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {/* Date Serviced */}
                     <div className="flex flex-col gap-1 text-left">
@@ -121,43 +134,23 @@ export function ClientInfo({ clientData, handleClientChange }) {
                                     onChange={handleClientChange}
                                     className="w-full rounded px-2 py-1 bg-gray-700 text-white"
                                 >
-                                    <option value="Ordinary">Ordinary</option>
-                                    <option value="Ordinary 3ft">
-                                        Ordinary 3ft
-                                    </option>
-                                    <option value="Ordinary 5ft">
-                                        Ordinary 5ft
-                                    </option>
-                                    <option value="Quadrado">Quadrado</option>
-                                    <option value="Urgoy">Urgoy</option>
-                                    <option value="Urgoy 3ft">Urgoy 3ft</option>
-                                    <option value="Urgoy 5ft">Urgoy 5ft</option>
-                                    <option value="Ogoy Stoko">
-                                        Ogoy Stoko
-                                    </option>
-                                    <option value="Ogoy Plain">
-                                        Ogoy Plain
-                                    </option>
-                                    <option value="Ogoy Plain Plan">
-                                        Ogoy Plain Plan
-                                    </option>
-                                    <option value="Ogoy Plain 3ft">
-                                        Ogoy Plain 3ft
-                                    </option>
-                                    <option value="Ogoy Plain 5ft">
-                                        Ogoy Plain 5ft
-                                    </option>
-                                    <option value="Metal">Metal</option>
+                                    {coffins.map((c, i) => (
+                                        <option key={i} value={c.coffin_name}>
+                                            {c.coffin_name}
+                                        </option>
+                                    ))}
+
                                 </select>
                             </div>
                             <div className="flex flex-col gap-1">
                                 <label className="text-sm">Amount</label>
-                                <div className="w-full rounded px-2 py-1 bg-gray-700 text-white">
-                                    ₱{' '}
-                                    {Number(
-                                        clientData.coffinAmount || 0,
-                                    ).toLocaleString()}
-                                </div>
+                                <input
+                                    type="text"
+                                    name="amount"
+                                    value={clientData.coffinAmount ?? ''}
+                                    onChange={handleClientChange}
+                                    className="w-full rounded px-2 py-1 bg-gray-700 text-white"
+                                />
                             </div>
                         </div>
                     </div>
@@ -420,7 +413,6 @@ export function Payments({
 }
 
 export function DSWDInfo({dswd, handleDswdChange,}) {
-    console.log('dswd:', dswd);
     return (
         <div className="flex flex-col items-start gap-4 w-full">
             <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -504,48 +496,4 @@ export function DSWDInfo({dswd, handleDswdChange,}) {
     );
 }
 
-export function PriceBreakdown({client, dswd, payments, otherCharges}) {
-    console.log(payments);
-    return (
-    <div className='payment_details self-start flex flex-col items-start text-left border border-gray-300 rounded p-6 bg-white shadow-md ml-6 w-6/12 h-full'>
-                <h2 className="text-gray-800 mb-2">Price Breakdown</h2>
-                <div className='flex justify-between w-full'>
-                    <p>Coffin:</p>
-                    <p>{client?.coffinAmount ? Number(client.coffinAmount || 0).toLocaleString() : '0'}</p>
-                </div>
-                {otherCharges.map((charge, index) => (
-                    <div className='flex justify-between w-full' key={index}>
-                        <p className="capitalize">{charge.item_service}:</p>
-                        <p> { charge?.amount? Number(charge.amount || 0).toLocaleString() : '0'}</p>
-                    </div>                 
-                ))}
-                <div className='flex justify-between w-full'>
-                    <h3 className='text-gray-800 font-bold'>Total:</h3>
-                    <h3 className='text-gray-800 font-bold'>{Number(client?.coffinAmount + otherCharges?.reduce((sum, charge) => sum + charge?.amount, 0)).toLocaleString()}</h3>
-                </div>
-                <div className='flex justify-between w-full'>
-                    <h3 className='text-gray-800 font-bold'>DSWD:</h3>
-                    <h3 className='text-gray-800 font-bold'>{dswd?.amount ? `${Number(dswd.amount).toLocaleString()}` : 0}</h3>
-                </div>
-                <div className='flex justify-between w-full'>
-                    <h3 className='text-gray-800 font-bold'>Amount Paid:</h3>
-                    <h3 className='text-gray-800 font-bold'> {Number(payments?.reduce((sum, payment) => sum + Number(payment.amount_paid || 0),0)).toLocaleString()}</h3>
-                </div>
-                <div className='flex justify-between w-full'>
-                    <h3 className='text-gray-800 font-bold'>Balance:</h3>
-                    <h3 className='text-gray-800 font-bold'>
-                        {(
-                            Number(client?.coffinAmount || 0) +
-                            (otherCharges?.reduce((sum, charge) =>
-                                sum + Number(charge?.amount || 0), 0
-                            ) || 0) -
-                            Number(dswd?.amount || 0) -
-                            (payments?.reduce((sum, payment) =>
-                                sum + Number(payment?.amount_paid || 0), 0
-                            ) || 0)
-                        ).toLocaleString()}
-                    </h3>
-                </div>
-            </div>
-    );
-}
+

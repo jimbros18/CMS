@@ -1,37 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 // import {fetchClients} from './ClientTable';
 import { Save, Trash, Pencil, Plus, XCircle } from 'lucide-react';
-import {addClient, getClients} from './API/server_api';
+import {addClient, getClients, getCoffins} from './API/server_api';
+import { Inclussions, PriceBreakdown } from './ViewFormSections';
 import {
     Charges,
     ChargeTable,
     ClientInfo,
     Payments,
     PaymentsTable,
-    DSWDInfo,
-    PriceBreakdown,
+    DSWDInfo
 } from './formSections';
-
-const Coffin_info = [
-    { Coffin: 'Ogoy Plain Plan', Amount: 17000 },
-    { Coffin: 'Ordinary', Amount: 15000 },
-    { Coffin: 'Ordinary 3ft', Amount: 15000 },
-    { Coffin: 'Ordinary 5ft', Amount: 15000 },
-    { Coffin: 'Quadrado', Amount: 23000 },
-    { Coffin: 'Urgoy', Amount: 30000 },
-    { Coffin: 'Urgoy 3ft', Amount: 30000 },
-    { Coffin: 'Urgoy 5ft', Amount: 30000 },
-    { Coffin: 'Ogoy Plain', Amount: 40000 },
-    { Coffin: 'Ogoy Plain 3ft', Amount: 40000 },
-    { Coffin: 'Ogoy Plain 5ft', Amount: 40000 },
-    { Coffin: 'Ogoy Stoko', Amount: 42000 },
-    { Coffin: 'Ogoy Stoko 3ft', Amount: 42000 },
-    { Coffin: 'Ogoy Stoko 5ft', Amount: 42000 },
-    { Coffin: 'Metal', Amount: 50000 },
-];
 
 // ================ CLIENT INFO ===================
 function ClientForm({ onFormSubmitted }) {
+
     const initialClientData = {
         dateServiced: new Date().toISOString().slice(0, 10), // today's date by default
         deceasedFirst: '',
@@ -48,32 +31,36 @@ function ClientForm({ onFormSubmitted }) {
 
     const [clientData, setClientData] = useState(initialClientData);
 
+    const [coffins, setCoffins] = useState([]);
+    
+        useEffect(() => {
+            const load = async () => {
+                const data = await getCoffins();
+                setCoffins(data);
+            };
+            load();
+        }, []);
+
     const handleClientChange = (e) => {
         const { name, value } = e.target;
+
         setClientData((prev) => {
-            const updated = { ...prev, [name]: value };
+            // copy first
+            let updated = { ...prev, [name]: value };
+
+            // ONLY override when coffin changes
             if (name === 'coffin') {
-                const matching = Coffin_info.find(
-                    (info) => info.Coffin === updated.coffin,
+                const matching = coffins.find(
+                    (c) => c.coffin_name === value
                 );
-                updated.coffinAmount = matching ? matching.Amount : 0;
+
+                updated.coffinAmount = matching ? matching.amount : '';
             }
-            // if (
-            //     ['deceasedFirst', 'deceasedMiddle', 'deceasedLast'].includes(
-            //         name,
-            //     )
-            // ) {
-            //     updated.deceased = [
-            //         updated.deceasedFirst,
-            //         updated.deceasedMiddle,
-            //         updated.deceasedLast,
-            //     ]
-            //         .filter(Boolean)
-            //         .join(' ');
-            // }
+
             return updated;
         });
     };
+    console.log("render coffinAmount:", clientData.coffinAmount);
 
     // ==================== DSWD Section ====================
     const [dswd, setDswd] = useState({});
@@ -142,9 +129,6 @@ function ClientForm({ onFormSubmitted }) {
         setPayments((prev) => prev.filter((_, i) => i !== index));
     };
 
-    {
-        /* ================= SUBMIT ================= */
-    }
 const resetForm = () => {
     setClientData(initialClientData);
     setDswd({});
@@ -195,8 +179,7 @@ const resetForm = () => {
             >
                 <ClientInfo
                     clientData={clientData}
-                    handleClientChange={handleClientChange}
-                    coffinInfo={Coffin_info}
+                    handleClientChange={handleClientChange}                                     
                 />
                 <div />
 
@@ -205,6 +188,8 @@ const resetForm = () => {
                         {submitStatus}
                     </div>
                 )}
+
+                <Inclussions  xcoffin ={clientData["coffin"]} />
 
                 {/* ================= OTHER CHARGES ================= */}
                 <section className="section flex flex-col-reverse items-start">

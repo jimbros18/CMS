@@ -197,12 +197,10 @@ function ClientsTable() {
                     <tbody className="text-lg text-slate-700">
                         {allClients.map((row, rowIndex) => {
                             const isActive = activeRow === rowIndex;
-                            // const [xclient, setxclient] = useState({});
                             return (
                                 <tr
                                     key={rowIndex}
                                     className={`border border-slate-200  ${isActive ? 'bg-blue-300' : rowIndex % 2 === 0 ? 'bg-white' : 'bg-slate-100'} hover:bg-slate-50 cursor-pointer`}
-                                    // onClick={() => handleRowClick(rowIndex)}
                                     onDoubleClick={async (e) => {   e.stopPropagation();                                                                    
                                                                     const clientId = row[0];           
                                                                     if (!clientId) return;
@@ -211,15 +209,12 @@ function ClientsTable() {
                                                                         if (data) {
                                                                             setSelectedClient(data);
                                                                             setViewForm(true);
-                                                                            console.log(`viewing: ${JSON.stringify(selectedClient)}`);
                                                                         }
                                                                     } catch (error) {
                                                                         console.error("Failed to fetch client:", error);
                                                                     }
                                                                 }}
                                 >
-                                
-
                                     {Object.keys(columns).map((key, colIndex) => {
                                         const value = row[columns[key]];
                                         if (key === 'actions') {
