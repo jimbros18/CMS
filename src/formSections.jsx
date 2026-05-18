@@ -3,16 +3,31 @@ import { useState, useEffect } from 'react';
 import { getCoffins } from './API/server_api';
 
 
-export function ClientInfo({ clientData, handleClientChange }) {
-    const [coffins, setCoffins] = useState([]);
+export function ClientInfo({clientData, setClientData}) { 
 
+    const [coffins, setCoffins] = useState([]);
     useEffect(() => {
         const load = async () => {
             const data = await getCoffins();
             setCoffins(data);
         };
         load();
-    }, []);
+    }, []);    
+
+    const handleClientChange = (e) => {
+        const { name, value } = e.target;
+        setClientData((prev) => {
+            let updated = { ...prev, [name]: value };
+            if (name === 'coffin') {
+                const matching = coffins.find(
+                    (c) => c.coffin_name === value
+                );
+                updated.coffinAmount = matching ? matching.amount : '';
+            }
+            return updated;
+        });
+    };
+    console.log("render coffinAmount:", clientData.coffinAmount);
 
     return (
         <section className="w-full text-gray-800">
@@ -173,7 +188,22 @@ export function ClientInfo({ clientData, handleClientChange }) {
     );
 }
 
-export function ChargeTable({ otherCharges = [], onDeleteCharge }) {
+export function ChargeTable({ otherCharges, setOtherCharges}) {
+    const [showCharge, setShowCharge] = useState(false);
+    const [chargeData, setchargeData] = useState({item_service: '', amount: 0, details: ''});
+    const onDeleteCharge = (index) => {setOtherCharges((prev) => prev.filter((_, i) => i !== index));};
+    
+    const addCharge = () => {
+        const hasValidAmount = chargeData.amount !== null && chargeData.amount !== '';
+        if (chargeData.item_service?.trim() && hasValidAmount) {
+            setOtherCharges((prev) => [
+                ...prev,
+                { ...chargeData, amount: Number(chargeData.amount) },
+            ]);
+        }
+        setchargeData({ item_service: '', amount: 0, details: '' }); // reset in all cases
+        setShowCharge(false);
+    };
     return (
         <div className="w-full overflow-x-auto">
             <table className="min-w-full max-w-full border-collapse border border-gray-300 text-sm">
@@ -222,8 +252,7 @@ export function ChargeTable({ otherCharges = [], onDeleteCharge }) {
                                     <button
                                         type="button"
                                         onClick={() =>
-                                            onDeleteCharge &&
-                                            onDeleteCharge(idx)
+                                            onDeleteCharge && onDeleteCharge(idx)
                                         }
                                         className="text-red-500 hover:text-red-700"
                                     >
@@ -235,14 +264,40 @@ export function ChargeTable({ otherCharges = [], onDeleteCharge }) {
                     )}
                 </tbody>
             </table>
+            <div className="flex flex-col-reverse items-start">
+                <button
+                    type="button"
+                    className="ml-5 mt-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded transition-colors duration-300"
+                    onClick={() =>
+                        showCharge ? addCharge() : setShowCharge(true)
+                    }
+                >
+                    {showCharge ? (
+                        <Save size={16} />
+                    ) : (
+                        <Plus size={16} />
+                    )}
+                </button>
+                {showCharge && (
+                    <Charges
+                        chargeData={chargeData}
+                        setchargeData={setchargeData}
+                    />
+                )}
+            </div>
         </div>
     );
 }
 
-export function Charges({
-    chargeData = {item_service: '', amount: 0, details: '' },
-    updateChargeData,
-}) {
+export function Charges({chargeData, setchargeData }) {
+
+    const updateChargeData = (newItems) => {
+        setchargeData((prev) => {
+            const updated = { ...prev, ...newItems };
+            return updated;
+        });
+    };
+
     return (
         <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="flex flex-col items-start gap-1">
@@ -291,7 +346,30 @@ export function Charges({
     );
 }
 
-export function PaymentsTable({ payments = [], onDeletePayment }) {
+export function PaymentsTable({ payments = [], setPayments }) {
+    const [showPayment, setShowPayment] = useState(false);
+    // const [tempPaymentData, setTempPaymentData] = useState({})
+    const [tempPaymentData, setTempPaymentData] = useState({
+        date_paid: new Date().toISOString().slice(0, 10),
+        amount_paid: '',
+        details: '',
+    });
+
+    const savePayment = () => {
+        if (tempPaymentData.datePaid && !isNaN(tempPaymentData.amountPaid !== null)) {
+            setPayments((prev) => [...prev, { ...tempPaymentData }]);
+            setTempPaymentData({
+                date_paid: new Date().toISOString().slice(0, 10),
+                amount_paid: '',
+                details: '',
+            });
+        }
+        setShowPayment(false);
+    }
+    const deletePayment = (index) => {
+        setPayments((prev) => prev.filter((_, i) => i !== index));
+    };
+
     return (
         <div className="w-full overflow-x-auto">
             <table className="min-w-full max-w-full border-collapse border border-gray-300 text-sm">
@@ -328,10 +406,10 @@ export function PaymentsTable({ payments = [], onDeletePayment }) {
                                 className={`${idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}
                             >
                                 <td className="border border-gray-300 px-2 py-1">
-                                    {trans.date_paid || '-'}
+                                    {trans.datePaid || '-'}
                                 </td>
                                 <td className="border border-gray-300 px-2 py-1">
-                                    {trans.amount_paid || '-'}
+                                    {trans.amountPaid || '-'}
                                 </td>
                                 <td className="border border-gray-300 px-2 py-1">
                                     {trans.details || '-'}
@@ -340,8 +418,8 @@ export function PaymentsTable({ payments = [], onDeletePayment }) {
                                     <button
                                         type="button"
                                         onClick={() =>
-                                            onDeletePayment &&
-                                            onDeletePayment(idx)
+                                            deletePayment &&
+                                            deletePayment(idx)
                                         }
                                         className="text-red-500 hover:text-red-700"
                                     >
@@ -353,66 +431,83 @@ export function PaymentsTable({ payments = [], onDeletePayment }) {
                     )}
                 </tbody>
             </table>
+            <div className="flex flex-col items-start py-4" >
+                {showPayment && (
+                    <Payments
+                        tempPaymentData={tempPaymentData}
+                        setTempPaymentData = {setTempPaymentData}
+                    />
+                )}
+                <button
+                    type="button"
+                    className="mt-2 bg-blue-500 text-white px-4 py-2 rounded"
+                    onClick={() =>
+                        showPayment ? savePayment() : setShowPayment(true)
+                    }
+                >
+                    {showPayment ? (<Save size={16} />) : (<Plus size={16} />)}
+                </button>
+            </div>
+
         </div>
     );
 }
 
-export function Payments({
-    paymentData = { date_paid: '', amount_paid: '', details: '' },
-    updatepaymentData,
-}) {
+export function Payments({tempPaymentData, setTempPaymentData }) {
+
+    // const updatepaymentData = (newItems) => {
+    //     setTempPaymentData((prev) => {
+    //         const updated = { ...prev, ...newItems };
+    //         return updated
+    //     });
+    // };
+
+    const updatepaymentData = (newItems) => {
+        setTempPaymentData((prev) => ({ ...prev, ...newItems })
+        );
+    };
+
+    if (!tempPaymentData || !setTempPaymentData) {
+        return <div className="text-red-500">Error: Payment data not available</div>;
+    }
+
     return (
         <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="flex flex-col items-start gap-1">
-                <label>Date Paid</label>
-                <input
-                    type="date"
-                    name="date_paid"
-                    value={paymentData.date_paid || ''}
-                    onChange={(e) =>
-                        updatepaymentData({
-                            ...paymentData,
-                            [e.target.name]: e.target.value,
-                        })
-                    }
-                    className="input"
-                />
-            </div>
-            <div className="flex flex-col items-start gap-1">
-                <label>Amount Paid</label>
-                <input
-                    type="number"
-                    name="amount_paid"
-                    value={paymentData.amount_paid || ''}
-                    onChange={(e) =>
-                        updatepaymentData({
-                            ...paymentData,
-                            [e.target.name]: e.target.value,
-                        })
-                    }
-                    className="input"
-                />
-            </div>
-            <div className="flex flex-col items-start gap-1">
-                <label>Details</label>
-                <input
-                    type="text"
-                    name="details"
-                    value={paymentData.details || ''}
-                    onChange={(e) =>
-                        updatepaymentData({
-                            ...paymentData,
-                            [e.target.name]: e.target.value,
-                        })
-                    }
-                    className="input"
-                />
-            </div>
+
+            <input
+                type="date"
+                name="datePaid"
+                value={tempPaymentData.date_paid || ''}
+                onChange={(e) => updatepaymentData({ [e.target.name]: e.target.value })}
+                className="input"
+            />
+
+            <input
+                type="number"
+                name="amountPaid"
+                value={tempPaymentData.amount_paid || ''}
+                onChange={(e) => updatepaymentData({ [e.target.name]: e.target.value })}
+                className="input"
+            />
+
+            <input
+                type="text"
+                name="details"
+                value={tempPaymentData.details || ''}
+                onChange={(e) => updatepaymentData({ [e.target.name]: e.target.value })}
+                className="input"
+            />
         </div>
     );
 }
 
-export function DSWDInfo({dswd, handleDswdChange,}) {
+export function DSWDInfo({dswd, setDswd}) {
+
+    const handleDswdChange = (e) => {
+        const { name, value } = e.target;
+        setDswd((prev) => ({ ...prev, [name]: value }));
+    };
+
     return (
         <div className="flex flex-col items-start gap-4 w-full">
             <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -495,5 +590,3 @@ export function DSWDInfo({dswd, handleDswdChange,}) {
         </div>
     );
 }
-
-
