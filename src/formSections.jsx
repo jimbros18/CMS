@@ -347,8 +347,7 @@ export function Charges({chargeData, setchargeData }) {
 }
 
 export function PaymentsTable({ payments = [], setPayments }) {
-    const [showPayment, setShowPayment] = useState(false);
-    // const [tempPaymentData, setTempPaymentData] = useState({})
+    const [showPayment, setShowPayment] = useState(false);   
     const [tempPaymentData, setTempPaymentData] = useState({
         date_paid: new Date().toISOString().slice(0, 10),
         amount_paid: '',
@@ -356,16 +355,21 @@ export function PaymentsTable({ payments = [], setPayments }) {
     });
 
     const savePayment = () => {
-        if (tempPaymentData.datePaid && !isNaN(tempPaymentData.amountPaid !== null)) {
-            setPayments((prev) => [...prev, { ...tempPaymentData }]);
-            setTempPaymentData({
-                date_paid: new Date().toISOString().slice(0, 10),
-                amount_paid: '',
-                details: '',
-            });
-        }
+        if (!tempPaymentData.date_paid || !tempPaymentData.amount_paid) return;
+        const newPayment = {
+            date_paid: tempPaymentData.date_paid,
+            amount_paid: Number(tempPaymentData.amount_paid),
+            details: tempPaymentData.details || ''
+        };
+        setPayments(prev => [...prev, newPayment]);
+        setTempPaymentData({
+            date_paid: new Date().toISOString().slice(0, 10),
+            amount_paid: '',
+            details: '',
+        });
         setShowPayment(false);
-    }
+    };
+
     const deletePayment = (index) => {
         setPayments((prev) => prev.filter((_, i) => i !== index));
     };
@@ -375,52 +379,29 @@ export function PaymentsTable({ payments = [], setPayments }) {
             <table className="min-w-full max-w-full border-collapse border border-gray-300 text-sm">
                 <thead>
                     <tr className="bg-gray-200">
-                        <th className="border border-gray-300 px-2 py-1 text-left">
-                            Date Paid
-                        </th>
-                        <th className="border border-gray-300 px-2 py-1 text-left">
-                            Amount Paid
-                        </th>
-                        <th className="border border-gray-300 px-2 py-1 text-left">
-                            Details
-                        </th>
-                        <th className="border border-gray-300 px-2 py-1 text-left">
-                            Actions
-                        </th>
+                        <th className="border border-gray-300 px-2 py-1 text-left">Date Paid</th>
+                        <th className="border border-gray-300 px-2 py-1 text-left">Amount Paid</th>
+                        <th className="border border-gray-300 px-2 py-1 text-left">Details</th>
+                        <th className="border border-gray-300 px-2 py-1 text-left">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     {payments.length === 0 ? (
                         <tr>
-                            <td
-                                colSpan="4"
-                                className="border border-gray-300 px-2 py-1 text-center text-gray-500"
-                            >
+                            <td colSpan="4" className="border border-gray-300 px-2 py-1 text-center text-gray-500">
                                 No Payments yet
                             </td>
                         </tr>
                     ) : (
                         payments.map((trans, idx) => (
-                            <tr
-                                key={idx}
-                                className={`${idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}
-                            >
+                            <tr key={idx} className={`${idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}>
+                                <td className="border border-gray-300 px-2 py-1">{trans.date_paid || '-'}</td>
+                                <td className="border border-gray-300 px-2 py-1">{trans.amount_paid || '-'}</td>
+                                <td className="border border-gray-300 px-2 py-1">{trans.details || '-'}</td>
                                 <td className="border border-gray-300 px-2 py-1">
-                                    {trans.datePaid || '-'}
-                                </td>
-                                <td className="border border-gray-300 px-2 py-1">
-                                    {trans.amountPaid || '-'}
-                                </td>
-                                <td className="border border-gray-300 px-2 py-1">
-                                    {trans.details || '-'}
-                                </td>
-                                <td className="border border-gray-300 px-2 py-1">
-                                    <button
-                                        type="button"
-                                        onClick={() =>
-                                            deletePayment &&
-                                            deletePayment(idx)
-                                        }
+                                    <button 
+                                        type="button" 
+                                        onClick={() => deletePayment(idx)}
                                         className="text-red-500 hover:text-red-700"
                                     >
                                         <Trash size={14} />
@@ -431,72 +412,72 @@ export function PaymentsTable({ payments = [], setPayments }) {
                     )}
                 </tbody>
             </table>
-            <div className="flex flex-col items-start py-4" >
+
+            <div className="flex flex-col items-start py-4">
                 {showPayment && (
                     <Payments
                         tempPaymentData={tempPaymentData}
-                        setTempPaymentData = {setTempPaymentData}
+                        setTempPaymentData={setTempPaymentData}
                     />
                 )}
+
                 <button
                     type="button"
-                    className="mt-2 bg-blue-500 text-white px-4 py-2 rounded"
-                    onClick={() =>
-                        showPayment ? savePayment() : setShowPayment(true)
-                    }
+                    className="mt-2 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                    onClick={() => showPayment ? savePayment() : setShowPayment(true)}
                 >
-                    {showPayment ? (<Save size={16} />) : (<Plus size={16} />)}
+                    {showPayment ? <Save size={16} /> : <Plus size={16} />}
                 </button>
             </div>
-
         </div>
     );
 }
 
-export function Payments({tempPaymentData, setTempPaymentData }) {
-
-    // const updatepaymentData = (newItems) => {
-    //     setTempPaymentData((prev) => {
-    //         const updated = { ...prev, ...newItems };
-    //         return updated
-    //     });
-    // };
+export function Payments({ tempPaymentData, setTempPaymentData }) {
 
     const updatepaymentData = (newItems) => {
-        setTempPaymentData((prev) => ({ ...prev, ...newItems })
-        );
+        setTempPaymentData(prev => ({ ...prev, ...newItems }));
     };
 
     if (!tempPaymentData || !setTempPaymentData) {
-        return <div className="text-red-500">Error: Payment data not available</div>;
+        return <div className="text-red-500 p-2">Error: Payment data not available</div>;
     }
 
     return (
-        <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-4">
-
-            <input
-                type="date"
-                name="datePaid"
-                value={tempPaymentData.date_paid || ''}
-                onChange={(e) => updatepaymentData({ [e.target.name]: e.target.value })}
-                className="input"
-            />
-
-            <input
-                type="number"
-                name="amountPaid"
-                value={tempPaymentData.amount_paid || ''}
-                onChange={(e) => updatepaymentData({ [e.target.name]: e.target.value })}
-                className="input"
-            />
-
-            <input
-                type="text"
-                name="details"
-                value={tempPaymentData.details || ''}
-                onChange={(e) => updatepaymentData({ [e.target.name]: e.target.value })}
-                className="input"
-            />
+        <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+            <div>
+                <label>Date</label>
+                <input
+                    type="date"
+                    name="date_paid"
+                    value={tempPaymentData.date_paid || ''}
+                    onChange={(e) => updatepaymentData({ [e.target.name]: e.target.value })}
+                    className="input"
+                />
+            </div>
+            <div>
+                <label>Amount</label>
+                <input
+                    type="number"
+                    name="amount_paid"
+                    value={tempPaymentData.amount_paid || ''}
+                    onChange={(e) => updatepaymentData({ [e.target.name]: e.target.value })}
+                    className="input"
+                    min="0"
+                    step="0.01"
+                />
+            </div>
+            <div>
+                <label>Details</label>
+                <input
+                    type="text"
+                    name="details"
+                    value={tempPaymentData.details || ''}
+                    onChange={(e) => updatepaymentData({ [e.target.name]: e.target.value })}
+                    className="input"
+                />
+            </div>
+            
         </div>
     );
 }

@@ -37,7 +37,7 @@ function ClientForm({ onFormSubmitted }) {
 
     const resetForm = () => {
         setClientData(initialClientData);
-        setDswd({});
+        setDswd([{gl_date: "", ci_number: "", processor: "", amount: 0, details: ""}]);
         setOtherCharges([{ item_service: '', amount: 0, details: '' }]);
         setPayments([{ date_paid: '', amount_paid:'', details: '' }]);
     };
@@ -52,7 +52,7 @@ function ClientForm({ onFormSubmitted }) {
             payments,
         };
 
-        console.log(payload["payments"]);
+        console.log(payload);
         setSubmitStatus('Saving client data...');
 
         try {
@@ -102,7 +102,7 @@ function ClientForm({ onFormSubmitted }) {
                 {/* ================= DSWD SECTION ================= */}
                 <section className="section">
                     <h2 className="text-gray-800 mb-2">DSWD Assistance</h2>
-                    <DSWDInfo dswd={dswd} />
+                    <DSWDInfo dswd={dswd} setDswd={setDswd} />
                 </section>
 
                 {/* ================= PAYMENTS ================= */}
