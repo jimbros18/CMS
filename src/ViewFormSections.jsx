@@ -133,6 +133,17 @@ export function Inclussions({ xcoffin }) {
     
     const inclussions = match ? JSON.parse(match.items || []) : [];
 
+    const [selected, setSelected] = useState([]);
+    const handleChange = (e) => {
+        const { value, checked } = e.target;
+        setSelected((prev) =>
+            checked
+            ? [...prev, value]              // add
+            : prev.filter((item) => item !== value) // remove
+        );
+    };
+    console.log('Selected inclussions:', selected);
+    
     return (
         <div className="w-full text-gray-800 py-8">
             <h2 className="text-gray-800 mb-4 text-left">Inclussions</h2>
@@ -140,7 +151,7 @@ export function Inclussions({ xcoffin }) {
                 <div className="flex flex-col text-sm">
                     {inclussions.map((inc, i) => (
                         <label key={i} className="flex items-center gap-2">
-                            <input key={i} name={inc} type="checkbox" className="ml-2" />
+                            <input key={i} name={inc} value={inc} type="checkbox" onChange={handleChange} className="ml-2" />
                             {inc}
                         </label>
                     ))}
