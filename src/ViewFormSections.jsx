@@ -126,16 +126,12 @@ export function Inclussions({ xcoffin }) {
         };
         load();
     }, []);
-    
-    // console.log(coffins)    
+
     const match = coffins.find (
         (c) => c.coffin_name === xcoffin
     );
-    // console.log(match)
     
     const inclussions = match ? JSON.parse(match.items || []) : [];
-
-
 
     return (
         <div className="w-full text-gray-800 py-8">
@@ -143,7 +139,10 @@ export function Inclussions({ xcoffin }) {
             <div className="w-full px-4 py-3 rounded">
                 <div className="flex flex-col text-sm">
                     {inclussions.map((inc, i) => (
-                        <li key={i}>{inc}</li>
+                        <label key={i} className="flex items-center gap-2">
+                            <input key={i} name={inc} type="checkbox" className="ml-2" />
+                            {inc}
+                        </label>
                     ))}
                 </div>
             </div>
@@ -185,7 +184,7 @@ export function ChargeTableView({ otherCharges = [] }) {
                                     {charge.item_service || '—'}
                                 </td>
                                 <td className="border border-slate-300 text-slate-800 px-2 py-1">
-                                    {charge.amount != null ? charge.amount : '—'}
+                                    {charge.amount != null ? `₱ ${Number(charge.amount).toLocaleString()}` : '—'}
                                 </td>
                                 <td className="border border-slate-300 text-slate-800 px-2 py-1 italic">
                                     {charge.details || '—'}

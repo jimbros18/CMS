@@ -5,13 +5,13 @@ import UpdateForm from './updateForm';
 import ViewForm from './ViewForm';
 import { getClients, deleteClient, getClient } from './API/server_api';
 
-function ClientsTable() {
+export default function Table() {
     const [viewForm, setViewForm] = useState(false);
     const [NewForm, setNewForm] = useState(false); // state to control rendering
     const [updateForm, setUpdateForm] = useState(false);
-    const [selectedClient, setSelectedClient] = useState(null);
     const [allClients, setAllClients] = useState([]);
     const [activeRow, setActiveRow] = useState(null);
+    const [selectedClient, setSelectedClient] = useState(null);
 
     const fetchClients = async () => {
         const clients = await getClients();
@@ -48,9 +48,19 @@ function ClientsTable() {
 };
 
 
+// const columns =[
+//   'ID', 
+//   'Date',
+//   "First",
+//   "Last",
+//   "Middle",
+//   "Address",
+//   "Plan",
+//   "Coffin",
+//   "actions"
+// ];
     return (
         <div className="flex flex-col w-[calc(100%-18rem)] ml-72 py-3 px-3 bg-slate-50 mt-1 rounded">
-          
             <div className="flex w-full items-center justify-start gap-2 mb-3">
                 <button
                     className="inline-flex items-center justify-center rounded-lg bg-slate-800 px-4 py-1.5 text-xs font-semibold text-white transition hover:bg-slate-700"
@@ -168,7 +178,7 @@ function ClientsTable() {
                 </div>
                 
             )}
-            <div className="w-full overflow-x-auto rounded bg-white p-1">
+            <div className="table-container w-full overflow-x-auto rounded bg-white p-1">
                 <table className="table-auto w-full border-separate border-spacing-y-1">
                     <thead>
                         <tr className="bg-slate-900 text-slate-100 text-[11px]">
@@ -269,11 +279,7 @@ function ClientsTable() {
                     </tbody>
                 </table>
             </div>
-              
-            
         </div>
     );
 }
 
-
-export default ClientsTable;

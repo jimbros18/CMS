@@ -27,8 +27,6 @@ export function ClientInfo({clientData, setClientData}) {
             return updated;
         });
     };
-    console.log("render coffinAmount:", clientData.coffinAmount);
-
     return (
         <section className="w-full text-gray-800">
             <h2 className="text-gray-800 mb-4 text-left">

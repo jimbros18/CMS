@@ -81,15 +81,12 @@ function ClientForm({ onFormSubmitted }) {
                     setClientData={setClientData}                           
                 />
                 <div />
-
                 {submitStatus && (
                     <div className="mb-4 w-full rounded border border-green-300 bg-green-50 px-3 py-2 text-green-700">
                         {submitStatus}
                     </div>
                 )}
-
                 <Inclussions  xcoffin ={clientData["coffin"]} />
-
                 {/* ================= OTHER CHARGES ================= */}
                 <section className="section flex flex-col-reverse items-start">
                     <h2 className="text-gray-800 mb-2">Other Charges</h2>
@@ -108,13 +105,11 @@ function ClientForm({ onFormSubmitted }) {
                 {/* ================= PAYMENTS ================= */}
                 <section className="section">
                     <h2 className="text-gray-800 mb-2">Payments</h2>
-
                     <PaymentsTable
                         payments={payments}
                         setPayments={setPayments}
                     />
                 </section>
-
                 {/* ================= FORM ACTIONS ================= */}
                 <div className="form-actions mt-4">
                     <button
@@ -126,7 +121,6 @@ function ClientForm({ onFormSubmitted }) {
                     </button>
                 </div>
             </form>
-
                 <PriceBreakdown
                     client={clientData}
                     otherCharges={otherCharges}

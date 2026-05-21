@@ -1,12 +1,14 @@
-// import './styles/content.css';
-import ClientsTable from './ClientTable';
+import Table from './ClientTable';
 
-function Content({ activeKey }) {
+
+
+export default function Content({ activeKey }) {
     if (activeKey === 'clients') {
-        return <ClientsTable />;
+        return (       
+            <Table/>
+        );
     }
-
-    return <h2>Other Page</h2>;
+        return (
+            <h2>Other Page</h2>
+        );
 }
-
-export default Content;
