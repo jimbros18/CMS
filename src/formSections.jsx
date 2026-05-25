@@ -1,5 +1,5 @@
 import { Save, Trash, Pencil, Plus, XCircle } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { getCoffins } from './API/server_api';
 
 
@@ -183,6 +183,69 @@ export function ClientInfo({clientData, setClientData}) {
                 </div>
             </div>
         </section>
+    );
+}
+
+export function Inclusions({ xcoffin, inclusions, setInclusions }) {
+    const [coffins, setCoffins] = useState([]);
+
+    useEffect(() => {
+        const load = async () => {
+            const data = await getCoffins();
+            setCoffins(data);
+        };
+        load();
+    }, []);
+
+    const match = coffins.find((c) => c.coffin_name === xcoffin);
+    const incs = match ? JSON.parse(match.items || "[]") : [];
+
+    const checked = useMemo(() => {
+        return incs.reduce((acc, item) => {
+            acc[item] = inclusions.includes(item);
+            return acc;
+        }, {});
+    }, [incs, inclusions]);
+
+    const handleChange = (e) => {
+        const { value, checked } = e.target;
+        setInclusions((prev) =>
+            checked
+            ? [...prev, value] : prev.filter((item) => item !== value));
+    };
+
+    // console.log("checked inclusions:", inclusions);
+    // console.log("options: ", incs);
+    return (
+        <div className="w-full text-gray-800 py-8">
+            <h2 className="text-gray-800 mb-4 text-left">Inclusions</h2>
+            <div className="w-full px-4 py-3 rounded">
+                <div className="flex flex-col text-sm">
+                    {incs.map((item) => {
+                        const isChecked = checked[item] ?? false;
+                        return (
+                            <label key={item} 
+                                className={`flex items-center gap-2 px-2 py-1 rounded transition-colors ${
+                                    isChecked
+                                        ? "bg-blue-50 text-blue-700 font-medium"
+                                        : "text-gray-700 cursor-pointer hover:bg-gray-50"
+                                }`}
+                            >
+                                <input 
+                                    name={item}
+                                    value={item} 
+                                    type="checkbox" 
+                                    checked={isChecked}
+                                    onChange={handleChange} 
+                                    className={`ml-2 ${isChecked ? "accent-blue-600" : ""}`} 
+                                />
+                            {item}
+                        </label>
+                        )
+                    })}
+                </div>
+            </div>
+        </div>
     );
 }
 

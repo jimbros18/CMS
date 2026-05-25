@@ -13,6 +13,19 @@ export default function Table() {
     const [activeRow, setActiveRow] = useState(null);
     const [selectedClient, setSelectedClient] = useState(null);
 
+    const columns = {
+        'ID': 0,
+        'Date': 1,
+        "First": 2,
+        "Last": 3,
+        "Middle": 4,
+        "Address": 5,
+        "Plan": 6,
+        "Coffin": 7,
+        "Vigil" : 8,
+        "actions": 9
+    };
+
     const fetchClients = async () => {
         const clients = await getClients();
         setAllClients(clients);
@@ -34,31 +47,18 @@ export default function Table() {
        console.log (`Deleting client: ID: ${row[0]}, Name: ${name}`);
         };
     
+    const getDaysLeft = (dateStr) => {
+        if (!dateStr) return null;
+        const start = new Date(dateStr);
+        const ninth = new Date(start);
+        ninth.setDate(start.getDate() + 9);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        ninth.setHours(0, 0, 0, 0);
+        const diff = Math.ceil((ninth - today) / (1000 * 60 * 60 * 24));
+        return diff;
+    };
 
-    const columns = {
-  'ID': 0,
-  'Date': 1,
-  "First": 2,
-  "Last": 3,
-  "Middle": 4,
-  "Address": 5,
-  "Plan": 6,
-  "Coffin": 7,
-  "actions": 8
-};
-
-
-// const columns =[
-//   'ID', 
-//   'Date',
-//   "First",
-//   "Last",
-//   "Middle",
-//   "Address",
-//   "Plan",
-//   "Coffin",
-//   "actions"
-// ];
     return (
         <div className="flex flex-col w-[calc(100%-18rem)] ml-72 py-3 px-3 bg-slate-50 mt-1 rounded">
             <div className="flex w-full items-center justify-start gap-2 mb-3">
@@ -126,6 +126,8 @@ export default function Table() {
                                     <X size={16} />
                                 </button> 
                         <UpdateForm
+                            setUpdateForm={setUpdateForm}
+                            selectedClient={selectedClient}
                             data={selectedClient}
                             onFormSubmitted={ async () => {                               
                                 setUpdateForm(false);
@@ -211,19 +213,20 @@ export default function Table() {
                                 <tr
                                     key={rowIndex}
                                     className={`border border-slate-200  ${isActive ? 'bg-blue-300' : rowIndex % 2 === 0 ? 'bg-white' : 'bg-slate-100'} hover:bg-slate-50 cursor-pointer`}
-                                    onDoubleClick={async (e) => {   e.stopPropagation();                                                                    
-                                                                    const clientId = row[0];           
-                                                                    if (!clientId) return;
-                                                                    try {
-                                                                        const data = await getClient(clientId);
-                                                                        if (data) {
-                                                                            setSelectedClient(data);
-                                                                            setViewForm(true);
-                                                                        }
-                                                                    } catch (error) {
-                                                                        console.error("Failed to fetch client:", error);
-                                                                    }
-                                                                }}
+                                    onDoubleClick={async (e) => {
+                                            e.stopPropagation();                                                                    
+                                            const clientId = row[0];           
+                                            if (!clientId) return;
+                                            try {
+                                                const data = await getClient(clientId);
+                                                if (data) {
+                                                    setSelectedClient(data);
+                                                    setViewForm(true);
+                                                }
+                                            } catch (error) {
+                                                console.error("Failed to fetch client:", error);
+                                            }
+                                    }}
                                 >
                                     {Object.keys(columns).map((key, colIndex) => {
                                         const value = row[columns[key]];
@@ -258,18 +261,53 @@ export default function Table() {
                                                 </td>
                                             );
                                         }
-
+                                        if (key === 'Plan') {
+                                            return (
+                                                <td
+                                                    key={colIndex}
+                                                    className="max-w-[50px] truncate px-2 align-top text-[13px] text-left"
+                                                >
+                                                    {value ? (
+                                                        <span className="inline-flex items-center justify-center bg-emerald-500 text-white px-1 py-0.5 rounded text-xs text-left">
+                                                            {value}
+                                                        </span>
+                                                    ) : null}
+                                                </td>
+                                            );
+                                        }
+                                        if (key === 'Vigil') {
+                                            const days = getDaysLeft(row[1]); // row[1] is the Date column
+                                            return (
+                                                <td key={colIndex} className="px-2 align-top text-[13px] text-left">
+                                                    {days === null ? null : days < 0 ? (
+                                                        <span className="inline-block text-center bg-gray-200 text-black-800 px-1 py-0.5 rounded text-xs">
+                                                            Done
+                                                        </span>
+                                                    ) : days === 0 ? (
+                                                        <span className="inline-block text-center bg-red-100 text-red-700 px-1 py-0.5 rounded text-xs font-medium">
+                                                            Today
+                                                        </span>
+                                                    ) : (
+                                                        <span className={`inline-block text-center px-1 py-0.5 rounded text-xs font-medium ${
+                                                            days <= 2 
+                                                                ? 'bg-red-100 text-red-700' 
+                                                                : days <= 5 
+                                                                ? 'bg-yellow-100 text-yellow-700' 
+                                                                : 'bg-green-100 text-green-700'
+                                                        }`}>
+                                                            {days}d left
+                                                        </span>
+                                                    )}
+                                                </td>
+                                            );
+                                        }
                                         const alignmentClass = key === 'Amount' ? 'text-right' : 'text-left';
                                         return (
                                             <td
                                                 key={colIndex}
                                                 className={`max-w-[50px] truncate px-2 align-top text-[13px] ${alignmentClass}`}
                                             >
-                                                {key === 'Amount'
-                                                    ? value != null
-                                                        ? value.toLocaleString()
-                                                        : 0
-                                                    : value || ''}
+                                                {key === 'Amount' ? (value != null ? value.toLocaleString(): 0) :(value || '')}
                                             </td>
                                         );
                                     })}

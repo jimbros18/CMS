@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo} from 'react';
 import { getCoffins } from './API/server_api';
 
 export function ClientView({ client = {} }) {
@@ -116,7 +116,7 @@ export function ClientView({ client = {} }) {
     );
 }
 
-export function Inclussions({ xcoffin }) {
+export function Inclusions({ xcoffin, inclusions, setInclusions }) {
     const [coffins, setCoffins] = useState([]);
 
     useEffect(() => {
@@ -127,34 +127,46 @@ export function Inclussions({ xcoffin }) {
         load();
     }, []);
 
-    const match = coffins.find (
-        (c) => c.coffin_name === xcoffin
-    );
-    
-    const inclussions = match ? JSON.parse(match.items || []) : [];
+    const match = coffins.find((c) => c.coffin_name === xcoffin);
+    const incs = match ? JSON.parse(match.items || "[]") : [];
 
-    const [selected, setSelected] = useState([]);
-    const handleChange = (e) => {
-        const { value, checked } = e.target;
-        setSelected((prev) =>
-            checked
-            ? [...prev, value]              // add
-            : prev.filter((item) => item !== value) // remove
-        );
-    };
-    console.log('Selected inclussions:', selected);
-    
+    const checked = useMemo(() => {
+        return incs.reduce((acc, item) => {
+            acc[item] = inclusions.includes(item);
+            return acc;
+        }, {});
+    }, [incs, inclusions]);
+
     return (
         <div className="w-full text-gray-800 py-8">
-            <h2 className="text-gray-800 mb-4 text-left">Inclussions</h2>
+            <h2 className="text-gray-800 mb-4 text-left">Inclusions</h2>
             <div className="w-full px-4 py-3 rounded">
                 <div className="flex flex-col text-sm">
-                    {inclussions.map((inc, i) => (
-                        <label key={i} className="flex items-center gap-2">
-                            <input key={i} name={inc} value={inc} type="checkbox" onChange={handleChange} className="ml-2" />
-                            {inc}
+                    {incs.map((item) => {
+                        const disabled = inclusions.includes(item);
+                        return (
+                        <label key={item} 
+                                className={`flex items-center gap-2 px-2 py-1 rounded transition-colors ${
+                                    disabled
+                                        ? "bg-blue-50 text-blue-700 font-medium cursor-not-allowed"
+                                        : "text-gray-700 cursor-pointer hover:bg-gray-50"
+                                }`}
+                        >
+                            <input 
+                                key={item} 
+                                name={item}
+                                value={item} 
+                                type="checkbox" 
+                                checked={checked[item] ?? false}
+                                disabled={disabled}
+                                // onChange={handleChange}
+                                onChange={() => {}}
+                                className="ml-2 bg-gray-200 accent-blue-600" 
+                            />
+                            {item}
                         </label>
-                    ))}
+                        )
+                    })}
                 </div>
             </div>
         </div>

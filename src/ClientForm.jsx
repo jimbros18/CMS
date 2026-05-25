@@ -2,14 +2,15 @@ import React, { useState, useEffect } from 'react';
 // import {fetchClients} from './ClientTable';
 import { Save, Trash, Pencil, Plus, XCircle } from 'lucide-react';
 import {addClient, getClients, getCoffins} from './API/server_api';
-import { Inclussions, PriceBreakdown } from './ViewFormSections';
+import { PriceBreakdown } from './ViewFormSections';
 import {
     Charges,
     ChargeTable,
     ClientInfo,
     Payments,
     PaymentsTable,
-    DSWDInfo
+    DSWDInfo,
+    Inclusions
 } from './formSections';
 
 // ================ CLIENT INFO ===================
@@ -34,12 +35,14 @@ function ClientForm({ onFormSubmitted }) {
     const [submitStatus, setSubmitStatus] = useState('');
     const [payments, setPayments] = useState([]);
     const [showPayment, setShowPayment] = useState(false);
+    const [inclusions, setInclusions] = useState([]);
 
     const resetForm = () => {
         setClientData(initialClientData);
         setDswd([{gl_date: "", ci_number: "", processor: "", amount: 0, details: ""}]);
         setOtherCharges([{ item_service: '', amount: 0, details: '' }]);
         setPayments([{ date_paid: '', amount_paid:'', details: '' }]);
+        setInclusions([]);
     };
     // ===================== SUBMIT =======================
     const handleSubmit = async (e) => {
@@ -47,9 +50,10 @@ function ClientForm({ onFormSubmitted }) {
 
         const payload = {
             client: clientData,
+            inclusions,
             otherCharges,
             dswd,
-            payments,
+            payments
         };
 
         console.log(payload);
@@ -86,7 +90,11 @@ function ClientForm({ onFormSubmitted }) {
                         {submitStatus}
                     </div>
                 )}
-                <Inclussions  xcoffin ={clientData["coffin"]} />
+                <Inclusions  
+                    xcoffin ={clientData["coffin"]}
+                    inclusions={inclusions}
+                    setInclusions={setInclusions}
+                />
                 {/* ================= OTHER CHARGES ================= */}
                 <section className="section flex flex-col-reverse items-start">
                     <h2 className="text-gray-800 mb-2">Other Charges</h2>
@@ -95,7 +103,6 @@ function ClientForm({ onFormSubmitted }) {
                         setOtherCharges = {setOtherCharges}
                     />
                 </section>
-
                 {/* ================= DSWD SECTION ================= */}
                 <section className="section">
                     <h2 className="text-gray-800 mb-2">DSWD Assistance</h2>
