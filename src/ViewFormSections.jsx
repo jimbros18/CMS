@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo} from 'react';
 import { getCoffins } from './API/server_api';
 
-export function ClientView({ client = {} }) {
+export function ClientView({ client = {}, formatDate, intermentDate }) {
     const displayValue = (value) => (value || '—');
 
     return (
@@ -9,7 +9,6 @@ export function ClientView({ client = {} }) {
                 <h2 className="text-xl font-semibold text-slate-900">
                     Client Information
                 </h2>
-
                 <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
 
                     {/* Date Serviced */}
@@ -18,10 +17,17 @@ export function ClientView({ client = {} }) {
                             Date Serviced
                         </label>
                         <div className="text-lg text-slate-800">
-                            {displayValue(client.dateServiced)}
+                            {displayValue(formatDate(client.dateServiced))}
                         </div>
                     </div>
-
+                    <div className="flex flex-col gap-1">
+                        <label className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+                            Interment Datetime
+                        </label>
+                        <div className="text-lg text-slate-800">
+                            {displayValue(intermentDate(client.interment_datetime))}
+                        </div>
+                    </div>
                     {/* Deceased */}
                     <div className="flex flex-col gap-1 md:col-span-2">
                         <label className="text-xs font-semibold uppercase tracking-wider text-slate-500">
@@ -148,7 +154,7 @@ export function Inclusions({ xcoffin, inclusions, setInclusions }) {
                         <label key={item} 
                                 className={`flex items-center gap-2 px-2 py-1 rounded transition-colors ${
                                     disabled
-                                        ? "bg-blue-50 text-blue-700 font-medium cursor-not-allowed"
+                                        ? "bg-blue-50 text-blue-700 font-medium"
                                         : "text-gray-700 cursor-pointer hover:bg-gray-50"
                                 }`}
                         >
@@ -159,7 +165,6 @@ export function Inclusions({ xcoffin, inclusions, setInclusions }) {
                                 type="checkbox" 
                                 checked={checked[item] ?? false}
                                 disabled={disabled}
-                                // onChange={handleChange}
                                 onChange={() => {}}
                                 className="ml-2 bg-gray-200 accent-blue-600" 
                             />
@@ -352,7 +357,7 @@ export function PaymentsView({ payments = [] }) {
 
 export function PriceBreakdown({client, dswd, payments, otherCharges}) {
     return (
-    <div className='payment_details self-start flex flex-col items-start text-left border border-gray-300 rounded p-6 bg-white shadow-md ml-6 w-6/12 h-full'>
+    <div className='payment_details self-start flex flex-col items-start text-left border border-gray-300 rounded p-6 bg-white shadow-md w-[400px]'>
                 <h2 className="text-gray-800 mb-2">Price Breakdown</h2>
                 <div className='flex justify-between w-full'>
                     <p>Coffin:</p>
@@ -392,5 +397,35 @@ export function PriceBreakdown({client, dswd, payments, otherCharges}) {
                     </h3>
                 </div>
             </div>
+    );
+}
+
+export function Lights_Staff({ lights_staff }) {
+    const ls = lights_staff?.[0]; // ← get first row
+    
+    return (
+        <div className='lights_services self-start flex flex-col items-start text-left border border-gray-300 rounded bg-white shadow-md p-6 mt-6 w-[400px]'>
+            <h2 className="text-gray-800 mb-2">Lights and Services</h2>
+            <div className='flex justify-between w-full'>
+                <label>Embalmer:</label>
+                <label className="text-right text-gray-800">{ls?.embalmer || ''}</label>
+            </div>
+            <div className='flex justify-between w-full'    >
+                <label>Driver:</label>
+                <label className="text-right text-gray-800">{ls?.driver || ''}</label>
+            </div>
+            <div className='flex justify-between w-full'>
+                <label>Helper:</label>
+                <label className="text-right text-gray-800">{ls?.helper || ''}</label>
+            </div>
+            <div className='flex justify-between w-full'>
+                <label>Plate Number:</label>
+                <label className="text-right text-gray-800">{ls?.plate_num || ''}</label>
+            </div>
+            <div className='flex justify-between w-full'>
+                <label>Lights:</label>
+                <label className="text-right text-gray-800">{ls?.lights || ''}</label>
+            </div>
+        </div>
     );
 }

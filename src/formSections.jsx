@@ -1,32 +1,117 @@
 import { Save, Trash, Pencil, Plus, XCircle } from 'lucide-react';
 import { useState, useEffect, useMemo } from 'react';
-import { getCoffins } from './API/server_api';
+import { getCoffins, getPlans, getRegions, getProvinces, getCitiesMunicipalities } from './API/server_api';
 
 
 export function ClientInfo({clientData, setClientData}) { 
 
     const [coffins, setCoffins] = useState([]);
+    const [plans, setPlans] = useState([]);
+    const [regions, setRegions] = useState([]);
+    const [provinces, setProvinces] = useState([]);
+    const [citiesMunicipalities, setCitiesMunicipalities] = useState([]);
+    const [barangays, setBarangays] = useState([]);
+
     useEffect(() => {
         const load = async () => {
             const data = await getCoffins();
+            const plans = await getPlans();
+            const regionList = await getRegions();
+            // const provList = await getProvinces(clientData.region);
+            // const cityList = await getCitiesMunicipalities(clientData.province);
+            // const brgyList = await getBarangays(clientData.city);
+            // setProvinces(provList);
+            // setCitiesMunicipalities(cityList);
+            // setBarangays(brgyList);
             setCoffins(data);
+            setPlans(plans);
+            setRegions(regionList);
         };
         load();
-    }, []);    
+    }, []);
+
+    // Load provinces when region changes
+    useEffect(() => {
+        const loadProvinces = async () => {
+            if (!clientData.region) {
+                setProvinces([]);
+                return;
+            }
+
+            const region = regions.find(r => r.name === clientData.region);
+            if (!region) return;
+
+            const provList = await getProvinces(region.code);
+            setProvinces(provList || []);
+        };
+        loadProvinces();
+    }, [clientData.region, regions]);
+
+    // Load cities when province changes
+    useEffect(() => {
+        const loadCities = async () => {
+            if (!clientData.province) {
+                setCitiesMunicipalities([]);
+                return;
+            }
+
+            const prov = provinces.find(p => p.name === clientData.province);
+            if (!prov) return;
+
+            const cityList = await getCitiesMunicipalities(prov.code);
+            setCitiesMunicipalities(cityList || []);
+        };
+        loadCities();
+    }, [clientData.province, provinces]);
+
+    const filteredProvinces = useMemo(() => {
+        const region = regions.find(r => r.name === clientData.region);
+        return region ? provinces.filter(p => (p.regionCode === region.code) || (p.region === region.code)) : [];
+    }, [clientData.region, provinces, regions]);
+
+    const filteredCities = useMemo(() => {
+        const province = provinces.find(p => p.name === clientData.province);
+        return province ? citiesMunicipalities.filter(c => (c.provinceCode === province.code) || (c.province === province.code)) : [];
+    }, [clientData.province, provinces, citiesMunicipalities]);
+
+    const filteredBarangays = useMemo(() => {
+        const city = citiesMunicipalities.find(c => c.name === clientData.city);
+        return city ? barangays.filter(b => (b.cityCode === city.code) || (b.city === city.code)) : [];
+    }, [clientData.city, citiesMunicipalities, barangays]);
+ 
 
     const handleClientChange = (e) => {
         const { name, value } = e.target;
         setClientData((prev) => {
             let updated = { ...prev, [name]: value };
+
             if (name === 'coffin') {
-                const matching = coffins.find(
-                    (c) => c.coffin_name === value
-                );
+                const matching = coffins.find(c => c.coffin_name === value);
                 updated.coffinAmount = matching ? matching.amount : '';
             }
+
+            if (name === 'plan') {
+                if (value && value !== 'None') {
+                    updated.coffin = 'Ogoy Plain';
+                    updated.coffinAmount = 17000;
+                } else {
+                    updated.coffin = '';
+                    updated.coffinAmount = '';
+                }
+            }
+
             return updated;
         });
     };
+
+    const normalizeDatetimeLocal = (value) => {
+        if (!value && value === null) return '';
+        if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+            return `${value}T00:00`;
+        }
+        return value;
+    };
+
     return (
         <section className="w-full text-gray-800">
             <h2 className="text-gray-800 mb-4 text-left">
@@ -46,6 +131,16 @@ export function ClientInfo({clientData, setClientData}) {
                             className="rounded px-2 bg-gray-700 text-white"
                         />
                     </div>
+                    <div className="flex flex-col gap-1 text-left">
+                        <label>Interment Date & Time</label>
+                        <input
+                            type="datetime-local"
+                            name="interment_datetime"
+                            value={normalizeDatetimeLocal(clientData.interment_datetime)}
+                            onChange={handleClientChange}
+                            className="rounded px-2 py-[0.10rem] bg-gray-700 text-white text-sm"
+                        />
+                    </div>
 
                     {/* Deceased - split into 3 inputs */}
                     <div className="flex flex-col gap-1 col-span-full text-left">
@@ -53,6 +148,7 @@ export function ClientInfo({clientData, setClientData}) {
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
                             <input
                                 type="text"
+                                pattern="[A-Za-z]+"
                                 name="deceasedFirst"
                                 value={clientData.deceasedFirst || ''}
                                 onChange={handleClientChange}
@@ -62,6 +158,7 @@ export function ClientInfo({clientData, setClientData}) {
                             />
                             <input
                                 type="text"
+                                pattern="[A-Za-z]+"
                                 name="deceasedMiddle"
                                 value={clientData.deceasedMiddle || ''}
                                 onChange={handleClientChange}
@@ -70,6 +167,7 @@ export function ClientInfo({clientData, setClientData}) {
                             />
                             <input
                                 type="text"
+                                pattern="[A-Za-z]+"
                                 name="deceasedLast"
                                 value={clientData.deceasedLast || '' }
                                 onChange={handleClientChange}
@@ -83,16 +181,89 @@ export function ClientInfo({clientData, setClientData}) {
                     {/* Address */}
                     <div className="flex flex-col gap-1 col-span-full text-left">
                         <label>Address</label>
-                        <input
-                            type="text"
-                            name="address"
-                            value={clientData.address || ''}
-                            onChange={handleClientChange}
-                            placeholder="Purok, Barangay, Municipality"
-                            className="w-full rounded px-2 py-1 bg-gray-700 text-white"
-                            required
-                        />
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                            {/* Region, Province, City selects remain unchanged */}
+
+                            <select
+                                name="region"
+                                value={clientData.region || ''}
+                                onChange={handleClientChange}
+                                className="w-full rounded px-2 py-1 bg-gray-700 text-white"
+                                required
+                            >
+                                <option value="">Select Region</option>
+                                {regions.map((r) => (
+                                    <option key={r.code} value={r.name}>
+                                        {r.name}
+                                    </option>
+                                ))}
+                            </select>
+
+                            <select
+                                name="province"
+                                value={clientData.province || ''}
+                                onChange={handleClientChange}
+                                className="w-full rounded px-2 py-1 bg-gray-700 text-white"
+                                required
+                            >
+                                <option value="">Select Province</option>
+                                {filteredProvinces.map((p) => (
+                                    <option key={p.code} value={p.name}>
+                                        {p.name}
+                                    </option>
+                                ))}
+                            </select>
+                            <select
+                                name="city"
+                                value={clientData.city || ''}
+                                onChange={handleClientChange}
+                                className="w-full rounded px-2 py-1 bg-gray-700 text-white"
+                                required
+                            >
+                                <option value="">Select City/Municipality</option>
+                                {filteredCities.map(c => (
+                                    <option key={c.code} value={c.name}>
+                                        {c.name}
+                                    </option>
+                                ))}
+                            </select>
+
+                            {/* 🔥 UPDATED BARANGAY SELECT */}
+                            {/* <select
+                                name="barangay"
+                                value={clientData.barangay || ''}
+                                onChange={handleClientChange}
+                                className="w-full rounded px-2 py-1 bg-gray-700 text-white"
+                                required
+                                // disabled={loadingBarangays}
+                            >
+                                <option value="">Select Barangay</option>
+                                {loadingBarangays ? (
+                                    <option disabled>Loading barangays...</option>
+                                ) : (
+                                    barangays
+                                        .sort((a, b) => a.name.localeCompare(b.name))
+                                        .map(b => (
+                                            <option key={b.code} value={b.name}>
+                                                {b.name}
+                                            </option>
+                                        ))
+                                )}
+                            </select> */}
+
+                            <input
+                                type="text"
+                                name="purok"
+                                value={clientData.purok || ''}
+                                onChange={handleClientChange}
+                                placeholder="Purok / Street"
+                                className="w-full rounded px-2 py-1 bg-gray-700 text-white"
+                                required
+                            />
+                        </div>
                     </div>
+
+
                     {/* Contacts */}
                     <div className="flex flex-col gap-1 col-span-full text-left">
                         <label>Contacts</label>
@@ -128,42 +299,50 @@ export function ClientInfo({clientData, setClientData}) {
                                     className="w-full rounded px-2 py-1 bg-gray-700 text-white"
                                 >
                                     <option value="None">None</option>
-                                    <option value="GOODLIFE">Goodlife</option>
-                                    <option value="BETTERLIFE">
-                                        Betterlife
-                                    </option>
-                                    <option value="DREAMLIFE">Dreamlife</option>
-                                    <option value="OPHIR">Ophir</option>
-                                    <option value="SAN ROQUE DAYONG">
-                                        San Roque Dayong
-                                    </option>
+                                    {plans.map((p, i) => (
+                                        <option key={i} value={p.company}>
+                                            {p.company}
+                                        </option>
+                                    ))}
                                 </select>
                             </div>
                             <div className="flex flex-col gap-1">
                                 <label className="text-sm">Coffin</label>
-                                <select
-                                    name="coffin"
-                                    value={clientData.coffin || ''}
-                                    onChange={handleClientChange}
-                                    className="w-full rounded px-2 py-1 bg-gray-700 text-white"
-                                >
-                                    {coffins.map((c, i) => (
-                                        <option key={i} value={c.coffin_name}>
-                                            {c.coffin_name}
-                                        </option>
-                                    ))}
+                                {clientData.plan && clientData.plan !== 'None' ? (
+                                    <label  className="w-full rounded px-2 py-1 bg-gray-700 text-white">
+                                        Ogoy Plain
+                                    </label>
+                                ):(
+                                    <select
+                                        name="coffin"
+                                        value={clientData.coffin || ''}
+                                        onChange={handleClientChange}
+                                        className="w-full rounded px-2 py-1 bg-gray-700 text-white"
+                                    >
+                                        {coffins.map((c, i) => (
+                                            <option key={i} value={c.coffin_name}>
+                                                {c.coffin_name}
+                                            </option>
+                                        ))}
 
-                                </select>
+                                    </select>
+                                )}
                             </div>
                             <div className="flex flex-col gap-1">
                                 <label className="text-sm">Amount</label>
+                                {clientData.plan && clientData.plan !== 'None' ? (
+                                    <label className="w-full rounded px-2 py-1 bg-gray-700 text-white">
+                                       {Number(17000).toLocaleString()}
+                                    </label>
+                                ) : (
                                 <input
                                     type="text"
                                     name="amount"
-                                    value={clientData.coffinAmount ?? ''}
+                                    value={Number(clientData.coffinAmount).toLocaleString() ?? ''}
                                     onChange={handleClientChange}
                                     className="w-full rounded px-2 py-1 bg-gray-700 text-white"
                                 />
+                                )}
                             </div>
                         </div>
                     </div>
@@ -213,19 +392,18 @@ export function Inclusions({ xcoffin, inclusions, setInclusions }) {
             checked
             ? [...prev, value] : prev.filter((item) => item !== value));
     };
-
     // console.log("checked inclusions:", inclusions);
     // console.log("options: ", incs);
     return (
-        <div className="w-full text-gray-800 py-8">
+        <div className="w-full text-gray-800 py-6">
             <h2 className="text-gray-800 mb-4 text-left">Inclusions</h2>
-            <div className="w-full px-4 py-3 rounded">
+            <div className="py-3 rounded">
                 <div className="flex flex-col text-sm">
                     {incs.map((item) => {
                         const isChecked = checked[item] ?? false;
                         return (
                             <label key={item} 
-                                className={`flex items-center gap-2 px-2 py-1 rounded transition-colors ${
+                                className={`flex items-center gap-2 py-1 rounded transition-colors ${
                                     isChecked
                                         ? "bg-blue-50 text-blue-700 font-medium"
                                         : "text-gray-700 cursor-pointer hover:bg-gray-50"
@@ -237,7 +415,7 @@ export function Inclusions({ xcoffin, inclusions, setInclusions }) {
                                     type="checkbox" 
                                     checked={isChecked}
                                     onChange={handleChange} 
-                                    className={`ml-2 ${isChecked ? "accent-blue-600" : ""}`} 
+                                    className={`${isChecked ? "accent-blue-600" : ""}`} 
                                 />
                             {item}
                         </label>
@@ -484,7 +662,7 @@ export function PaymentsTable({ payments = [], setPayments }) {
 
                 <button
                     type="button"
-                    className="mt-2 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                    className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
                     onClick={() => showPayment ? savePayment() : setShowPayment(true)}
                 >
                     {showPayment ? <Save size={16} /> : <Plus size={16} />}
@@ -628,6 +806,80 @@ export function DSWDInfo({dswd, setDswd}) {
                         className="w-full rounded px-2 py-1 bg-gray-700 text-white"
                     />
                 </div>
+            </div>
+        </div>
+    );
+}
+
+export function Lights_Staff({ lights_staff, setLightsStaff}) {
+    const ls = lights_staff?.[0]; // ← get first row
+    
+    const handleLSchange = (e) => {
+        const { name, value } = e.target;
+        setLightsStaff([{ ...ls, [name]: value }]);
+    };
+
+
+    return (
+        <div className='lights_services self-start flex flex-col items-start text-left border border-gray-300 rounded p-6 bg-white shadow-md mt-6'>
+            <h2 className="text-gray-800 mb-2">Lights and Services</h2>
+            <div className='flex justify-between w-full'>
+                <label>Embalmer:</label>
+                <input
+                    type="text"
+                    pattern="[A-Za-z]+"
+                    name="embalmer"
+                    value={ls?.embalmer || ''}
+                    onChange={handleLSchange}
+                    required
+                    className="rounded px-2 bg-gray-700 text-white"
+                />
+            </div>
+            <div className='flex justify-between w-full'    >
+                <label>Driver:</label>
+                <input
+                    type="text"
+                    pattern="[A-Za-z]+"
+                    name="driver"
+                    value={ls?.driver || ''}
+                    onChange={handleLSchange}
+                    required
+                    className="rounded px-2 bg-gray-700 text-white"
+                />
+            </div>
+            <div className='flex justify-between w-full'>
+                <label>Helper:</label>
+                <input
+                    type="text"
+                    pattern="[A-Za-z]+"
+                    name="helper"
+                    value={ls?.helper || ''}
+                    onChange={handleLSchange}
+                    required
+                    className="rounded px-2 bg-gray-700 text-white"
+                />
+            </div>
+            <div className='flex justify-between w-full'>
+                <label>Plate Number:</label>
+                <input
+                    type="text"
+                    name="plate_num"
+                    value={ls?.plate_num || ''}
+                    onChange={handleLSchange}
+                    required
+                    className="rounded px-2 bg-gray-700 text-white"
+                />
+            </div>
+            <div className='flex justify-between w-full'>
+                <label>Lights:</label>
+                <input
+                    type="text"
+                    name="lights"
+                    value={ls?.lights || ''}
+                    onChange={handleLSchange}
+                    required
+                    className="rounded px-2 bg-gray-700 text-white"
+                />
             </div>
         </div>
     );

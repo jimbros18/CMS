@@ -10,13 +10,19 @@ import {
     Payments,
     PaymentsTable,
     DSWDInfo,
-    Inclusions
+    Inclusions,
+    Lights_Staff
 } from './formSections';
 
 // ================ UPDATE CLIENT FORM ===================
-function UpdateForm({ data, onFormSubmitted, setUpdateForm, selectedClient }) {
+export default function UpdateForm({ data, onFormSubmitted, setUpdateForm, selectedClient }) {
     const [resetKey, setResetKey] = useState(0);
     const [client, setClientData] = useState(data.client || {});
+    // const [region, setRegion] = useState([]);
+    // const [province, setProvince] = useState([]);
+    // const [city, setCity] = useState([]);
+    // const [brgy, setBrgys] = useState([]);
+    // const [purok, setPuroks] = useState([]);
     const [dswd, setDswd] = useState(Array.isArray(data.dswd) ? data.dswd[0] : data.dswd || {});
     const [payments, setPayments] = useState(data.payments || []);
     const [otherCharges, setOtherCharges] = useState(data.otherCharges || []);
@@ -26,6 +32,7 @@ function UpdateForm({ data, onFormSubmitted, setUpdateForm, selectedClient }) {
     const [submitStatus, setSubmitStatus] = useState('');
     const [inclusions, setInclusions] = useState(data.inclusions || []);
     const [committedCoffin, setCommittedCoffin] = useState(data.client?.coffin || '');
+    const [lights_staff, setLightsStaff] = useState(data.lights_staff?.[0] || []);
 
     useEffect(() => {
         const currentCoffin = client["coffin"];
@@ -37,7 +44,6 @@ function UpdateForm({ data, onFormSubmitted, setUpdateForm, selectedClient }) {
     // ===================== SUBMIT =======================
     const handleSubmit = async (e) => {
         if (e && e.preventDefault) e.preventDefault();
-
             const payload = {
             client,
             inclusions,
@@ -72,51 +78,69 @@ function UpdateForm({ data, onFormSubmitted, setUpdateForm, selectedClient }) {
         setInclusions(data.inclusions || []);
         console.log("Data discarded, form reset to original data.");
     };
+
     return (
-        <div className="updateform-container flex flex-row px-4 py-6 items-start justify-start"
+        <div className="updateform-container flex flex-row border-blue-500 border"
             key={resetKey}
         >
-            <form className="flex flex-col items-start text-left border border-gray-300 rounded p-6 bg-white shadow-md w-full"
+            <form className="flex flex-col items-start text-left"
                 onSubmit={handleSubmit}
             >
-                <ClientInfo
-                    clientData={client}
-                    setClientData={setClientData}
-                />
-                <div />
-                <Inclusions 
-                    xcoffin = {client["coffin"]}
-                    inclusions={inclusions}
-                    setInclusions={setInclusions}
-                />
-                <section className="section flex flex-col-reverse items-start">
-                    <h2 className="text-gray-800 mb-2">Other Charges</h2>
-                    <ChargeTable
-                        otherCharges={otherCharges}
-                        setOtherCharges={setOtherCharges}
-                    />
-                </section>
+                <div className="flex flex-row">
+                    <div className="bg-white border-green-500 border rounded-lg p-6">
+                            <div className="mt-6">
+                                <ClientInfo
+                                    clientData={client}
+                                    setClientData={setClientData}
+                                />
+                            </div>
+                            <section className="section flex flex-col-reverse items-start">
+                                <Inclusions 
+                                    xcoffin = {client["coffin"]}
+                                    inclusions={inclusions}
+                                    setInclusions={setInclusions}
+                                />
+                                </section>
+                            <section className="section flex flex-col-reverse items-start">
+                                <h2 className="text-gray-800 mb-2">Other Charges</h2>
+                                <ChargeTable
+                                    otherCharges={otherCharges}
+                                    setOtherCharges={setOtherCharges}
+                                />
+                            </section>
 
-                {/* ================= DSWD SECTION ================= */}
-                <section className="section">
-                    <h2 className="text-gray-800 mb-2">DSWD Assistance</h2>
-                    <DSWDInfo dswd={dswd} setDswd={setDswd} />
-                </section>
+                            {/* ================= DSWD SECTION ================= */}
+                            <section className="section">
+                                <h2 className="text-gray-800 mb-2">DSWD Assistance</h2>
+                                <DSWDInfo dswd={dswd} setDswd={setDswd} />
+                            </section>
 
-                {/* ================= PAYMENTS ================= */}
-                <section className="section">
-                    <h2 className="text-gray-800 mb-2">Payments</h2>
-                    <PaymentsTable
-                        payments={payments}
-                        setPayments={setPayments}
-                    />
-                </section>
-
-                {/* ================= FORM ACTIONS ================= */}
-                <div className="form-actions flex flex-row mt-4">
+                            {/* ================= PAYMENTS ================= */}
+                            <section className="section">
+                                <h2 className="text-gray-800 mb-2">Payments</h2>
+                                <PaymentsTable
+                                    payments={payments}
+                                    setPayments={setPayments}
+                                />
+                            </section>
+                    </div>
+                    <div className="border-red-500 border rounded-lg flex flex-col ml-6">
+                        <PriceBreakdown
+                            client={client}
+                            dswd={dswd}
+                            payments={payments}
+                            otherCharges={otherCharges}
+                        />
+                        <Lights_Staff
+                            lights_staff={lights_staff}
+                            setLightsStaff={setLightsStaff}
+                        />
+                    </div>
+                </div> 
+                   <div className="flex flex-row gap-2 items-center justify-items bg-white shadow-lg rounded-lg">
                     <button
                         type="submit"
-                        className="mr-[125px] bg-green-500 hover:bg-green-600 disabled:bg-gray-400 disabled:cursor-not-allowed text-white px-4 py-2 rounded transition-colors duration-300"
+                        className="bg-green-500 hover:bg-green-600 disabled:bg-gray-400 disabled:cursor-not-allowed text-white px-4 py-2 rounded transition-colors duration-300"
                         disabled={!client.dateServiced || !client.deceasedFirst || !client.deceasedLast}
                     >
                         Update
@@ -124,21 +148,15 @@ function UpdateForm({ data, onFormSubmitted, setUpdateForm, selectedClient }) {
                     <button
                         type="button"
                         onClick={handleCancel}
-                        className="ml-[130px] bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded transition-colors duration-300"
+                        className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded transition-colors duration-300"
                     >
                         Cancel
                     </button>
                 </div>
             </form>
-            <PriceBreakdown 
-                client={client}
-                dswd={dswd}
-                payments={payments}
-                otherCharges={otherCharges}
-            />
         </div>
 
     );
 }
 
-export default UpdateForm;
+// export default UpdateForm;

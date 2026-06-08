@@ -29,7 +29,7 @@ export async function getClients() {
     });
 
     const clients = await response.json();
-    // console.log(`SERVER: ${JSON.stringify(clients)}`);
+    console.log('SERVER: ', clients);
     return clients;
   } catch (error) {
     console.error("Error:", error);
@@ -106,33 +106,58 @@ export async function getCoffins() {
   }
 }
 
-// const fetch_coffins = async (params) => {
-//   try {
-//     const response = await fetch(`http://${ip}:9000/coffins`, {
-//       method: "GET",
-//       headers: {
-//         "Content-Type": "application/json"
-//       }
-//     });
+export async function getPlans() {
+  try {
+    const response = await fetch(`http://${ip}:9000/plans`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json"
+      }
+    });
 
-//     const coffins = await response.json();
-//     return coffins;
-//   } catch (error) {
-//     console.error("Error:", error);
-//     return [];
-//   }
-// }
+    const plans = await response.json();
+    return plans;
+  } catch (error) {
+    console.error("Error:", error);
+    return [];
+  }
+}
 
-// export async function getCoffins() {
-//   const [coffins, setCoffins] = useState([]);
+export async function getRegions() {
+  try {
+    const res = await fetch('https://psgc.cloud/api/regions');
+    if (!res.ok) throw new Error('Failed to fetch regions');
+    
+    const data = await res.json();
+    return Array.isArray(data) ? data : [];
+  } catch (error) {
+    console.error("Error fetching regions:", error);
+    return [];
+  }
+}
 
-//    useEffect(() => {
-//               const load = async () => {
-//                   const data = await getCoffins();
-//                   setCoffins(data);
-//               };
-//               load();
-//           }, []);
-//     return coffins 
-//     // return await fetch_coffins();
-// }
+export async function getProvinces(regionCode) {
+  try {
+      const res = await fetch(`https://psgc.cloud/api/regions/${regionCode}/provinces`);
+      if (!res.ok) throw new Error('Failed to fetch provinces');
+      const data = await res.json();
+      return Array.isArray(data) ? data : [];
+  }
+  catch (error) {
+      console.error("Error fetching provinces:", error);
+      return [];
+  }
+}
+
+export async function getCitiesMunicipalities(provinceCode) {
+  try {
+      const res = await fetch(`https://psgc.cloud/api/provinces/${provinceCode}/cities-municipalities`);
+      if (!res.ok) throw new Error('Failed to fetch cities/municipalities');
+      const data = await res.json();
+      return Array.isArray(data) ? data : [];
+  }
+  catch (error) {
+      console.error("Error fetching cities/municipalities:", error);
+      return [];
+  }
+}
