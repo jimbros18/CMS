@@ -43,15 +43,14 @@ export function ClientView({ client = {}, formatDate, intermentDate }) {
                     </div>
 
                     {/* Address */}
-                    <div className="flex flex-col gap-1 md:col-span-2">
+                    <div className="flex flex-col gap-1 w-full md:col-span-2">
                         <label className="text-xs font-semibold uppercase tracking-wider text-slate-500">
                             Address
-                        </label>
-                        <div className="text-lg text-slate-800">
-                            {displayValue(client.address)}
-                        </div>
+                        </label>  
+                            <div className="text-lg text-slate-800">
+                                {displayValue(client.purok)}, {displayValue(client.barangay)}, {displayValue(client.city)}, {displayValue(client.province)}
+                            </div>
                     </div>
-
                     {/* Contacts */}
                     <div className="flex flex-col md:flex-row gap-8 md:col-span-2">
 

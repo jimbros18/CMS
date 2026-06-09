@@ -1,6 +1,6 @@
 import { Save, Trash, Pencil, Plus, XCircle } from 'lucide-react';
 import { useState, useEffect, useMemo } from 'react';
-import { getCoffins, getPlans, getRegions, getProvinces, getCitiesMunicipalities } from './API/server_api';
+import { getCoffins, getPlans, getProvinces, getCities, getBarangays} from './API/server_api';
 
 
 export function ClientInfo({clientData, setClientData}) { 
@@ -9,76 +9,59 @@ export function ClientInfo({clientData, setClientData}) {
     const [plans, setPlans] = useState([]);
     const [regions, setRegions] = useState([]);
     const [provinces, setProvinces] = useState([]);
-    const [citiesMunicipalities, setCitiesMunicipalities] = useState([]);
+    const [cities, setCities] = useState([]);
     const [barangays, setBarangays] = useState([]);
 
     useEffect(() => {
         const load = async () => {
             const data = await getCoffins();
             const plans = await getPlans();
-            const regionList = await getRegions();
-            // const provList = await getProvinces(clientData.region);
-            // const cityList = await getCitiesMunicipalities(clientData.province);
-            // const brgyList = await getBarangays(clientData.city);
-            // setProvinces(provList);
-            // setCitiesMunicipalities(cityList);
-            // setBarangays(brgyList);
+            const provinces = await getProvinces();
             setCoffins(data);
             setPlans(plans);
-            setRegions(regionList);
+            setProvinces(provinces);
         };
         load();
     }, []);
 
-    // Load provinces when region changes
-    useEffect(() => {
-        const loadProvinces = async () => {
-            if (!clientData.region) {
-                setProvinces([]);
-                return;
-            }
-
-            const region = regions.find(r => r.name === clientData.region);
-            if (!region) return;
-
-            const provList = await getProvinces(region.code);
-            setProvinces(provList || []);
-        };
-        loadProvinces();
-    }, [clientData.region, regions]);
-
-    // Load cities when province changes
     useEffect(() => {
         const loadCities = async () => {
             if (!clientData.province) {
-                setCitiesMunicipalities([]);
+                setCities([]);
                 return;
             }
 
-            const prov = provinces.find(p => p.name === clientData.province);
-            if (!prov) return;
+            const provObj = provinces.find(p => p.name === clientData.province);
+            if (!provObj?.code) 
+            {setCities([]);
+                return;
+            }
 
-            const cityList = await getCitiesMunicipalities(prov.code);
-            setCitiesMunicipalities(cityList || []);
+            const cityList = await getCities(provObj.code);
+            setCities(cityList || []);
         };
         loadCities();
     }, [clientData.province, provinces]);
 
-    const filteredProvinces = useMemo(() => {
-        const region = regions.find(r => r.name === clientData.region);
-        return region ? provinces.filter(p => (p.regionCode === region.code) || (p.region === region.code)) : [];
-    }, [clientData.region, provinces, regions]);
+    // Load barangays when city changes
+    useEffect(() => {
+        const loadBarangays = async () => {
+            if (!clientData.city) {
+                setBarangays([]);
+                return;
+            }
 
-    const filteredCities = useMemo(() => {
-        const province = provinces.find(p => p.name === clientData.province);
-        return province ? citiesMunicipalities.filter(c => (c.provinceCode === province.code) || (c.province === province.code)) : [];
-    }, [clientData.province, provinces, citiesMunicipalities]);
+            const cityObj = cities.find(c => c.name === clientData.city);
+            if (!cityObj?.code) 
+            {setBarangays([]);
+                return;
+            }
 
-    const filteredBarangays = useMemo(() => {
-        const city = citiesMunicipalities.find(c => c.name === clientData.city);
-        return city ? barangays.filter(b => (b.cityCode === city.code) || (b.city === city.code)) : [];
-    }, [clientData.city, citiesMunicipalities, barangays]);
- 
+            const bgyList = await getBarangays(cityObj.code);
+            setBarangays(bgyList || []);
+        };
+        loadBarangays();
+    }, [clientData.city, cities]);
 
     const handleClientChange = (e) => {
         const { name, value } = e.target;
@@ -93,7 +76,7 @@ export function ClientInfo({clientData, setClientData}) {
             if (name === 'plan') {
                 if (value && value !== 'None') {
                     updated.coffin = 'Ogoy Plain';
-                    updated.coffinAmount = 17000;
+                    updated.coffinAmount = Number(17000);
                 } else {
                     updated.coffin = '';
                     updated.coffinAmount = '';
@@ -181,38 +164,21 @@ export function ClientInfo({clientData, setClientData}) {
                     {/* Address */}
                     <div className="flex flex-col gap-1 col-span-full text-left">
                         <label>Address</label>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                            {/* Region, Province, City selects remain unchanged */}
-
-                            <select
-                                name="region"
-                                value={clientData.region || ''}
-                                onChange={handleClientChange}
-                                className="w-full rounded px-2 py-1 bg-gray-700 text-white"
-                                required
-                            >
-                                <option value="">Select Region</option>
-                                {regions.map((r) => (
-                                    <option key={r.code} value={r.name}>
-                                        {r.name}
-                                    </option>
-                                ))}
-                            </select>
-
-                            <select
+                        <select
                                 name="province"
                                 value={clientData.province || ''}
                                 onChange={handleClientChange}
                                 className="w-full rounded px-2 py-1 bg-gray-700 text-white"
                                 required
                             >
-                                <option value="">Select Province</option>
-                                {filteredProvinces.map((p) => (
+                                <option value="" disabled hidden>Select Province</option>
+                                {provinces.map((p) => (
                                     <option key={p.code} value={p.name}>
                                         {p.name}
                                     </option>
                                 ))}
                             </select>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                             <select
                                 name="city"
                                 value={clientData.city || ''}
@@ -220,8 +186,8 @@ export function ClientInfo({clientData, setClientData}) {
                                 className="w-full rounded px-2 py-1 bg-gray-700 text-white"
                                 required
                             >
-                                <option value="">Select City/Municipality</option>
-                                {filteredCities.map(c => (
+                                <option value="" disabled hidden>Select City/Municipality</option>
+                                {cities.map(c => (
                                     <option key={c.code} value={c.name}>
                                         {c.name}
                                     </option>
@@ -229,40 +195,35 @@ export function ClientInfo({clientData, setClientData}) {
                             </select>
 
                             {/* 🔥 UPDATED BARANGAY SELECT */}
-                            {/* <select
+                            <select
                                 name="barangay"
                                 value={clientData.barangay || ''}
                                 onChange={handleClientChange}
                                 className="w-full rounded px-2 py-1 bg-gray-700 text-white"
                                 required
-                                // disabled={loadingBarangays}
+
                             >
-                                <option value="">Select Barangay</option>
-                                {loadingBarangays ? (
-                                    <option disabled>Loading barangays...</option>
-                                ) : (
-                                    barangays
+                                <option value="" disabled hidden>Select Barangay</option>
+                                    {barangays
                                         .sort((a, b) => a.name.localeCompare(b.name))
                                         .map(b => (
                                             <option key={b.code} value={b.name}>
                                                 {b.name}
                                             </option>
                                         ))
-                                )}
-                            </select> */}
-
-                            <input
+                                    }
+                            </select>                      
+                        </div>
+                            <textarea
                                 type="text"
                                 name="purok"
                                 value={clientData.purok || ''}
                                 onChange={handleClientChange}
                                 placeholder="Purok / Street"
-                                className="w-full rounded px-2 py-1 bg-gray-700 text-white"
+                                className="w-full rounded px-2 py-1 bg-gray-700 text-white mt-1"
                                 required
                             />
-                        </div>
                     </div>
-
 
                     {/* Contacts */}
                     <div className="flex flex-col gap-1 col-span-full text-left">
@@ -831,7 +792,7 @@ export function Lights_Staff({ lights_staff, setLightsStaff}) {
                     name="embalmer"
                     value={ls?.embalmer || ''}
                     onChange={handleLSchange}
-                    required
+                    // required
                     className="rounded px-2 bg-gray-700 text-white"
                 />
             </div>
@@ -843,7 +804,7 @@ export function Lights_Staff({ lights_staff, setLightsStaff}) {
                     name="driver"
                     value={ls?.driver || ''}
                     onChange={handleLSchange}
-                    required
+                    // required
                     className="rounded px-2 bg-gray-700 text-white"
                 />
             </div>
@@ -855,7 +816,7 @@ export function Lights_Staff({ lights_staff, setLightsStaff}) {
                     name="helper"
                     value={ls?.helper || ''}
                     onChange={handleLSchange}
-                    required
+                    // required
                     className="rounded px-2 bg-gray-700 text-white"
                 />
             </div>
@@ -866,7 +827,7 @@ export function Lights_Staff({ lights_staff, setLightsStaff}) {
                     name="plate_num"
                     value={ls?.plate_num || ''}
                     onChange={handleLSchange}
-                    required
+                    // required
                     className="rounded px-2 bg-gray-700 text-white"
                 />
             </div>
@@ -877,7 +838,7 @@ export function Lights_Staff({ lights_staff, setLightsStaff}) {
                     name="lights"
                     value={ls?.lights || ''}
                     onChange={handleLSchange}
-                    required
+                    // required
                     className="rounded px-2 bg-gray-700 text-white"
                 />
             </div>

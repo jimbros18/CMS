@@ -29,7 +29,7 @@ export async function getClients() {
     });
 
     const clients = await response.json();
-    console.log('SERVER: ', clients);
+    // console.log('SERVER: ', clients);
     return clients;
   } catch (error) {
     console.error("Error:", error);
@@ -123,33 +123,22 @@ export async function getPlans() {
   }
 }
 
-export async function getRegions() {
+export async function getProvinces() {
   try {
-    const res = await fetch('https://psgc.cloud/api/regions');
-    if (!res.ok) throw new Error('Failed to fetch regions');
+    const res = await fetch(`https://psgc.cloud/api/provinces`);
+    if (!res.ok) throw new Error('Failed to fetch provinces');
     
     const data = await res.json();
-    return Array.isArray(data) ? data : [];
+    return Array.isArray(data) 
+        ? data.sort((a, b) => a.name.localeCompare(b.name)) 
+        : [];
   } catch (error) {
-    console.error("Error fetching regions:", error);
+    console.error("Error fetching provinces:", error);
     return [];
   }
 }
 
-export async function getProvinces(regionCode) {
-  try {
-      const res = await fetch(`https://psgc.cloud/api/regions/${regionCode}/provinces`);
-      if (!res.ok) throw new Error('Failed to fetch provinces');
-      const data = await res.json();
-      return Array.isArray(data) ? data : [];
-  }
-  catch (error) {
-      console.error("Error fetching provinces:", error);
-      return [];
-  }
-}
-
-export async function getCitiesMunicipalities(provinceCode) {
+export async function getCities(provinceCode) {
   try {
       const res = await fetch(`https://psgc.cloud/api/provinces/${provinceCode}/cities-municipalities`);
       if (!res.ok) throw new Error('Failed to fetch cities/municipalities');
@@ -159,5 +148,18 @@ export async function getCitiesMunicipalities(provinceCode) {
   catch (error) {
       console.error("Error fetching cities/municipalities:", error);
       return [];
+  }
+}
+
+export async function getBarangays(cityCode) {
+  try {
+      const res = await fetch(`https://psgc.cloud/api/cities-municipalities/${cityCode}/barangays`);
+      if (!res.ok) throw new Error('Failed to fetch barangays');
+      const data = await res.json();
+      return Array.isArray(data) ? data : [];
+  }
+  catch (error) {
+      console.error("Error fetching barangays:", error);
+      return [];  
   }
 }
