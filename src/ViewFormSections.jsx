@@ -1,33 +1,33 @@
 import { useState, useEffect, useMemo} from 'react';
-import { getCoffins } from './API/server_api';
+import { getCoffins, getLights } from './API/server_api';
 
 export function ClientView({ client = {}, formatDate, intermentDate }) {
     const displayValue = (value) => (value || '—');
 
     return (
-        <section className="w-full space-y-6">
+        <section className="w-full">
                 <h2 className="text-xl font-semibold text-slate-900">
                     Client Information
                 </h2>
-                <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-
-                    {/* Date Serviced */}
-                    <div className="flex flex-col gap-1">
-                        <label className="text-xs font-semibold uppercase tracking-wider text-slate-500">
-                            Date Serviced
-                        </label>
-                        <div className="text-lg text-slate-800">
-                            {displayValue(formatDate(client.dateServiced))}
+                <div className="grid grid-cols-1 gap-6 ">
+                    <div className="flex flex-col md:flex-row items-start justify-start gap-6">  
+                        <div className="flex flex-col gap-1 w-full">
+                            <label className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+                                Date Serviced
+                            </label>
+                            <div className="text-lg text-slate-800">
+                                {displayValue(formatDate(client.dateServiced))}
+                            </div>
                         </div>
-                    </div>
-                    <div className="flex flex-col gap-1">
-                        <label className="text-xs font-semibold uppercase tracking-wider text-slate-500">
-                            Interment Datetime
-                        </label>
-                        <div className="text-lg text-slate-800">
-                            {displayValue(intermentDate(client.interment_datetime))}
+                        <div className="flex flex-col gap-1 w-full">
+                            <label className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+                                Interment
+                            </label>
+                            <div className="text-lg text-slate-800">
+                                {displayValue(intermentDate(client.interment_datetime))}
+                            </div>
                         </div>
-                    </div>
+                     </div>
                     {/* Deceased */}
                     <div className="flex flex-col gap-1 md:col-span-2">
                         <label className="text-xs font-semibold uppercase tracking-wider text-slate-500">
@@ -47,7 +47,7 @@ export function ClientView({ client = {}, formatDate, intermentDate }) {
                         <label className="text-xs font-semibold uppercase tracking-wider text-slate-500">
                             Address
                         </label>  
-                            <div className="text-lg text-slate-800">
+                            <div className="text-lg text-slate-800 break-words">
                                 {displayValue(client.purok)}, {displayValue(client.barangay)}, {displayValue(client.city)}, {displayValue(client.province)}
                             </div>
                     </div>
@@ -356,7 +356,7 @@ export function PaymentsView({ payments = [] }) {
 
 export function PriceBreakdown({client, dswd, payments, otherCharges}) {
     return (
-    <div className='payment_details self-start flex flex-col items-start text-left border border-gray-300 rounded p-6 bg-white shadow-md w-[400px]'>
+    <div className='payment_details self-start flex flex-col items-start text-left border border-gray-300 rounded p-6 bg-white shadow-md w-full'>
                 <h2 className="text-gray-800 mb-2">Price Breakdown</h2>
                 <div className='flex justify-between w-full'>
                     <p>Coffin:</p>
@@ -399,12 +399,12 @@ export function PriceBreakdown({client, dswd, payments, otherCharges}) {
     );
 }
 
-export function Lights_Staff({ lights_staff }) {
-    const ls = lights_staff?.[0]; // ← get first row
+export function Staff({ staff }) {
+    const ls = staff?.[0]; // ← get first row
     
     return (
-        <div className='lights_services self-start flex flex-col items-start text-left border border-gray-300 rounded bg-white shadow-md p-6 mt-6 w-[400px]'>
-            <h2 className="text-gray-800 mb-2">Lights and Services</h2>
+        <div className='staff self-start flex flex-col items-start text-left border border-gray-300 rounded bg-white shadow-md p-6 mt-6 w-full'>
+            <h2 className="text-gray-800 mb-2">Staff</h2>
             <div className='flex justify-between w-full'>
                 <label>Embalmer:</label>
                 <label className="text-right text-gray-800">{ls?.embalmer || ''}</label>
@@ -421,9 +421,32 @@ export function Lights_Staff({ lights_staff }) {
                 <label>Plate Number:</label>
                 <label className="text-right text-gray-800">{ls?.plate_num || ''}</label>
             </div>
-            <div className='flex justify-between w-full'>
-                <label>Lights:</label>
-                <label className="text-right text-gray-800">{ls?.lights || ''}</label>
+        </div>
+    );
+}
+
+export function Lights({ lights }) {
+    console.log('lights:', lights);
+    return (
+        <div className="self-start flex flex-col items-start text-left border border-gray-300 rounded bg-white shadow-md p-6 mt-6 w-full">
+            <h2 className="text-gray-800 mb-4 text-left">Lights</h2>
+            <div className="flex flex-col text-sm w-full">
+                {(lights.length === 0) ? (
+                    <p className="text-gray-800 text-center w-full">No lights recorded</p>
+                ) : (
+                    lights.map((item) => (
+                        <label key={item.id} className="flex items-center gap-2 px-2 py-1 rounded bg-blue-50 text-blue-700 font-medium">
+                            <input
+                                type="checkbox"
+                                checked={true}
+                                // disabled
+                                className="ml-2 accent-blue-600"
+                                onChange={() => {}}
+                            />
+                            {item.item_name}
+                        </label>    
+                    ))
+                )}
             </div>
         </div>
     );

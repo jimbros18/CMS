@@ -11,18 +11,15 @@ import {
     PaymentsTable,
     DSWDInfo,
     Inclusions,
-    Lights_Staff
+    Staff,
+    Lights
+
 } from './formSections';
 
 // ================ UPDATE CLIENT FORM ===================
 export default function UpdateForm({ data, onFormSubmitted, setUpdateForm, selectedClient }) {
     const [resetKey, setResetKey] = useState(0);
     const [client, setClientData] = useState(data.client || {});
-    // const [region, setRegion] = useState([]);
-    // const [province, setProvince] = useState([]);
-    // const [city, setCity] = useState([]);
-    // const [brgy, setBrgys] = useState([]);
-    // const [purok, setPuroks] = useState([]);
     const [dswd, setDswd] = useState(Array.isArray(data.dswd) ? data.dswd[0] : data.dswd || {});
     const [payments, setPayments] = useState(data.payments || []);
     const [otherCharges, setOtherCharges] = useState(data.otherCharges || []);
@@ -32,7 +29,8 @@ export default function UpdateForm({ data, onFormSubmitted, setUpdateForm, selec
     const [submitStatus, setSubmitStatus] = useState('');
     const [inclusions, setInclusions] = useState(data.inclusions || []);
     const [committedCoffin, setCommittedCoffin] = useState(data.client?.coffin || '');
-    const [lights_staff, setLightsStaff] = useState(data.lights_staff?.[0] || []);
+    const [staff, setStaff] = useState(data.staff?.[0] || []);
+    const [lights, setLights] = useState(data.lights || []);
 
     useEffect(() => {
         const currentCoffin = client["coffin"];
@@ -49,7 +47,9 @@ export default function UpdateForm({ data, onFormSubmitted, setUpdateForm, selec
             inclusions,
             otherCharges,
             payments,
-            dswd
+            dswd,
+            staff,
+            lights
         };
         console.log(`inc_payload: `, payload.inclusions);
 
@@ -80,14 +80,14 @@ export default function UpdateForm({ data, onFormSubmitted, setUpdateForm, selec
     };
 
     return (
-        <div className="updateform-container flex flex-row border-blue-500 border"
+        <div className="updateform-container flex  flex-row border-blue-500 border gap-6 p-6 w-8/12"
             key={resetKey}
         >
-            <form className="flex flex-col items-start text-left"
+            <form className="flex inline-flex flex-col items-start text-left"
                 onSubmit={handleSubmit}
             >
                 <div className="flex flex-row">
-                    <div className="bg-white border-green-500 border rounded-lg p-6">
+                    <div className="bg-white border-green-500 border rounded-lg px-6 w-[60%]">
                             <div className="mt-6">
                                 <ClientInfo
                                     clientData={client}
@@ -124,16 +124,20 @@ export default function UpdateForm({ data, onFormSubmitted, setUpdateForm, selec
                                 />
                             </section>
                     </div>
-                    <div className="border-red-500 border rounded-lg flex flex-col ml-6">
+                    <div className="border-red-500 border rounded-lg flex  inline-flex flex-col ml-6 w-[40%]">
                         <PriceBreakdown
                             client={client}
                             dswd={dswd}
                             payments={payments}
                             otherCharges={otherCharges}
                         />
-                        <Lights_Staff
-                            lights_staff={lights_staff}
-                            setLightsStaff={setLightsStaff}
+                        <Staff
+                            staff={staff}
+                            setStaff={setStaff}
+                        />
+                        <Lights
+                            lights={lights}
+                            setLights={setLights}
                         />
                     </div>
                 </div> 

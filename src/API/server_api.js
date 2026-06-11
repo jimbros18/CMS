@@ -163,3 +163,20 @@ export async function getBarangays(cityCode) {
       return [];  
   }
 }
+
+export async function getLights() {
+  try {
+    const response = await fetch(`http://${ip}:9000/lights`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json"
+      }
+    });
+
+    const lights = await response.json();
+    return lights;
+  } catch (error) {
+    console.error("Error:", error);
+    return [];
+  }
+}

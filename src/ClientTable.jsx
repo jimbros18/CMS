@@ -197,8 +197,6 @@ export default function Table() {
             )}
             {viewForm && selectedClient != null && (
                 <div className="fixed inset-0 z-50 flex items-start justify-center bg-white/10 backdrop-blur-md overflow-y-auto scrollbar-hide p-12">
-                    {/* <div className="border border-yellow-300 rounded p-12"> 
-                        <div className='flex flex-row'> */}
                                     <button  className="
                                             absolute top-4 left-4
                                             flex items-center justify-center
@@ -227,10 +225,8 @@ export default function Table() {
                                     >                                               
                                         <X size={16} />
                                     </button>
-                            {/* </div> */}
-                        <ViewForm client_data={selectedClient} onClose={() => setViewForm(false)} />
-                //     </div>
-                // </div>
+                        <ViewForm client_data={selectedClient} onClose={() => setViewForm(false)}/>
+                  </div>
                 
             )}
             <div className="table-container w-full overflow-x-auto rounded bg-white p-1">
