@@ -401,6 +401,8 @@ export function PriceBreakdown({client, dswd, payments, otherCharges}) {
 
 export function Staff({ staff }) {
     const ls = staff?.[0]; // ← get first row
+    console.log('ls: ', ls)
+    console.log('staff: ', staff)
     
     return (
         <div className='staff self-start flex flex-col items-start text-left border border-gray-300 rounded bg-white shadow-md p-6 mt-6 w-full'>
@@ -425,27 +427,41 @@ export function Staff({ staff }) {
     );
 }
 
-export function Lights({ lights }) {
-    console.log('lights:', lights);
+export function Lights({ lights, returned }) {
+    const [allLights, setAllLights] = useState([]);
+
+    useEffect(() => {
+        const load = async () => {
+            const data = await getLights() || [];
+            setAllLights(data);
+        };
+        load();
+    }, []);
+
     return (
         <div className="self-start flex flex-col items-start text-left border border-gray-300 rounded bg-white shadow-md p-6 mt-6 w-full">
             <h2 className="text-gray-800 mb-4 text-left">Lights</h2>
             <div className="flex flex-col text-sm w-full">
-                {(lights.length === 0) ? (
+                {lights.length === 0 ? (
                     <p className="text-gray-800 text-center w-full">No lights recorded</p>
                 ) : (
-                    lights.map((item) => (
-                        <label key={item.id} className="flex items-center gap-2 px-2 py-1 rounded bg-blue-50 text-blue-700 font-medium">
-                            <input
-                                type="checkbox"
-                                checked={true}
-                                // disabled
-                                className="ml-2 accent-blue-600"
-                                onChange={() => {}}
-                            />
-                            {item.item_name}
-                        </label>    
-                    ))
+                    allLights
+                        .filter(item => lights.includes(item.id))
+                        .map((item) => {
+                            const isReturned = returned.includes(item.id);
+                            return (
+                                <div key={item.id} className="flex flex-row gap-2 mb-1">
+                                    <span className="px-2 py-1 rounded bg-blue-50 text-blue-700 font-medium w-full">
+                                        {item.item_name}
+                                    </span>
+                                    {isReturned && (
+                                        <span className="px-2 py-1 rounded bg-green-50 text-green-700 font-medium w-4/12">
+                                            returned
+                                        </span>
+                                    )}
+                                </div>
+                            );
+                        })
                 )}
             </div>
         </div>

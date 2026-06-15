@@ -29,8 +29,9 @@ export default function UpdateForm({ data, onFormSubmitted, setUpdateForm, selec
     const [submitStatus, setSubmitStatus] = useState('');
     const [inclusions, setInclusions] = useState(data.inclusions || []);
     const [committedCoffin, setCommittedCoffin] = useState(data.client?.coffin || '');
-    const [staff, setStaff] = useState(data.staff?.[0] || []);
-    const [lights, setLights] = useState(data.lights || []);
+    const [staff, setStaff] = useState(data.staff?.[0] || {});
+    const [lights, setLights] = useState((data.lights || []).map(l => typeof l === 'object' ? l.id : l));
+    const [returned, setReturned] = useState(data.returned || []);
 
     useEffect(() => {
         const currentCoffin = client["coffin"];
@@ -48,10 +49,10 @@ export default function UpdateForm({ data, onFormSubmitted, setUpdateForm, selec
             otherCharges,
             payments,
             dswd,
-            staff,
-            lights
+            staff: [staff],
+            lights,
+            returned
         };
-        console.log(`inc_payload: `, payload.inclusions);
 
         setSubmitStatus('Updating client data...');
         try {
@@ -138,6 +139,8 @@ export default function UpdateForm({ data, onFormSubmitted, setUpdateForm, selec
                         <Lights
                             lights={lights}
                             setLights={setLights}
+                            returned = {returned}
+                            setReturned = {setReturned}
                         />
                     </div>
                 </div> 

@@ -771,11 +771,11 @@ export function DSWDInfo({dswd, setDswd}) {
 }
 
 export function Staff({ staff, setStaff}) {
-    const s = staff?.[0]; // ← get first row
-    
-    const handleLSchange = (e) => {
+    // const s = Array.isArray(staff) ? staff[0] : staff;
+        
+    const handleChange = (e) => {
         const { name, value } = e.target;
-        setStaff([{ ...s, [name]: value }]);
+        setStaff((prev) => ({ ...prev, [name]: value }));
     };
 
 
@@ -788,8 +788,8 @@ export function Staff({ staff, setStaff}) {
                     type="text"
                     pattern="[A-Za-z ]+"
                     name="embalmer"
-                    value={s?.embalmer || ''}
-                    onChange={handleLSchange}
+                    value={staff?.embalmer || ''}
+                    onChange={handleChange}
                     // required
                     className="rounded px-2 bg-gray-700 text-white"
                 />
@@ -800,8 +800,8 @@ export function Staff({ staff, setStaff}) {
                     type="text"
                     pattern="[A-Za-z ]+"
                     name="driver"
-                    value={s?.driver || ''}
-                    onChange={handleLSchange}
+                    value={staff?.driver || ''}
+                    onChange={handleChange}
                     // required
                     className="rounded px-2 bg-gray-700 text-white"
                 />
@@ -812,8 +812,8 @@ export function Staff({ staff, setStaff}) {
                     type="text"
                     pattern="[A-Za-z ]+"
                     name="helper"
-                    value={s?.helper || ''}
-                    onChange={handleLSchange}
+                    value={staff?.helper || ''}
+                    onChange={handleChange}
                     // required
                     className="rounded px-2 bg-gray-700 text-white"
                 />
@@ -823,17 +823,17 @@ export function Staff({ staff, setStaff}) {
                 <input
                     type="text"
                     name="plate_num"
-                    value={s?.plate_num || ''}
-                    onChange={handleLSchange}
+                    value={staff?.plate_num || ''}
+                    onChange={handleChange}
                     // required
                     className="rounded px-2 bg-gray-700 text-white"
                 />
-            </div>
+            </div>  
         </div>
     );
 }
 
-export function Lights({ lights, setLights }) {
+export function Lights({ lights, setLights, returned, setReturned}) {
     const [allLights, setAllLights] = useState([]);
 
     useEffect(() => {
@@ -846,7 +846,7 @@ export function Lights({ lights, setLights }) {
 
     const checked = useMemo(() => {
         return allLights.reduce((acc, item) => {
-            acc[item.id] = lights.some(l => l.id === item.id);
+            acc[item.id] = lights.includes(item.id); // ✅ lights is array of numbers
             return acc;
         }, {});
     }, [allLights, lights]);
@@ -854,23 +854,25 @@ export function Lights({ lights, setLights }) {
     const handleChange = (e) => {
         const { value, checked } = e.target;
         const id = Number(value);
-        const item = allLights.find(l => l.id === id); // ✅ get full object
         setLights((prev) =>
             checked
-                ? [...prev, item]
-                : prev.filter((l) => Number(l.id) !== id)
+                ? [...prev, id]
+                : prev.filter((l) => l !== id)
         );
+        if (!checked) {
+            setReturned((prev) => prev.filter((r) => r !== id));
+        }
     };
 
-    // const handleChange = (e) => {
-    //     const { value, checked } = e.target;
-    //     const id = Number(value);
-    //     setLights((prev) =>
-    //         checked
-    //             ? [...prev, { id }]
-    //             : prev.filter((l) => Number(l.id) !== id)
-    //     );
-    // };
+    const handleReturn = (e) => {
+        const { value, checked } = e.target;
+        const id = Number(value);
+        setReturned((prev) =>
+            checked
+                ? [...prev, id]
+                : prev.filter((i) => i !== id)
+        );
+    }
 
     return (
         <div className="self-start flex flex-col items-start text-left border border-gray-300 rounded bg-white shadow-md p-6 mt-6 w-full">
@@ -880,25 +882,47 @@ export function Lights({ lights, setLights }) {
                     <p className="text-gray-800 text-center w-full">No lights recorded</p>
                 ) : (
                     allLights.map((item) => {
-                        const isChecked = checked[item.id] ?? false;
+                        const isChecked = lights.includes(item.id);
+                        const isReturned = returned.includes(item.id); // ✅ item.id not lights.id
                         return (
-                            <label key={item.id}
-                                className={`flex items-center gap-2 py-1 rounded transition-colors ${
-                                    isChecked
-                                        ? "bg-blue-50 text-blue-700 font-medium"
-                                        : "text-gray-700 cursor-pointer hover:bg-gray-50"
-                                }`}
-                            >
-                                <input
-                                    name={item.item_name}
-                                    value={item.id}
-                                    type="checkbox"
-                                    checked={isChecked}
-                                    onChange={handleChange}
-                                    className={`${isChecked ? "accent-blue-600" : ""}`}
-                                />
-                                {item.item_name}
-                            </label>
+                            <div className={`flex flex-row gap-2 mb-2 ${isChecked ? 'bg-blue-50 rounded' : ''}`}> 
+                                <label key={item.id}
+                                    className={`flex items-center gap-2 py-1 rounded transition-colors w-full ${
+                                        isChecked
+                                            ? "bg-blue-50 text-blue-700 font-medium"
+                                            : "text-gray-700 cursor-pointer hover:bg-gray-50"
+                                    }`}
+                                >
+                                    <input
+                                        name={item.item_name}
+                                        value={item.id}
+                                        type="checkbox"
+                                        checked={isChecked}
+                                        onChange={handleChange}
+                                        className={` ml-2 ${isChecked ? "accent-blue-600" : ""}`}
+                                    />
+                                    {item.item_name}
+                                </label>
+                                {isChecked && (
+                                    <label 
+                                    className={`ml-5 flex items-center gap-2 py-1 rounded transition-colors w-8/12 ${
+                                            isReturned
+                                                ? "bg-blue-50 text-blue-700 font-medium"
+                                                : "text-gray-700 cursor-pointer hover:bg-gray-50"
+                                        }`}
+                                > 
+                                    <input
+                                        className='ml-5'
+                                        name = {item.item_name}
+                                        value={item.id}
+                                        type="checkbox" 
+                                        checked={isReturned}
+                                        onChange={handleReturn}
+                                    />
+                                    returned
+                                </label>
+                                )}
+                            </div>
                         );
                     })
                 )}

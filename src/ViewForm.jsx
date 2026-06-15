@@ -3,7 +3,7 @@ import { Library } from 'lucide-react';
 import { ClientView, ChargeTableView, DSWDView, PaymentsView, Inclusions, PriceBreakdown, Staff, Lights } from './ViewFormSections';
 
 export default function ViewForm({client_data, onClose}) {
-    const { client, inclusions, otherCharges, dswd, payments, staff, lights } = client_data;
+    const { client, inclusions, otherCharges, dswd, payments, staff, lights, returned } = client_data;
 
     const formatDate = (val) => {
         const d = new Date(val);
@@ -33,7 +33,7 @@ export default function ViewForm({client_data, onClose}) {
             <div className="flex flex-col border border-blue-500 rounded shadow-md w-[40%]">
                 <PriceBreakdown client={client} otherCharges={otherCharges} dswd={dswd[0]} payments={payments} />
                 <Staff staff={staff} />
-                <Lights lights={lights} />
+                <Lights lights={lights} returned={returned} />
             </div>
         </div>
     );
