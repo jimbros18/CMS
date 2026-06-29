@@ -1,9 +1,9 @@
 
 import { Library } from 'lucide-react';
-import { ClientView, ChargeTableView, DSWDView, PaymentsView, Inclusions, PriceBreakdown, Staff, Lights } from './ViewFormSections';
+import { ClientView, ChargeTableView, AssistanceTableView, PaymentsView, Inclusions, PriceBreakdown, Staff, Lights } from './ViewFormSections';
 
 export default function ViewForm({client_data, onClose}) {
-    const { client, inclusions, otherCharges, dswd, payments, staff, lights, returned } = client_data;
+    const { client, inclusions, otherCharges, assistance, payments, staff, lights, returned } = client_data;
 
     const formatDate = (val) => {
         const d = new Date(val);
@@ -21,17 +21,19 @@ export default function ViewForm({client_data, onClose}) {
         return `${month}-${day}-${year} ${time}`;
     };
 
+    console.log('ViewForm-assistance: ', assistance)
+
     return (
-        <div className="viewform-container inline-flex flex-row border border-black p-6 gap-6 w-8/12">        
-            <div className="flex flex-col text-left border border-red-500 rounded shadow-md bg-white p-6 w-[60%]" >
+        <div className="viewform-container inline-flex flex-row p-6 gap-6 w-8/12">        
+            <div className="flex flex-col border border-gray-300 text-left rounded shadow-lg bg-white p-6 w-[60%]" >
                 <ClientView client={client} formatDate={formatDate} intermentDate={intermentDate} />
                 <Inclusions xcoffin = {client["coffin"]} inclusions={inclusions}/>
                 <ChargeTableView otherCharges={otherCharges} />
-                <DSWDView dswd={dswd[0]} />
+                <AssistanceTableView assistance={assistance} />
                 <PaymentsView payments={payments} />
             </div>
-            <div className="flex flex-col border border-blue-500 rounded shadow-md w-[40%]">
-                <PriceBreakdown client={client} otherCharges={otherCharges} dswd={dswd[0]} payments={payments} />
+            <div className="flex flex-col rounded w-[40%]">
+                <PriceBreakdown client={client} otherCharges={otherCharges} assistance={assistance} payments={payments} />
                 <Staff staff={staff} />
                 <Lights lights={lights} returned={returned} />
             </div>

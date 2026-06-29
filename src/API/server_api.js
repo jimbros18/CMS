@@ -29,7 +29,7 @@ export async function getClients() {
     });
 
     const clients = await response.json();
-    // console.log('SERVER: ', clients);
+    console.log('SERVER: ', clients);
     return clients;
   } catch (error) {
     console.error("Error:", error);
@@ -179,4 +179,25 @@ export async function getLights() {
     console.error("Error:", error);
     return [];
   }
+}
+
+export async function getAsstProviders() {
+  try {
+    const response = await fetch(`http://${ip}:9000/asst_providers`, {
+    method: "GET", 
+    headers: {"Content-Type": "application/json"}
+    });
+    const providers = await response.json();
+    return providers;
+  }catch (error) {
+    console.error("Error:", error);
+    return [];
+  }
+  
+  
+}
+
+export async function getAllClientInfos() {
+    const res = await fetch(`http://${ip}:9000/clients/charges`);
+    return await res.json();
 }

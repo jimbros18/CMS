@@ -9,8 +9,10 @@ import {
     ClientInfo,
     Payments,
     PaymentsTable,
-    DSWDInfo,
-    Inclusions
+    Assistance,
+    Inclusions,
+    Staff,
+    Lights
 } from './formSections';
 
 // ================ CLIENT INFO ===================
@@ -34,16 +36,20 @@ function ClientForm({ onFormSubmitted }) {
         notes: '',
     };
     const [clientData, setClientData] = useState(initialClientData);
-    const [dswd, setDswd] = useState({});
+    const [assistance, setAssistance] = useState({});
     const [otherCharges, setOtherCharges] = useState([]);
     const [submitStatus, setSubmitStatus] = useState('');
     const [payments, setPayments] = useState([]);
     const [showPayment, setShowPayment] = useState(false);
     const [inclusions, setInclusions] = useState([]);
+    const [staff, setStaff] = useState([]);
+    const [lights, setLights] = useState([]);
+    const [returned, setReturned] = useState([]);
+
 
     const resetForm = () => {
         setClientData(initialClientData);
-        setDswd([{gl_date: "", ci_number: "", processor: "", amount: 0, details: ""}]);
+        setAssistance([{gl_date: "", ci_number: "", provider:"", processor: "", amount: 0}]);
         setOtherCharges([{ item_service: '', amount: 0, details: '' }]);
         setPayments([{ date_paid: '', amount_paid:'', details: '' }]);
         setInclusions([]);
@@ -56,7 +62,7 @@ function ClientForm({ onFormSubmitted }) {
             client: clientData,
             inclusions,
             otherCharges,
-            dswd,
+            assistance,
             payments
         };
 
@@ -79,50 +85,58 @@ function ClientForm({ onFormSubmitted }) {
     };
 
   return (
-       <div className="newform-container flex flex-row px-4 py-6 items-start justify-start">
-            <form
-                className="flex flex-col items-start text-left border border-gray-300 rounded p-6 bg-white shadow-md w-full"
+        <div className="updateform-container flex  flex-row border-blue-500 border gap-6 p-6 w-8/12">   
+            <form className="flex inline-flex flex-col items-start text-left"
                 onSubmit={handleSubmit}
             >
-                <ClientInfo
-                    clientData={clientData}
-                    setClientData={setClientData}                           
-                />
-                <div />
-                {submitStatus && (
-                    <div className="mb-4 w-full rounded border border-green-300 bg-green-50 px-3 py-2 text-green-700">
-                        {submitStatus}
-                    </div>
-                )}
-                <Inclusions  
-                    xcoffin ={clientData["coffin"]}
-                    inclusions={inclusions}
-                    setInclusions={setInclusions}
-                />
-                {/* ================= OTHER CHARGES ================= */}
-                <section className="section flex flex-col-reverse items-start">
-                    <h2 className="text-gray-800 mb-2">Other Charges</h2>
-                    <ChargeTable
-                        otherCharges={otherCharges}
-                        setOtherCharges = {setOtherCharges}
-                    />
-                </section>
-                {/* ================= DSWD SECTION ================= */}
-                <section className="section">
-                    <h2 className="text-gray-800 mb-2">DSWD Assistance</h2>
-                    <DSWDInfo dswd={dswd} setDswd={setDswd} />
-                </section>
+                <div className="flex flex-row">
+                    <div className = "flex flex-col text-left border border-red-500 rounded shadow-md bg-white p-6 w-[60%]">
+                        <ClientInfo clientData={clientData} setClientData={setClientData}  />
+                        {submitStatus && ( 
+                            <div className="mb-4 w-full rounded border border-green-300 bg-green-50 px-3 py-2 text-green-700">
+                                {submitStatus}
+                            </div>
+                        )}
+                        <Inclusions  
+                            xcoffin ={clientData["coffin"]}
+                            inclusions={inclusions}
+                            setInclusions={setInclusions}
+                        />
+                        {/* ================= OTHER CHARGES ================= */}
+                        <section className="section flex flex-col-reverse items-start">
+                            <ChargeTable otherCharges={otherCharges} setOtherCharges = {setOtherCharges} />
+                        </section>
+                        {/* ================= DSWD SECTION ================= */}
+                        <section className="section">
+                            <Assistance assistance={assistance} setAssistance={setAssistance} />
+                        </section>
 
-                {/* ================= PAYMENTS ================= */}
-                <section className="section">
-                    <h2 className="text-gray-800 mb-2">Payments</h2>
-                    <PaymentsTable
-                        payments={payments}
-                        setPayments={setPayments}
-                    />
-                </section>
+                        {/* ================= PAYMENTS ================= */}
+                        <section className="section">
+                            <PaymentsTable payments={payments} setPayments={setPayments} />
+                        </section>
+                    </div>
+                    <div className="border-red-500 border rounded-lg flex  inline-flex flex-col ml-6 w-[40%]">
+                        <PriceBreakdown
+                            client={clientData}
+                            otherCharges={otherCharges}
+                            payments={payments}
+                            assistance={assistance}
+                        />
+                        <Staff
+                            staff={staff}
+                            setStaff={setStaff}
+                        />
+                        <Lights
+                            lights={lights}
+                            setLights={setLights}
+                            returned = {returned}
+                            setReturned = {setReturned}
+                        />
+                    </div>
+                </div>
                 {/* ================= FORM ACTIONS ================= */}
-                <div className="form-actions mt-4">
+                <div className="flex flex-row gap-2 items-center justify-items bg-white shadow-lg rounded-lg mt-4">
                     <button
                         type="submit"
                         className="bg-green-500 hover:bg-green-600 disabled:bg-gray-400 disabled:cursor-not-allowed text-white px-4 py-2 rounded transition-colors duration-300"
@@ -132,12 +146,6 @@ function ClientForm({ onFormSubmitted }) {
                     </button>
                 </div>
             </form>
-                <PriceBreakdown
-                    client={clientData}
-                    otherCharges={otherCharges}
-                    payments={payments}
-                    dswd={dswd}
-                />
         </div>
     );
 }

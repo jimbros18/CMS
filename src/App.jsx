@@ -13,12 +13,15 @@ function App() {
     };
 
     return (
-        <>
-            <Sidebar activeKey={activeKey} onItemClick={handleItemClick} />
-            <main className="main_content w-full min-h-screen p-4 bg-gray-800 mx-5">
-                <Content activeKey={activeKey} />
-            </main>
-        </>
+        <div className='flex flex-row w-full'>
+            <Sidebar 
+                activeKey={activeKey} 
+                onItemClick={handleItemClick} 
+            />
+            <Content 
+                activeKey={activeKey} 
+            />
+        </div>
     );
 }
 

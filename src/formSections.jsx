@@ -1,6 +1,6 @@
 import { Save, Trash, Pencil, Plus, XCircle } from 'lucide-react';
 import { useState, useEffect, useMemo } from 'react';
-import { getCoffins, getPlans, getProvinces, getCities, getBarangays, getLights} from './API/server_api';
+import { getCoffins, getPlans, getProvinces, getCities, getBarangays, getLights, getAsstProviders} from './API/server_api';
 
 
 export function ClientInfo({clientData, setClientData}) { 
@@ -404,6 +404,7 @@ export function ChargeTable({ otherCharges, setOtherCharges}) {
     };
     return (
         <div className="w-full overflow-x-auto">
+            <h2 className="text-gray-800 mb-2">Other Charges</h2>
             <table className="min-w-full max-w-full border-collapse border border-gray-300 text-sm">
                 <thead>
                     <tr className="bg-gray-200">
@@ -465,7 +466,7 @@ export function ChargeTable({ otherCharges, setOtherCharges}) {
             <div className="flex flex-col-reverse items-start">
                 <button
                     type="button"
-                    className="ml-5 mt-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded transition-colors duration-300"
+                    className="mt-4 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded transition-colors duration-300"
                     onClick={() =>
                         showCharge ? addCharge() : setShowCharge(true)
                     }
@@ -574,6 +575,7 @@ export function PaymentsTable({ payments = [], setPayments }) {
 
     return (
         <div className="w-full overflow-x-auto">
+            <h2 className="text-gray-800 mb-2">Payments</h2>
             <table className="min-w-full max-w-full border-collapse border border-gray-300 text-sm">
                 <thead>
                     <tr className="bg-gray-200">
@@ -680,23 +682,147 @@ export function Payments({ tempPaymentData, setTempPaymentData }) {
     );
 }
 
-export function DSWDInfo({dswd, setDswd}) {
+export function AssistanceTable({assistance, setAssistance}) {
+    const [showAsst, setShowAsst] = useState(false);
+    const [tempData, setTempData] = useState({
+        provider: '',
+        gl_date: new Date().toISOString().slice(0, 10),
+        ci_number: '',
+        processor: '',
+        amount: ''
+    })
 
-    const handleDswdChange = (e) => {
+    const save = () => {
+        const newData = {
+            provider: tempData.provider,
+            gl_date: tempData.gl_date,
+            ci_number: tempData.ci_number,
+            processor: tempData.processor,
+            amount: tempData.amount
+        }
+        setAssistance(prev => [...prev, newData]);
+        setTempData({
+            provider: '',
+            gl_date: new Date().toISOString().slice(0, 10),
+            ci_number: '',
+            processor: '',
+            amount: ''
+        })
+        setShowAsst(false)
+        console.log('saving tempData:', tempData);
+    };
+
+    const deleteAssistance = (index) => {
+        setAssistance((prev) => prev.filter((_, i) => i !== index));
+    }
+
+    return (
+        <div className="w-full overflow-x-auto">
+            <h2 className="text-gray-800 mb-2">Assistance</h2>
+            <table className="min-w-full max-w-full border-collapse border border-gray-300 text-sm">
+                <thead>
+                    <tr className="bg-gray-200">
+                        <th className="border border-gray-300 px-2 py-1 text-left">Provider</th>
+                        <th className="border border-gray-300 px-2 py-1 text-left">GL Date</th>
+                        <th className="border border-gray-300 px-2 py-1 text-left">CI Number</th>
+                        <th className="border border-gray-300 px-2 py-1 text-left">Processor</th>
+                        <th className="border border-gray-300 px-2 py-1 text-left">Amount</th>
+                        <th className="border border-gray-300 px-2 py-1 text-left">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {assistance.length === 0 ? (
+                        <tr>
+                        <td colSpan="6" className="border border-gray-300 px-2 py-1 text-center text-gray-500">
+                            No Payments yet
+                        </td>
+                    </tr>
+                    ): (
+                        assistance?.map((v, i) => (
+                            <tr key={i} className={`${i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}>
+                                <td className='border border-gray-300 px-2 py-1'>{v.provider}</td>
+                                <td className='border border-gray-300 px-2 py-1'>{v.gl_date}</td>
+                                <td className='border border-gray-300 px-2 py-1'>{v.ci_number}</td>
+                                <td className='border border-gray-300 px-2 py-1'>{v.processor}</td>
+                                <td className='border border-gray-300 px-2 py-1'>{v.amount}</td>
+                                <td className='border border-gray-300 px-2 py-1'>
+                                    <button 
+                                        type="button" 
+                                        onClick={() => deleteAssistance(i)}
+                                        className='text-red-500 hover:text-red-700'
+                                    >
+                                        <Trash size={14}/>
+                                    </button>
+                                </td>
+                            </tr>
+                        ))
+                    )}
+                </tbody>
+            </table>
+            <div className="flex flex-col items-start py-4">
+                {showAsst && (
+                    <Assistance 
+                        tempData = {tempData}
+                        setTempData = {setTempData}
+                    />
+                )}
+                <button
+                    type = "button"
+                    className='bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600'
+                    onClick={() => showAsst ? save(): setShowAsst(true)}
+                >
+                    {showAsst ? <Save size={16}/> : <Plus size={16}/>}
+                </button>
+            </div>
+        </div>
+    )
+
+
+}
+
+export function Assistance({tempData, setTempData}) {
+    const [providers, setProviders] = useState();
+
+    useEffect(() => {
+        const load = async () => {
+            const data = await getAsstProviders();
+            setProviders(data);
+        };
+        load();
+    }, []);
+
+    const handleAsstChange = (e) => {
         const { name, value } = e.target;
-        setDswd((prev) => ({ ...prev, [name]: value }));
+        setTempData((prev) => ({ ...prev, [name]: value }));
     };
 
     return (
-        <div className="flex flex-col items-start gap-4 w-full">
-            <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                <div className="flex flex-col items-start gap-1">
+                    <label>Provider</label>
+                    <select 
+                        name="provider"
+                        value={tempData?.provider || ''}
+                        onChange={handleAsstChange}
+                        className="w-full rounded px-2 py-1 bg-gray-700 text-white"
+                        required
+                    >
+                       <option value="" disabled hidden>Select Provider</option>
+                            {providers?.map((p) => (
+                                <option key={p.id} value={p.provider}>
+                                    {p.provider}
+                                </option>
+                            ))} 
+                    </select>
+                </div>
+
                 <div className="flex flex-col items-start gap-1">
                     <label>GL Date</label>
                     <input
                         type="date"
                         name="gl_date"
-                        value={dswd?.gl_date ? new Date(dswd.gl_date).toISOString().split("T")[0] : ""}
-                        onChange={handleDswdChange}
+                        value={tempData?.gl_date ? new Date(tempData.gl_date).toISOString().split("T")[0] : ""}
+                        onChange={handleAsstChange}
                         className="w-full rounded px-2 py-1 bg-gray-700 text-white"
                         // required
                     />
@@ -707,8 +833,8 @@ export function DSWDInfo({dswd, setDswd}) {
                     <input
                         type="text"
                         name="ci_number"
-                        value={dswd?.ci_number || ''}
-                        onChange={handleDswdChange}
+                        value={tempData?.ci_number || ''}
+                        onChange={handleAsstChange}
                         className="w-full rounded px-2 py-1 bg-gray-700 text-white"
                         // required
                     />
@@ -719,8 +845,8 @@ export function DSWDInfo({dswd, setDswd}) {
                     <input
                         type="text"
                         name="processor"
-                        value={dswd?.processor || ''}
-                        onChange={handleDswdChange}
+                        value={tempData?.processor || ''}
+                        onChange={handleAsstChange}
                         className="w-full rounded px-2 py-1 bg-gray-700 text-white"
                         // required
                     />
@@ -731,41 +857,14 @@ export function DSWDInfo({dswd, setDswd}) {
                     <input
                         type="number"
                         name="amount"
-                        value={dswd?.amount || ''} 
-                        onChange={handleDswdChange}
+                        value={tempData?.amount || ''} 
+                        onChange={handleAsstChange}
                         min="0"
                         step="0.01"
                         className="w-full rounded px-2 py-1 bg-gray-700 text-white"
                         // required
                     />
                 </div>
-
-                <div className="flex flex-col items-start gap-1">
-                    <label>Status</label>
-                    <select
-                        name="status"
-                        value={dswd?.status || 'Pending'}
-                        onChange={handleDswdChange}
-                        className="w-full rounded px-2 py-1 bg-gray-700 text-white"
-                    >
-                        <option value="Pending">Pending</option>
-                        <option value="Approved">Approved</option>
-                        <option value="Released">Released</option>
-                        <option value="Denied">Denied</option>
-                    </select>
-                </div>
-
-                <div className="flex flex-col items-start gap-1 col-span-full">
-                    <label>Notes</label>
-                    <textarea
-                        name="notes"
-                        value={dswd?.notes || ''}
-                        onChange={handleDswdChange}
-                        rows={2}
-                        className="w-full rounded px-2 py-1 bg-gray-700 text-white"
-                    />
-                </div>
-            </div>
         </div>
     );
 }
@@ -845,7 +944,7 @@ export function Lights({ lights, setLights, returned, setReturned}) {
     }, []);
 
     const checked = useMemo(() => {
-        return allLights.reduce((acc, item) => {
+        return allLights?.reduce((acc, item) => {
             acc[item.id] = lights.includes(item.id); // ✅ lights is array of numbers
             return acc;
         }, {});

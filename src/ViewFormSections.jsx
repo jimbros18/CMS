@@ -1,3 +1,4 @@
+import { Save, Trash, Pencil, Plus, XCircle } from 'lucide-react';
 import { useState, useEffect, useMemo} from 'react';
 import { getCoffins, getLights } from './API/server_api';
 
@@ -150,7 +151,14 @@ export function Inclusions({ xcoffin, inclusions, setInclusions }) {
                     {incs.map((item) => {
                         const disabled = inclusions.includes(item);
                         return (
-                        <label key={item} 
+                        <>
+                        <ul key={item} 
+                                className='flex items-center gap-2 px-2 py-1 rounded bg-blue-50 mb-1 gap-2'>
+                            <li className="ml-2 text-blue-700 font-medium" >
+                                {item}
+                            </li>
+                        </ul>
+                        {/* <label key={item} 
                                 className={`flex items-center gap-2 px-2 py-1 rounded transition-colors ${
                                     disabled
                                         ? "bg-blue-50 text-blue-700 font-medium"
@@ -168,7 +176,8 @@ export function Inclusions({ xcoffin, inclusions, setInclusions }) {
                                 className="ml-2 bg-gray-200 accent-blue-600" 
                             />
                             {item}
-                        </label>
+                        </label> */}
+                        </>
                         )
                     })}
                 </div>
@@ -225,85 +234,44 @@ export function ChargeTableView({ otherCharges = [] }) {
     );
 }
 
-export function DSWDView({ dswd = {} }) {
-    const displayValue = (value) => (value || '—');
-    if (Object.keys(dswd).length === 0) {
-        return (
-            <section className="w-full text-slate-900 my-6">
-                <h2 className="text-slate-900 mb-4 text-left text-xl font-semibold">
-                    DSWD Assistance
-                </h2>
-                <div className="w-full border-slate-300 rounded p-4 text-center text-gray-800">
-                    No record yet.
-                </div>
-            </section>
-        )
-    }
+export function AssistanceTableView({assistance = []}) {
     return (
-      <section className="w-full text-slate-900 my-6">
-            <h2 className="text-slate-900 mb-4 text-left text-xl font-semibold">
-                DSWD Assistance
-            </h2>
+        <div className="w-full overflow-x-auto">
+            <h2 className="text-gray-800 mb-2">Assistance</h2>
+            <table className="min-w-full max-w-full border-collapse text-sm">
+                <thead>
+                    <tr className="bg-gray-800 text-white">
+                        <th className="border border-gray-300 px-2 py-2 text-left text-xs">PROVIDER</th>
+                        <th className="border border-gray-300 px-2 py-2 text-left text-xs">GL DATE</th>
+                        <th className="border border-gray-300 px-2 py-2 text-left text-xs">CI NUMBER</th>
+                        <th className="border border-gray-300 px-2 py-2 text-left text-xs">PROCESSOR</th>
+                        <th className="border border-gray-300 px-2 py-2 text-left text-xs">AMOUNT</th>
+                    </tr>
+                </thead>
+                <tbody className='text-black'>
+                    {assistance.length === 0 ? (
+                        <tr>
+                        <td colSpan="6" className="border border-gray-300 px-2 py-1 text-center text-gray-500">
+                            No Assistance recorded.
+                        </td>
+                    </tr>
+                    ): (
+                        assistance.map((v, i) => (
+                            <tr key={i} className={`${i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}>
+                                <td className='border border-gray-300 px-2 py-1'>{v.provider}</td>
+                                <td className='border border-gray-300 px-2 py-1'>{v.gl_date}</td>
+                                <td className='border border-gray-300 px-2 py-1'>{v.ci_number}</td>
+                                <td className='border border-gray-300 px-2 py-1'>{v.processor}</td>
+                                <td className='border border-gray-300 px-2 py-1'>₱ {Number(v.amount).toLocaleString()}</td>
+                            </tr>
+                        ))
+                    )}
+                </tbody>
+            </table>
+        </div>
+    )
 
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
 
-                <div className="flex flex-col gap-1">
-                    <label className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
-                        GL Date
-                    </label>
-                    <div className="text-lg text-slate-800">
-                        {dswd?.gl_date ? new Date(dswd.gl_date).toISOString().split('T')[0] : '—'}
-                    </div>
-                </div>
-
-                <div className="flex flex-col gap-1">
-                    <label className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
-                        CI Number
-                    </label>
-                    <div className="text-lg text-slate-800">
-                        {displayValue(dswd?.ci_number)}
-                    </div>
-                </div>
-
-                <div className="flex flex-col gap-1">
-                    <label className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
-                        Processor
-                    </label>
-                    <div className="text-lg text-slate-800">
-                        {displayValue(dswd?.processor)}
-                    </div>
-                </div>
-
-                <div className="flex flex-col gap-1">
-                    <label className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
-                        Amount
-                    </label>
-                    <div className="text-lg text-slate-800">
-                        ₱ {Number(dswd?.amount || 0).toLocaleString()}
-                    </div>
-                </div>
-
-                <div className="flex flex-col gap-1">
-                    <label className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
-                        Status
-                    </label>
-                    <div className="text-lg text-slate-800">
-                        {displayValue(dswd?.status)}
-                    </div>
-                </div>
-
-                <div className="flex flex-col gap-1 md:col-span-3">
-                    <label className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
-                        Notes
-                    </label>
-                    <div className="min-h-[70px] whitespace-pre-wrap text-lg text-slate-800">
-                        {displayValue(dswd?.notes)}
-                    </div>
-                </div>
-
-            </div>
-        </section>
-    );
 }
 
 export function PaymentsView({ payments = [] }) {
@@ -354,32 +322,42 @@ export function PaymentsView({ payments = [] }) {
     );
 }
 
-export function PriceBreakdown({client, dswd, payments, otherCharges}) {
+export function PriceBreakdown({client, assistance, payments, otherCharges}) {  
+    const totalAss = assistance.reduce((sum, ass) => sum + Number(ass.amount || 0), 0);
+    
     return (
     <div className='payment_details self-start flex flex-col items-start text-left border border-gray-300 rounded p-6 bg-white shadow-md w-full'>
                 <h2 className="text-gray-800 mb-2">Price Breakdown</h2>
-                <div className='flex justify-between w-full'>
-                    <p>Coffin:</p>
-                    <p>{client?.coffinAmount ? Number(client.coffinAmount || 0).toLocaleString() : '0'}</p>
+                <div className='flex flex-col justify-between w-full border-b border-gray-800 text-gray-700'>
+                    <div className='flex justify-between w-full'>
+                        <p>Coffin:</p>
+                        <p>{client?.coffinAmount ? Number(client.coffinAmount || 0).toLocaleString() : '0'}</p>
+                    </div>
+                    {otherCharges.map((charge, index) => (
+                        <div className='flex justify-between w-full' key={index}>
+                            <p className="capitalize">{charge.item_service}:</p>
+                            <p> { charge?.amount? Number(charge.amount || 0).toLocaleString() : '0'}</p>
+                        </div>                 
+                    ))}
                 </div>
-                {otherCharges.map((charge, index) => (
-                    <div className='flex justify-between w-full' key={index}>
-                        <p className="capitalize">{charge.item_service}:</p>
-                        <p> { charge?.amount? Number(charge.amount || 0).toLocaleString() : '0'}</p>
-                    </div>                 
-                ))}
-                <div className='flex justify-between w-full'>
+                <div className='flex justify-between w-full mb-3'>
                     <h3 className='text-gray-800 font-bold'>Total:</h3>
                     <h3 className='text-gray-800 font-bold'>{Number(client?.coffinAmount + otherCharges?.reduce((sum, charge) => sum + charge?.amount, 0)).toLocaleString()}</h3>
                 </div>
-                <div className='flex justify-between w-full'>
-                    <h3 className='text-gray-800 font-bold'>DSWD:</h3>
-                    <h3 className='text-gray-800 font-bold'>{dswd?.amount ? `${Number(dswd.amount).toLocaleString()}` : 0}</h3>
-                </div>
-                <div className='flex justify-between w-full'>
+                {assistance.map((ass) => {
+                    return (
+                        <div className='flex justify-between w-full'>
+                            <h3 className='text-gray-800 font-bold'>{ass.provider}:</h3>
+                            <h3 className='text-gray-800 font-bold'>{ass?.amount ? `${Number(ass.amount).toLocaleString()}` : 0}</h3>
+                        </div>
+                    )
+                })}
+                
+                <div className='flex justify-between w-full border-b border-gray-800'>
                     <h3 className='text-gray-800 font-bold'>Amount Paid:</h3>
                     <h3 className='text-gray-800 font-bold'> {Number(payments?.reduce((sum, payment) => sum + Number(payment.amount_paid || 0),0)).toLocaleString()}</h3>
                 </div>
+
                 <div className='flex justify-between w-full'>
                     <h3 className='text-gray-800 font-bold'>Balance:</h3>
                     <h3 className='text-gray-800 font-bold'>
@@ -388,7 +366,7 @@ export function PriceBreakdown({client, dswd, payments, otherCharges}) {
                             (otherCharges?.reduce((sum, charge) =>
                                 sum + Number(charge?.amount || 0), 0
                             ) || 0) -
-                            Number(dswd?.amount || 0) -
+                            totalAss -
                             (payments?.reduce((sum, payment) =>
                                 sum + Number(payment?.amount_paid || 0), 0
                             ) || 0)
@@ -400,9 +378,7 @@ export function PriceBreakdown({client, dswd, payments, otherCharges}) {
 }
 
 export function Staff({ staff }) {
-    const ls = staff?.[0]; // ← get first row
-    console.log('ls: ', ls)
-    console.log('staff: ', staff)
+    const ls = staff?.[0];
     
     return (
         <div className='staff self-start flex flex-col items-start text-left border border-gray-300 rounded bg-white shadow-md p-6 mt-6 w-full'>

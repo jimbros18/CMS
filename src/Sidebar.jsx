@@ -12,10 +12,10 @@ const menuItems = [
         func: () => console.log('Clients'),
     },
     {
-        label: 'Tasks',
+        label: 'Reports',
         icon: CheckSquare,
-        key: 'tasks',
-        func: () => console.log('Tasks'),
+        key: 'reports',
+        func: () => console.log('reports'),
     },
     {
         label: 'Payments',
@@ -33,7 +33,7 @@ const menuItems = [
 
 function Sidebar({ activeKey, onItemClick }) {
     return (
-        <aside className="fixed left-0 top-0 h-screen w-64 text-slate-200 border-r bg-gray-800">
+        <aside className="w-[15%] text-slate-200 bg-gray-800">
             <div className='mx-5 my-5 rounded bg-gray-900'>
                     <div className="border-b border-slate-800 px-6 py-6">   
                         <h2 className="text-2xl font-semibold text-sky-300">CMS</h2>

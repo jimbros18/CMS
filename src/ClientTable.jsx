@@ -18,13 +18,12 @@ export default function Table() {
         'Date': 1,
         "First": 2,
         "Last": 3,
-        "Middle": 4,
-        "Address": 5,
-        "Plan": 6,
-        "Coffin": 7,
-        "Burial Date": 8,
-        "Status" : 9,
-        "Actions": 10
+        "Address": 4,
+        "Plan": 5,
+        "Coffin": 6,
+        "Burial Date": 7,
+        "Status" : 8,
+        "Actions": 9
     };
 
     const fetchClients = async () => {
@@ -90,7 +89,7 @@ export default function Table() {
     });
 
     return (
-        <div className="flex flex-col w-[calc(100%-18rem)] ml-72 py-3 px-3 bg-slate-50 mt-1 rounded">
+        <div className="flex flex-col w-full py-3 px-3 bg-slate-50 mt-1 rounded">
             <div className="flex w-full items-center justify-between gap-2 mb-3 ml-1">
                 <div className="flex items-center gap-2">
                     <select
@@ -137,22 +136,21 @@ export default function Table() {
                 </button>
             </div>
             {NewForm && (
-                <div className="fixed inset-0 z-50 flex items-start justify-center bg-white/10 backdrop-blur-md px-4 py-6 overflow-y-auto scrollbar-hide">
-                    <div className="w-full max-w-3xl rounded-2xl p-5 ">
-                        <button
-                            onClick={() =>  setNewForm(false)}
-                            className="
-                                absolute top-4 right-4
-                                flex items-center justify-center
-                                w-8 h-8
-                                rounded-full
-                                bg-slate-100 text-slate-500
-                                hover:bg-red-500 hover:text-white
-                                transition-all duration-200
-                                shadow-sm hover:shadow-md"
-                                >                                               
+                <div className="fixed inset-0 z-50 flex items-start justify-center bg-white/10 backdrop-blur-md overflow-y-auto scrollbar-hide p-12 border border-red-500">
+                            <button
+                                onClick={() =>  setNewForm(false)}
+                                className="
+                                    absolute top-4 right-4
+                                    flex items-center justify-center
+                                    w-8 h-8
+                                    rounded-full
+                                    bg-slate-100 text-slate-500
+                                    hover:bg-red-500 hover:text-white
+                                    transition-all duration-200
+                                    shadow-sm hover:shadow-md"
+                                    >                                               
                                     <X size={16} />
-                                </button>
+                            </button>
                             <ClientForm
                                 onFormSubmitted={() => {
                                     setNewForm(false);
@@ -160,10 +158,9 @@ export default function Table() {
                                 }}
                             />                         
                     </div>
-                </div>
             )}
             {updateForm && selectedClient && (
-                <div className="fixed inset-0 z-50 flex items-start justify-center bg-white/10 backdrop-blur-md p-12 overflow-y-auto scrollbar-hide border border-red-500">
+                <div className="fixed inset-0 z-50 flex items-start justify-center bg-white/10 backdrop-blur-md  overflow-y-auto scrollbar-hide p-12">
                         <button
                             onClick={() => setUpdateForm(false)}
                             className="

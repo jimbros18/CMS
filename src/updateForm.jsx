@@ -9,18 +9,19 @@ import {
     ClientInfo,
     Payments,
     PaymentsTable,
-    DSWDInfo,
+    AssistanceTable,
     Inclusions,
     Staff,
     Lights
-
 } from './formSections';
+
+
 
 // ================ UPDATE CLIENT FORM ===================
 export default function UpdateForm({ data, onFormSubmitted, setUpdateForm, selectedClient }) {
     const [resetKey, setResetKey] = useState(0);
     const [client, setClientData] = useState(data.client || {});
-    const [dswd, setDswd] = useState(Array.isArray(data.dswd) ? data.dswd[0] : data.dswd || {});
+    const [assistance, setAssistance] = useState(Array.isArray(data.assistance) ? data.assistance : []);
     const [payments, setPayments] = useState(data.payments || []);
     const [otherCharges, setOtherCharges] = useState(data.otherCharges || []);
     const [showCharge, setShowCharge] = useState(false);
@@ -48,7 +49,7 @@ export default function UpdateForm({ data, onFormSubmitted, setUpdateForm, selec
             inclusions,
             otherCharges,
             payments,
-            dswd,
+            assistance,
             staff: [staff],
             lights,
             returned
@@ -73,7 +74,7 @@ export default function UpdateForm({ data, onFormSubmitted, setUpdateForm, selec
 
     const handleCancel = () => {
         setClientData(data.client || {});
-        setDswd(Array.isArray(data.dswd) ? data.dswd[0] : data.dswd || {});
+        setAssistance(Array.isArray(data.assistance) ? data.assistance : [])
         setPayments(data.payments || []);
         setOtherCharges(data.otherCharges || []);
         setInclusions(data.inclusions || []);
@@ -81,14 +82,14 @@ export default function UpdateForm({ data, onFormSubmitted, setUpdateForm, selec
     };
 
     return (
-        <div className="updateform-container flex  flex-row border-blue-500 border gap-6 p-6 w-8/12"
+        <div className="updateform-container flex flex-row gap-6 p-6 w-8/12"
             key={resetKey}
         >
             <form className="flex inline-flex flex-col items-start text-left"
                 onSubmit={handleSubmit}
             >
                 <div className="flex flex-row">
-                    <div className="bg-white border-green-500 border rounded-lg px-6 w-[60%]">
+                    <div className="bg-white rounded-lg px-6 w-[60%]">
                             <div className="mt-6">
                                 <ClientInfo
                                     clientData={client}
@@ -103,7 +104,6 @@ export default function UpdateForm({ data, onFormSubmitted, setUpdateForm, selec
                                 />
                                 </section>
                             <section className="section flex flex-col-reverse items-start">
-                                <h2 className="text-gray-800 mb-2">Other Charges</h2>
                                 <ChargeTable
                                     otherCharges={otherCharges}
                                     setOtherCharges={setOtherCharges}
@@ -112,23 +112,23 @@ export default function UpdateForm({ data, onFormSubmitted, setUpdateForm, selec
 
                             {/* ================= DSWD SECTION ================= */}
                             <section className="section">
-                                <h2 className="text-gray-800 mb-2">DSWD Assistance</h2>
-                                <DSWDInfo dswd={dswd} setDswd={setDswd} />
+                                <AssistanceTable 
+                                    assistance={assistance}
+                                    setAssistance={setAssistance} />
                             </section>
 
                             {/* ================= PAYMENTS ================= */}
                             <section className="section">
-                                <h2 className="text-gray-800 mb-2">Payments</h2>
                                 <PaymentsTable
                                     payments={payments}
                                     setPayments={setPayments}
                                 />
                             </section>
                     </div>
-                    <div className="border-red-500 border rounded-lg flex  inline-flex flex-col ml-6 w-[40%]">
+                    <div className="rounded-lg flex  inline-flex flex-col ml-6 w-[40%]">
                         <PriceBreakdown
                             client={client}
-                            dswd={dswd}
+                            assistance={assistance}
                             payments={payments}
                             otherCharges={otherCharges}
                         />
@@ -144,7 +144,7 @@ export default function UpdateForm({ data, onFormSubmitted, setUpdateForm, selec
                         />
                     </div>
                 </div> 
-                   <div className="flex flex-row gap-2 items-center justify-items bg-white shadow-lg rounded-lg">
+                   <div className="flex flex-row gap-2 items-center justify-items bg-white shadow-lg rounded-lg mt-4">
                     <button
                         type="submit"
                         className="bg-green-500 hover:bg-green-600 disabled:bg-gray-400 disabled:cursor-not-allowed text-white px-4 py-2 rounded transition-colors duration-300"
@@ -165,5 +165,3 @@ export default function UpdateForm({ data, onFormSubmitted, setUpdateForm, selec
 
     );
 }
-
-// export default UpdateForm;
