@@ -6,119 +6,101 @@ export function ClientView({ client = {}, formatDate, intermentDate }) {
     const displayValue = (value) => (value || '—');
 
     return (
-        <section className="w-full">
+        <section className="w-full bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-6">
+            
+            {/* Header */}
+            <div>
                 <h2 className="text-xl font-semibold text-slate-900">
                     Client Information
                 </h2>
-                <div className="grid grid-cols-1 gap-6 ">
-                    <div className="flex flex-col md:flex-row items-start justify-start gap-6">  
-                        <div className="flex flex-col gap-1 w-full">
-                            <label className="text-xs font-semibold uppercase tracking-wider text-slate-500">
-                                Date Serviced
-                            </label>
-                            <div className="text-lg text-slate-800">
-                                {displayValue(formatDate(client.dateServiced))}
-                            </div>
-                        </div>
-                        <div className="flex flex-col gap-1 w-full">
-                            <label className="text-xs font-semibold uppercase tracking-wider text-slate-500">
-                                Interment
-                            </label>
-                            <div className="text-lg text-slate-800">
-                                {displayValue(intermentDate(client.interment_datetime))}
-                            </div>
-                        </div>
-                     </div>
-                    {/* Deceased */}
-                    <div className="flex flex-col gap-1 md:col-span-2">
-                        <label className="text-xs font-semibold uppercase tracking-wider text-slate-500">
-                            Deceased
-                        </label>
-                        <div className="text-lg text-slate-800">
-                            {[
-                                displayValue(client.deceasedFirst),
-                                displayValue(client.deceasedMiddle),
-                                displayValue(client.deceasedLast)
-                            ].join(' ')}
-                        </div>
-                    </div>
+                <p className="text-sm text-slate-500">
+                    Overview of service and client details
+                </p>
+            </div>
 
-                    {/* Address */}
-                    <div className="flex flex-col gap-1 w-full md:col-span-2">
-                        <label className="text-xs font-semibold uppercase tracking-wider text-slate-500">
-                            Address
-                        </label>  
-                            <div className="text-lg text-slate-800 break-words">
-                                {displayValue(client.purok)}, {displayValue(client.barangay)}, {displayValue(client.city)}, {displayValue(client.province)}
-                            </div>
-                    </div>
-                    {/* Contacts */}
-                    <div className="flex flex-col md:flex-row gap-8 md:col-span-2">
-
-                        <div className="flex flex-col gap-1 flex-1">
-                            <label className="text-xs font-semibold uppercase tracking-wider text-slate-500">
-                                Contacts
-                            </label>
-                            <div className="text-lg text-slate-800">
-                                {displayValue(client.cellNumber)}
-                            </div>
-                        </div>
-
-                        <div className="flex flex-col gap-1 flex-1">
-                            <label className="text-xs font-semibold uppercase tracking-wider text-slate-500">
-                                Facebook
-                            </label>
-                            <div className="text-lg text-slate-800">
-                                {displayValue(client.facebook)}
-                            </div>
-                        </div>
-
-                    </div>
-
-                    {/* Plan / Coffin / Amount */}
-                    <div className="grid grid-cols-1 gap-6 sm:grid-cols-3 md:col-span-2">
-
-                        <div className="flex flex-col gap-1">
-                            <label className="text-xs font-semibold uppercase tracking-wider text-slate-500">
-                                Plan
-                            </label>
-                            <div className="text-lg text-slate-800">
-                                {displayValue(client.plan)}
-                            </div>
-                        </div>
-
-                        <div className="flex flex-col gap-1">
-                            <label className="text-xs font-semibold uppercase tracking-wider text-slate-500">
-                                Coffin
-                            </label>
-                            <div className="text-lg text-slate-800">
-                                {displayValue(client.coffin)}
-                            </div>
-                        </div>
-
-                        <div className="flex flex-col gap-1">
-                            <label className="text-xs font-semibold uppercase tracking-wider text-slate-500">
-                                Amount
-                            </label>
-                            <div className="text-lg text-slate-800">
-                                ₱ {Number(client.coffinAmount || 0).toLocaleString()}
-                            </div>
-                        </div>
-
-                    </div>
-
-                    {/* Notes */}
-                    <div className="flex flex-col gap-1 md:col-span-2">
-                        <label className="text-xs font-semibold uppercase tracking-wider text-slate-500">
-                            Notes
-                        </label>
-                        <div className="min-h-[80px] whitespace-pre-wrap text-lg text-slate-400 italic">
-                            {displayValue(client.notes)}
-                        </div>
-                    </div>
-
+            {/* Dates */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 border-t pt-4">
+                <div>
+                    <p className="text-xs text-slate-500 uppercase">Date Serviced</p>
+                    <p className="text-base font-medium text-slate-800">
+                        {displayValue(formatDate(client.dateServiced))}
+                    </p>
                 </div>
-            </section>
+
+                <div>
+                    <p className="text-xs text-slate-500 uppercase">Interment</p>
+                    <p className="text-base font-medium text-slate-800">
+                        {displayValue(intermentDate(client.interment_datetime))}
+                    </p>
+                </div>
+            </div>
+
+            {/* Deceased */}
+            <div className="border-t pt-4">
+                <p className="text-xs text-slate-500 uppercase">Deceased</p>
+                <p className="text-lg font-semibold text-slate-900">
+                    {[client.deceasedFirst, client.deceasedMiddle, client.deceasedLast]
+                        .filter(Boolean)
+                        .join(' ') || '—'}
+                </p>
+            </div>
+
+            {/* Address */}
+            <div className="border-t pt-4">
+                <p className="text-xs text-slate-500 uppercase">Address</p>
+                <p className="text-base text-slate-800">
+                    {displayValue(client.purok)}, {displayValue(client.barangay)}, {displayValue(client.city)}, {displayValue(client.province)}
+                </p>
+            </div>
+
+            {/* Contacts */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 border-t pt-4">
+                <div>
+                    <p className="text-xs text-slate-500 uppercase">Contact</p>
+                    <p className="text-base text-slate-800">{displayValue(client.cellNumber)}</p>
+                </div>
+
+                <div>
+                    <p className="text-xs text-slate-500 uppercase">Facebook</p>
+                    <p className="text-base text-slate-800">{displayValue(client.facebook)}</p>
+                </div>
+            </div>
+
+            {/* Plan Cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 border-t pt-4">
+                
+                <div className="bg-slate-50 rounded-lg p-4 border">
+                    <p className="text-xs text-slate-500 uppercase">Plan</p>
+                    <p className="text-base font-medium text-slate-900">
+                        {displayValue(client.plan)}
+                    </p>
+                </div>
+
+                <div className="bg-slate-50 rounded-lg p-4 border">
+                    <p className="text-xs text-slate-500 uppercase">Coffin</p>
+                    <p className="text-base font-medium text-slate-900">
+                        {displayValue(client.coffin)}
+                    </p>
+                </div>
+
+                <div className="bg-slate-900 text-white rounded-lg p-4">
+                    <p className="text-xs uppercase opacity-70">Amount</p>
+                    <p className="text-lg font-semibold">
+                        ₱ {Number(client.coffinAmount || 0).toLocaleString()}
+                    </p>
+                </div>
+
+            </div>
+
+            {/* Notes */}
+            <div className="border-t pt-4">
+                <p className="text-xs text-slate-500 uppercase">Notes</p>
+                <p className="min-h-[80px] whitespace-pre-wrap text-sm text-slate-500 italic">
+                    {displayValue(client.notes)}
+                </p>
+            </div>
+
+        </section>
     );
 }
 
@@ -136,53 +118,55 @@ export function Inclusions({ xcoffin, inclusions, setInclusions }) {
     const match = coffins.find((c) => c.coffin_name === xcoffin);
     const incs = match ? JSON.parse(match.items || "[]") : [];
 
-    const checked = useMemo(() => {
-        return incs.reduce((acc, item) => {
-            acc[item] = inclusions.includes(item);
-            return acc;
-        }, {});
-    }, [incs, inclusions]);
+    const toggleItem = (item) => {
+        if (inclusions.includes(item)) return;
+        setInclusions([...inclusions, item]);
+    };
 
     return (
-        <div className="w-full text-gray-800 py-8">
-            <h2 className="text-gray-800 mb-4 text-left">Inclusions</h2>
-            <div className="w-full px-4 py-3 rounded">
-                <div className="flex flex-col text-sm">
-                    {incs.map((item) => {
-                        const disabled = inclusions.includes(item);
-                        return (
-                        <>
-                        <ul key={item} 
-                                className='flex items-center gap-2 px-2 py-1 rounded bg-blue-50 mb-1 gap-2'>
-                            <li className="ml-2 text-blue-700 font-medium" >
-                                {item}
-                            </li>
-                        </ul>
-                        {/* <label key={item} 
-                                className={`flex items-center gap-2 px-2 py-1 rounded transition-colors ${
-                                    disabled
-                                        ? "bg-blue-50 text-blue-700 font-medium"
-                                        : "text-gray-700 cursor-pointer hover:bg-gray-50"
-                                }`}
-                        >
-                            <input 
-                                key={item} 
-                                name={item}
-                                value={item} 
-                                type="checkbox" 
-                                checked={checked[item] ?? false}
-                                disabled={disabled}
-                                onChange={() => {}}
-                                className="ml-2 bg-gray-200 accent-blue-600" 
-                            />
-                            {item}
-                        </label> */}
-                        </>
-                        )
-                    })}
-                </div>
+        <section className="w-full bg-white border border-slate-200 rounded-xl shadow-sm p-6 space-y-4">
+            
+            {/* Header */}
+            <div>
+                <h2 className="text-lg font-semibold text-slate-900">
+                    Inclusions
+                </h2>
+                <p className="text-sm text-slate-500">
+                    Items included with selected coffin
+                </p>
             </div>
-        </div>
+
+            {/* Content */}
+            <div className="flex flex-wrap gap-2">
+                {incs.length === 0 && (
+                    <p className="text-sm text-slate-400 italic">
+                        No inclusions available
+                    </p>
+                )}
+
+                {incs.map((item) => {
+                    const isIncluded = inclusions.includes(item);
+
+                    return (
+                        <button
+                            key={item}
+                            onClick={() => toggleItem(item)}
+                            disabled={isIncluded}
+                            className={`
+                                px-3 py-1.5 rounded-full text-sm transition-all border
+                                ${isIncluded
+                                    ? "bg-blue-100 text-blue-700 border-blue-200 font-medium cursor-default"
+                                    : "bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100"
+                                }
+                            `}
+                        >
+                            {item}
+                        </button>
+                    );
+                })}
+            </div>
+
+        </section>
     );
 }
 

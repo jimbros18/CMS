@@ -1,9 +1,9 @@
 import Table from './ClientTable';
-import Reports from './Reports';
+import reportTbl from './Reports';
 
 const components = {
     'clients': Table,
-    'reports': Reports   
+    'reports': reportTbl   
 }
 
 export default function Content({ activeKey }) {

@@ -199,5 +199,6 @@ export async function getAsstProviders() {
 
 export async function getAllClientInfos() {
     const res = await fetch(`http://${ip}:9000/clients/charges`);
-    return await res.json();
+      const data = await res.json();
+    return data;
 }
