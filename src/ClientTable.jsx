@@ -12,19 +12,33 @@ export default function Table() {
     const [allClients, setAllClients] = useState([]);
     const [activeRow, setActiveRow] = useState(null);
     const [selectedClient, setSelectedClient] = useState(null);
+    
+// const columns = [
+//     { header: 'ID',   value: (row) => row[0] },
+//     { header: 'Date', value: (row) => formatDate(row[1]) },
+//     { header: 'Name', value: (row) => `${row[2]} ${row[3]}` },
+//     { header: 'Address', value: (row) => `${row[4] || ''}, ${row[5] || ''}, ${row[6] || ''}` }, // barangay, city, province
+//     { header: 'Plan',    value: (row) => row[7] },
+//     { header: 'Coffin',  value: (row) => row[8] },
+//     { header: 'Amount',  value: (row) => row[10]?.toLocaleString() },
+//     { header: 'Burial Date', value: (row) => formatDate(row[9]) },
+//     { header: 'Status', value: (row) => row[11]},
+//     { header: 'Actions', value: (row) => row[0]},
+// ];
 
-    const columns = {
-        'ID': 0,
-        'Date': 1,
-        "First": 2,
-        "Last": 3,
-        "Address": 4,
-        "Plan": 5,
-        "Coffin": 6,
-        "Burial Date": 7,
-        "Status" : 8,
-        "Actions": 9
-    };
+const columns = [
+    { header: 'ID',          width: 'w-[10px]',  value: (row) => row[0] },
+    { header: 'Date',        width: 'w-[40px]',  value: (row) => formatDate(row[1]) },
+    { header: 'Name',        width: 'w-[60px]', value: (row) => `${row[2]} ${row[3]}` },
+    { header: 'Address',     width: 'w-[80px]', value: (row) => `${row[4] || ''}, ${row[5] || ''}, ${row[6] || ''}` },
+    { header: 'Plan',        width: 'w-[60px]', value: (row) => row[7] },
+    { header: 'Coffin',      width: 'w-[50px]', value: (row) => row[8] },
+    { header: 'Amount',      width: 'w-[40px]',  value: (row) => row[10]?.toLocaleString() },
+    { header: 'Burial Date', width: 'w-[50px]',  value: (row) => formatDate(row[9]) },
+    { header: 'Status',      width: 'w-[40px]',  value: (row) => row[11] },
+    { header: 'Actions',     width: 'w-[60px]',  value: (row) => row[0] },
+];
+
 
     const fetchClients = async () => {
         const clients = await getClients();
@@ -89,13 +103,13 @@ export default function Table() {
     });
 
     return (
-        <div className="flex flex-col w-full py-3 px-3 bg-slate-50 mt-1 rounded">
-            <div className="flex w-full items-center justify-between gap-2 mb-3 ml-1">
+        <div className="flex flex-col w-full py-2 rounded-lg border">
+            <div className="flex w-full items-center justify-between gap-2 py-2 px-4">
                 <div className="flex items-center gap-2">
                     <select
                         value={selectedMonth}
                         onChange={(e) => setSelectedMonth(e.target.value)}
-                        className="rounded px-2 py-1 bg-slate-800 text-white"
+                        className="rounded px-2 py-1 bg-slate-600 text-white"
                     >
                         <option value="">All Months</option>
                         {months.map((month, index) => (
@@ -105,7 +119,7 @@ export default function Table() {
                     <select
                         value={selectedYear}
                         onChange={(e) => setSelectedYear(e.target.value)}
-                        className="rounded px-2 py-1 bg-slate-800 text-white"
+                        className="rounded px-2 py-1 bg-slate-600 text-white"
                     >
                         <option value="">All Years</option>
                         {years.map((year, index) => (
@@ -226,49 +240,29 @@ export default function Table() {
                   </div>
                 
             )}
-            <div className="table-container w-full overflow-x-auto rounded bg-white p-1">
-                <table className="table-auto w-full border-separate border-spacing-y-1">
+            <div className="table-container w-full overflow-x-auto rounded px-4 py-2">
+                <table className="table-fixed w-full border-separate border-spacing-y-1">
                     <thead>
                         <tr className="bg-slate-900 text-slate-100 text-[11px]">
-                            {Object.keys(columns).map((header, index) => {
-                                if (header === 'actions') {
-                                    return (
-                                        <th
-                                            key={index}
-                                            className="px-2 py-1 text-center text-[15px] font-semibold uppercase tracking-[0.35px] whitespace-nowrap"
-                                        >
-                                            Actions
-                                        </th>
-                                    );
-                                }
-                                if (header === 'Burial Date'){
-                                    return (
-                                        <th
-                                            key={index}
-                                            className="text-left text-[15px] font-semibold uppercase tracking-[0.35px]"
-                                        >
-                                            Burial Date
-                                        </th>
-                                    );
-                                }
+                            {columns.map((col, i) => {
                                 return (
                                     <th
-                                        key={index}
-                                        className="px-2 py-1 text-left text-[15px] font-semibold uppercase tracking-[0.35px]"
+                                        key={i}
+                                        className={`px-2 py-1 text-left text-[15px] font-semibold uppercase tracking-[0.35px] ${col.width} ${col.header === 'Amount' ? 'text-center' : 'text-left'}`}
                                     >
-                                        {header}
+                                        {col.header}
                                     </th>
                                 );
                             })}
                         </tr>
                     </thead>
-                    <tbody className="text-lg text-slate-700">
+                    <tbody className="text-lg text-white">
                         {filteredClients.map((row, rowIndex) => {
                             const isActive = activeRow === rowIndex;
                             return (
                                 <tr
                                     key={rowIndex}
-                                    className={`border border-slate-200  ${isActive ? 'bg-blue-300' : rowIndex % 2 === 0 ? 'bg-white' : 'bg-slate-100'} hover:bg-slate-50 cursor-pointer`}
+                                    className={`hover:bg-blue-500 cursor-pointer ${isActive ? 'bg-blue-300' : rowIndex % 2 === 0 ? 'bg-slate-700' : 'bg-gray-800'}`}
                                     onDoubleClick={async (e) => {
                                             e.stopPropagation();                                                                    
                                             const clientId = row[0];           
@@ -285,52 +279,45 @@ export default function Table() {
                                             }
                                     }}
                                 >
-                                    {Object.keys(columns).map((key, colIndex) => {
-                                        const alignmentClass = key === 'Amount' ? 'text-right' : 'text-left';
-                                        const value = row[columns[key]];
-                                        if (key === 'Date') {
+                                    {columns.map((col, i) => {
+                                        const alignmentClass = col.header === 'Amount' ? 'text-right px-5' : 'text-left';
+                                        const value = col.value(row);
+                                        if (col.header === 'ID') {
                                             return (
-                                                <td className={`max-w-[50px] truncate px-2 align-top text-[13px] ${alignmentClass}`} key={colIndex}>
+                                                <td
+                                                    key={i}
+                                                    className={`${col.width} ${alignmentClass} truncate px-2 text-[13px]`}
+                                                >
+                                                    {value}
+                                                </td>
+                                            );
+                                        }
+                                        if (col.header === 'Date') {
+                                            return (
+                                                <td className={`truncate px-2 align-top text-[13px] ${col.width} ${alignmentClass} `} key={i}>
                                                     {value ? formatDate(value) : ''}
                                                 </td>
                                             );
                                         }
-                                        if (key === 'Actions') {
+                                        if (col.header === 'Name') {
                                             return (
-                                                <td
-                                                    key={colIndex}
-                                                    className="flex items-center justify-center gap-2 px-2 whitespace-nowrap"
-                                                >
-                                                    <button
-                                                        className="inline-flex h-5 w-5 items-center justify-center rounded bg-emerald-500 text-white transition hover:bg-emerald-600"
-                                                        onClick={async (e) => {
-                                                            e.stopPropagation();
-                                                            const data = await getClient(row[0]);
-                                                            if (data) {
-                                                                setSelectedClient(data);
-                                                                setUpdateForm(true);
-                                                            }
-                                                        }}
-                                                    >
-                                                        <Pencil size={16} />
-                                                    </button>
-                                                    <button
-                                                        className="inline-flex h-5 w-5 items-center justify-center rounded bg-rose-500 text-white transition hover:bg-rose-600"
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            handleDelete(row);
-                                                        }}
-                                                    >
-                                                        <Trash size={16} />
-                                                    </button>
+                                                <td className={`truncate px-2 align-top text-[13px] ${col.width} ${alignmentClass}`} key={i}>
+                                                   {value}
                                                 </td>
-                                            );
+                                            )
                                         }
-                                        if (key === 'Plan') {
+                                        if (col.header === 'Address') {
+                                            return (
+                                                <td className={`truncate px-2 align-top text-[13px] ${col.width} ${alignmentClass}`} key={i}>
+                                                    {value}
+                                                </td>
+                                            )
+                                        }
+                                        if (col.header === 'Plan') {
                                             return (
                                                 <td
-                                                    key={colIndex}
-                                                    className="max-w-[50px] truncate px-2 align-top text-[13px] text-left"
+                                                    key={i}
+                                                    className={`truncate px-5 align-top text-[13px] text-left ${col.width} ${alignmentClass}}`}
                                                 >
                                                     {value !== 'None' && value !== '' ? (
                                                         <span className="inline-flex items-center justify-center bg-orange-400 text-white px-1 py-0.5 rounded text-xs text-left">
@@ -340,21 +327,21 @@ export default function Table() {
                                                 </td>
                                             );
                                         }
-                                        if (key === 'Burial Date') {
+                                        if (col.header === 'Burial Date') {
                                             return (
-                                                <td key={colIndex} className="max-w-[50px] truncate px-2 align-top text-[13px] text-left">
+                                                <td key={i} className={`truncate px-5 align-top text-[13px] text-left ${col.width} ${alignmentClass} }`}>
                                                     {value ? (formatDate(value)) : null}
                                                 </td>
                                             );
                                         }
-                                        if (key === 'Status') {
+                                        if (col.header === 'Status') {
                                             const days = getDaysLeft(row[1]);
-                                            const balance = row[9]; // adjust index to your total_paid column
+                                            const balance = row[11]; // adjust index to your total_paid column
                                             return (
-                                                <td key={colIndex} className="px-2 align-top text-[13px] text-left">
+                                                <td key={i} className={` ${col.width} ${alignmentClass} truncate px-2 align-top text-[13px] text-left`}>
                                                     {balance > 0 && days < 0 ? (
                                                         <span className="inline-block text-center bg-red-200 text-red-700 px-1 py-0.5 rounded text-xs font-medium">
-                                                            {balance.toLocaleString()}
+                                                            {`-₱ ${balance.toLocaleString()}`}
                                                         </span>
                                                     ) : days === null ? null : days < 0 ? (
                                                         <span className="inline-block text-center bg-emerald-600 text-white px-1 py-0.5 rounded text-xs">
@@ -380,12 +367,46 @@ export default function Table() {
                                                 </td>
                                             );
                                         }
+                                        if (col.header === 'Actions') {
+                                            return (
+                                                <td
+                                                    key={i}
+                                                    className={`${col.width} px-2 py-1 align-middle`}
+                                                >
+                                                    <div className="flex px-2 gap-2">
+                                                        <button
+                                                            className="inline-flex h-5 w-5 items-center justify-center rounded bg-emerald-500 text-white transition hover:bg-emerald-600"
+                                                            onClick={async (e) => {
+                                                                e.stopPropagation();
+                                                                const data = await getClient(row[0]);
+                                                                if (data) { setSelectedClient(data); setUpdateForm(true); }
+                                                            }}
+                                                        >
+                                                            <Pencil size={14} />
+                                                        </button>
+                                                        <button
+                                                            className="inline-flex h-5 w-5 items-center justify-center rounded bg-rose-500 text-white transition hover:bg-rose-600"
+                                                            onClick={(e) => { e.stopPropagation(); handleDelete(row); }}
+                                                        >
+                                                            <Trash size={14} />
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            );
+                                        }
+                                        if (col.header === 'Amount') {
+                                            return (
+                                                <td key={i} className={`${col.width} px-2 py-1 text-[13px] align-middle`}>
+                                                    {value && value !== '0' ? `₱ ${value.toLocaleString()}` : ''}
+                                                </td>
+                                            );
+                                        }
                                         return (
                                             <td
-                                                key={colIndex}
-                                                className={`max-w-[60px] truncate px-2 align-top text-[13px] ${alignmentClass}`}
+                                                key={i}
+                                                className={`truncate px-2 align-top text-[13px] ${col.width} ${alignmentClass}`}
                                             >
-                                                {key === 'Amount' ? (value != null ? value.toLocaleString(): 0) :(value || '')}
+                                                {(value != null ? value.toLocaleString(): null)}
                                             </td>
                                         );
                                     })}

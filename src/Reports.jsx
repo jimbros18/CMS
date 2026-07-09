@@ -37,7 +37,7 @@ export default function reportTbl() {
     };
 
     return (
-        <div className="w-full p-4 border  rounded">
+        <div className="w-full p-4 border rounded-lg">
           <input
             type="text"
             placeholder="Search clients..."
@@ -59,7 +59,7 @@ export default function reportTbl() {
                     return (
                         <tr
                             key={rowIndex}
-                            className={`text-white hover:bg-blue-500 hover:text-blue-100 cursor-pointer ${rowIndex % 2 === 0 ? 'bg-slate-700' : 'bg-gray-800'}`}
+                            className={`text-white hover:bg-blue-500 cursor-pointer ${rowIndex % 2 === 0 ? 'bg-slate-700' : 'bg-gray-800'}`}
                             onClick={() => setActiveRow(rowIndex)}
                         >
                             {Object.entries(columns).map(([header, key], colIndex) => {

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 
 const ip = "10.0.2.88"
+// const ip = "192.168.0.105"
 
 export async function addClient(client) {
   try {
