@@ -1,8 +1,5 @@
 import React from 'react';
-
-// Assuming these are your icon components (from lucide-react, heroicons, etc.)
 import { Home, CheckSquare, CreditCard, Settings } from 'lucide-react';
-// or whichever icon library you're using
 
 const menuItems = [
     {
@@ -18,10 +15,10 @@ const menuItems = [
         func: () => console.log('reports'),
     },
     {
-        label: 'Payments',
+        label: 'Dashboard',
         icon: CreditCard,
-        key: 'payments',
-        func: () => console.log('Payments'),
+        key: 'dashboard',
+        func: () => console.log('Dashboard'),
     },
     {
         label: 'Settings',
@@ -31,7 +28,7 @@ const menuItems = [
     },
 ];
 
-function Sidebar({ activeKey, onItemClick }) {
+export default function Sidebar({ activeKey, onItemClick }) {
     return (
         <aside className="w-[15%] text-slate-200 bg-gray-800">
             <div className='mx-5 my-5 rounded bg-gray-900'>
@@ -71,4 +68,4 @@ function Sidebar({ activeKey, onItemClick }) {
         </aside>
     );
 }
-export default Sidebar;
+

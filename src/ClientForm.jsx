@@ -9,7 +9,7 @@ import {
     ClientInfo,
     Payments,
     PaymentsTable,
-    Assistance,
+    AssistanceTable,
     Inclusions,
     Staff,
     Lights
@@ -36,7 +36,7 @@ function ClientForm({ onFormSubmitted }) {
         notes: '',
     };
     const [clientData, setClientData] = useState(initialClientData);
-    const [assistance, setAssistance] = useState({});
+    const [assistance, setAssistance] = useState([]);
     const [otherCharges, setOtherCharges] = useState([]);
     const [submitStatus, setSubmitStatus] = useState('');
     const [payments, setPayments] = useState([]);
@@ -99,6 +99,7 @@ function ClientForm({ onFormSubmitted }) {
                         )}
                         <Inclusions  
                             xcoffin ={clientData["coffin"]}
+                            plan={clientData["plan"]}
                             inclusions={inclusions}
                             setInclusions={setInclusions}
                         />
@@ -108,7 +109,7 @@ function ClientForm({ onFormSubmitted }) {
                         </section>
                         {/* ================= DSWD SECTION ================= */}
                         <section className="section">
-                            <Assistance assistance={assistance} setAssistance={setAssistance} />
+                            <AssistanceTable assistance={assistance} setAssistance={setAssistance} />
                         </section>
 
                         {/* ================= PAYMENTS ================= */}

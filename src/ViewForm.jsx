@@ -21,7 +21,7 @@ export default function ViewForm({client_data, onClose}) {
         return `${month}-${day}-${year} ${time}`;
     };
 
-    console.log('ViewForm-assistance: ', assistance)
+    // console.log('ViewForm-assistance: ', assistance)
 
     return (
         <div className="viewform-container inline-flex flex-row p-6 gap-6 w-8/12">        

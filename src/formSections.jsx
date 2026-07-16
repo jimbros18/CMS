@@ -291,19 +291,13 @@ export function ClientInfo({clientData, setClientData}) {
                             </div>
                             <div className="flex flex-col gap-1">
                                 <label className="text-sm">Amount</label>
-                                {clientData.plan && clientData.plan !== 'None' ? (
-                                    <label className="w-full rounded px-2 py-1 bg-gray-700 text-white">
-                                       {Number(17000).toLocaleString()}
-                                    </label>
-                                ) : (
                                 <input
-                                    type="text"
-                                    name="amount"
-                                    value={Number(clientData.coffinAmount).toLocaleString() ?? ''}
+                                    type="number"
+                                    name="coffinAmount"
+                                    value={clientData.coffinAmount ?? ''}
                                     onChange={handleClientChange}
                                     className="w-full rounded px-2 py-1 bg-gray-700 text-white"
                                 />
-                                )}
                             </div>
                         </div>
                     </div>
@@ -326,9 +320,9 @@ export function ClientInfo({clientData, setClientData}) {
     );
 }
 
-export function Inclusions({ xcoffin, inclusions, setInclusions }) {
+export function Inclusions({ xcoffin, plan, inclusions, setInclusions }) {
     const [coffins, setCoffins] = useState([]);
-
+    console.log('plan: ', plan);
     useEffect(() => {
         const load = async () => {
             const data = await getCoffins();
@@ -358,28 +352,35 @@ export function Inclusions({ xcoffin, inclusions, setInclusions }) {
             <h2 className="text-gray-800 mb-4 text-left">Inclusions</h2>
             <div className="py-3 rounded">
                 <div className="flex flex-col text-sm">
-                    {incs.map((item) => {
-                        const isChecked = checked[item] ?? false;
-                        return (
-                            <label key={item} 
-                                className={`flex items-center gap-2 py-1 rounded transition-colors ${
-                                    isChecked
-                                        ? "bg-blue-50 text-blue-700 font-medium"
-                                        : "text-gray-700 cursor-pointer hover:bg-gray-50"
-                                }`}
-                            >
-                                <input 
-                                    name={item}
-                                    value={item} 
-                                    type="checkbox" 
-                                    checked={isChecked}
-                                    onChange={handleChange} 
-                                    className={`${isChecked ? "accent-blue-600" : ""}`} 
-                                />
-                            {item}
-                        </label>
-                        )
-                    })}
+                    {(plan !== "" && plan !== "None" ) ? 
+                        <p className="pl-5 text-gray-600 text-sm">
+                            Inclusions will be provided by {plan}.
+                        </p> 
+                    : (
+                        incs.map((item) => {
+                            const isChecked = checked[item] ?? false;
+                            console.log('plan:', plan, 'condition:', plan !== "" && plan !== "None");
+                            return (
+                                <label key={item}
+                                    className={`flex items-center gap-2 py-1 rounded transition-colors ${
+                                        isChecked
+                                            ? "bg-blue-50 text-blue-700 font-medium"
+                                            : "text-gray-700 cursor-pointer hover:bg-gray-50"
+                                    }`}
+                                >
+                                    <input
+                                        name={item}
+                                        value={item}
+                                        type="checkbox"
+                                        checked={isChecked}
+                                        onChange={handleChange}
+                                        className={`${isChecked ? "accent-blue-600" : ""}`}
+                                    />
+                                    {item}
+                                </label>
+                            );
+                        })
+                    )}
                 </div>
             </div>
         </div>
@@ -693,6 +694,12 @@ export function AssistanceTable({assistance, setAssistance}) {
     })
 
     const save = () => {
+
+        if (!tempData.provider || !tempData.amount) {
+            setShowAsst(false);
+            return; // ✅ inside the if block
+        }
+
         const newData = {
             provider: tempData.provider,
             gl_date: tempData.gl_date,

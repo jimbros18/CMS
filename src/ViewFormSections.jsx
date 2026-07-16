@@ -308,6 +308,7 @@ export function PaymentsView({ payments = [] }) {
 
 export function PriceBreakdown({client, assistance, payments, otherCharges}) {  
     const totalAss = assistance.reduce((sum, ass) => sum + Number(ass.amount || 0), 0);
+    // const totalAss = Array.isArray(assistance) ? assistance.reduce((sum, ass) => sum + Number(ass.amount || 0), 0) : 0;
     
     return (
     <div className='payment_details self-start flex flex-col items-start text-left border border-gray-300 rounded p-6 bg-white shadow-md w-full'>

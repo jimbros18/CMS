@@ -13,19 +13,6 @@ export default function Table() {
     const [activeRow, setActiveRow] = useState(null);
     const [selectedClient, setSelectedClient] = useState(null);
     
-// const columns = [
-//     { header: 'ID',   value: (row) => row[0] },
-//     { header: 'Date', value: (row) => formatDate(row[1]) },
-//     { header: 'Name', value: (row) => `${row[2]} ${row[3]}` },
-//     { header: 'Address', value: (row) => `${row[4] || ''}, ${row[5] || ''}, ${row[6] || ''}` }, // barangay, city, province
-//     { header: 'Plan',    value: (row) => row[7] },
-//     { header: 'Coffin',  value: (row) => row[8] },
-//     { header: 'Amount',  value: (row) => row[10]?.toLocaleString() },
-//     { header: 'Burial Date', value: (row) => formatDate(row[9]) },
-//     { header: 'Status', value: (row) => row[11]},
-//     { header: 'Actions', value: (row) => row[0]},
-// ];
-
 const columns = [
     { header: 'ID',          width: 'w-[10px]',  value: (row) => row[0] },
     { header: 'Date',        width: 'w-[40px]',  value: (row) => formatDate(row[1]) },
@@ -33,9 +20,9 @@ const columns = [
     { header: 'Address',     width: 'w-[80px]', value: (row) => `${row[4] || ''}, ${row[5] || ''}, ${row[6] || ''}` },
     { header: 'Plan',        width: 'w-[60px]', value: (row) => row[7] },
     { header: 'Coffin',      width: 'w-[50px]', value: (row) => row[8] },
-    { header: 'Amount',      width: 'w-[40px]',  value: (row) => row[10]?.toLocaleString() },
+    { header: 'Amount',width: 'w-[40px]', value: (row) => {const total = Number(row[10]) + Number(row[11]); return total ? total : '';} },
     { header: 'Burial Date', width: 'w-[50px]',  value: (row) => formatDate(row[9]) },
-    { header: 'Status',      width: 'w-[40px]',  value: (row) => row[11] },
+    { header: 'Status',      width: 'w-[40px]',  value: (row) => row[0] },
     { header: 'Actions',     width: 'w-[60px]',  value: (row) => row[0] },
 ];
 
@@ -131,7 +118,7 @@ const columns = [
                     </label>
                 </div>
                 <button
-                    className="mr-2 inline-flex items-center justify-center rounded-lg bg-slate-800 px-4 py-2 text-xs font-semibold text-white transition hover:bg-slate-700"
+                    className="mr-2 inline-flex items-center justify-center rounded-lg bg-slate-600 px-4 py-2 text-xs font-semibold text-white transition hover:bg-slate-700"
                     onClick={() => {
                         setNewForm((prev) => {
                             const nextForm = !prev;
@@ -395,6 +382,7 @@ const columns = [
                                             );
                                         }
                                         if (col.header === 'Amount') {
+                                            const amount = Number(value);
                                             return (
                                                 <td key={i} className={`${col.width} px-2 py-1 text-[13px] align-middle`}>
                                                     {value && value !== '0' ? `₱ ${value.toLocaleString()}` : ''}
