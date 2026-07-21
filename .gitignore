@@ -25,3 +25,5 @@ dist-ssr
 .continue/agents
 continue/agents/
 desktop.ini
+
+.env

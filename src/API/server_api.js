@@ -3,6 +3,16 @@ import { useState, useEffect } from 'react';
 const ip = "10.0.2.88"
 // const ip = "192.168.0.105"
 
+export async function SignInAPI({ email, password }) {
+    console.log('sending:', { email, password }); // ✅ check this
+    const response = await fetch(`http://${ip}:9000/sign_in`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password })
+    });
+    return await response.json();
+}
+
 export async function addClient(client) {
   try {
     const response = await fetch(`http://${ip}:9000/+client`, {
