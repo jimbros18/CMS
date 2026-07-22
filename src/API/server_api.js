@@ -3,15 +3,57 @@ import { useState, useEffect } from 'react';
 const ip = "10.0.2.88"
 // const ip = "192.168.0.105"
 
-export async function SignInAPI({ email, password }) {
-    console.log('sending:', { email, password }); // ✅ check this
-    const response = await fetch(`http://${ip}:9000/sign_in`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password })
-    });
-    return await response.json();
-}
+export async function AuthCheck() {
+    try {
+        const response = await fetch('/api/me', {
+            credentials: 'include'
+        });
+        console.log('AuthCheck status:', response.status);
+        return response;
+    } catch (error) {
+        console.error('Auth check error:', error);
+        throw error;
+    }
+};
+
+export async function SignInAPI({ email, password })  {
+    try {
+        console.log('Sending login request...');
+        const response = await fetch('/api/sign_in', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ email, password }),
+            credentials: 'include'
+        });
+        
+        const data = await response.json();
+        console.log('SignIn response:', data);
+        
+        if (!response.ok) {
+            throw new Error(data.message || 'Login failed');
+        }
+        
+        return data;
+    } catch (error) {
+        console.error('Sign in error:', error);
+        throw error;
+    }
+};
+
+export const SignOutAPI = async () => {
+    try {
+        const response = await fetch('/api/sign_out', {
+            method: 'POST',
+            credentials: 'include'
+        });
+        return response;
+    } catch (error) {
+        console.error('Sign out error:', error);
+        throw error;
+    }
+};
 
 export async function addClient(client) {
   try {

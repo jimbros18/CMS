@@ -1,7 +1,8 @@
 import React from 'react';
-import { Home, CheckSquare, CreditCard, Settings } from 'lucide-react';
+import { Home, CheckSquare, CreditCard, Settings, LogOut } from 'lucide-react';
 
-const menuItems = [
+export default function Sidebar({ activeKey, onItemClick, OnSignOut }) {
+    const menuItems = [
     {
         label: 'Clients',
         icon: Home,
@@ -26,9 +27,13 @@ const menuItems = [
         key: 'settings',
         func: () => console.log('Settings'),
     },
+     {
+        label: 'Logout',
+        icon: LogOut,
+        key: 'logout',
+        func: OnSignOut,
+    }
 ];
-
-export default function Sidebar({ activeKey, onItemClick }) {
     return (
         <aside className="w-[15%] text-slate-200 bg-gray-800">
             <div className='mx-5 my-5 rounded bg-gray-900'>

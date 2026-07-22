@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-export default function SignIn({ onSignIn }) {
+export default function SignIn({ OnSignIn }) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
@@ -12,7 +12,7 @@ export default function SignIn({ onSignIn }) {
             return;
         }
         setError('');
-        onSignIn({ email, password });
+        OnSignIn({ email, password });
     };
 
     return (
