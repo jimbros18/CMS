@@ -5,11 +5,14 @@ import SignIn from './SignIn';
 import Sidebar from './Sidebar.jsx';
 import Content from './Content.jsx';
 import { SignInAPI, SignOutAPI, AuthCheck } from './API/server_api.js';
+import LoadingScreen from './LoadingScreen'
 
 export default function App() {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [loading, setLoading] = useState(true);
     const [activeKey, setActiveKey] = useState('clients');
+    const [signingIn, setSigningIn] = useState(false);
+    const [loggingOut, setloggingOut] = useState(false);
 
     useEffect(() => {
         console.log('🔄 isAuthenticated changed to:', isAuthenticated);
@@ -25,7 +28,7 @@ export default function App() {
         checkAuthStatus();
     }, []);
 
-    const checkAuthStatus = async () => {
+   const checkAuthStatus = async () => {
         try {
             const response = await AuthCheck();
             if (response && response.ok) {
@@ -36,8 +39,6 @@ export default function App() {
         } catch (error) {
             console.error('Auth check failed:', error);
             setIsAuthenticated(false);
-        } finally {
-            setLoading(false);
         }
     };
 
@@ -45,7 +46,8 @@ export default function App() {
         try {
             const res = await SignInAPI({ email, password });
             if (res && res.status === 'success') {
-                setIsAuthenticated(true);
+                // setIsAuthenticated(true);
+                setSigningIn(true)
             } else {
                 alert(res?.message || 'Invalid email or password');
             }
@@ -65,6 +67,7 @@ export default function App() {
             if (response && response.ok) {
                 setIsAuthenticated(false);
                 setActiveKey('clients');
+                setloggingOut(true)
             } else {
                 alert('Sign out failed');
             }
@@ -81,13 +84,40 @@ export default function App() {
         }
     };
 
-    if (loading) {
-        return (
-            <div className="flex justify-center items-center h-screen bg-gray-900">
-                <div className="text-white text-xl">Loading...</div>
-            </div>
-        );
-    }
+    if (loading) return (
+    <LoadingScreen
+        variant="spinner"
+        title="Setting things up…"
+        subtitle="Wait sa kadali"
+        duration={1000}
+        onDone={() => setLoading(false)}
+    />
+    )
+
+    if (signingIn) return (
+    <LoadingScreen
+        variant="bars"
+        title="Setting things up…"
+        subtitle="Loading your workspace"
+        duration={2000}
+        onDone={() => {
+        setSigningIn(false)
+        setIsAuthenticated(true)
+        }}
+    />
+    )
+     if (loggingOut) return (
+    <LoadingScreen
+        variant="bars"
+        title="Wait a bit...."
+        subtitle="Logging you out."
+        duration={2000}
+        onDone={() => {
+        setloggingOut(false)
+        setIsAuthenticated(false)
+        }}
+    />
+    )
 
     return isAuthenticated ? (
         <div className='flex flex-row w-full'>
@@ -99,7 +129,7 @@ export default function App() {
             <Content activeKey={activeKey} />
         </div>
     ) : (
-        <div className='flex justify-center items-center h-screen bg-gray-900'>
+        <div className='w-full flex justify-center items-center h-screen bg-gray-900'>
             <SignIn OnSignIn={OnSignIn} />
         </div>
     );
