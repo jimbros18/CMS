@@ -1,7 +1,68 @@
 import { useState, useEffect } from 'react';
 
-// const ip = "10.0.2.88"
-const ip = '192.168.1.3';
+const ip = "10.0.2.88"
+// const ip = '192.168.1.3';
+
+// const token = localStorage.getItem('token');
+
+async function refreshToken() {
+    const refresh_token = localStorage.getItem('refresh_token');
+    const res = await fetch(`/api/refresh_token`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ refresh_token })
+    });
+    if (!res.ok) throw new Error('Session expired');
+    const data = await res.json();
+    localStorage.setItem('token', data.token);
+    localStorage.setItem('refresh_token', data.refresh_token);
+
+    if (!localStorage.getItem('userData') && data.user) {
+        localStorage.setItem('userData', JSON.stringify({
+            user: data.user,
+            username: data.username,
+            branch: data.branch,
+            role: data.role
+        }));
+    }
+    return data.token;
+}
+
+export async function apiFetch(url, options = {}) {
+    let token = localStorage.getItem('token');
+    let response = await fetch(url, {
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+            ...options.headers
+        }
+    });
+
+    if (response.status === 401) {
+        try {
+            token = await refreshToken();
+            response = await fetch(url, {
+                ...options,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                    ...options.headers
+                }
+            });
+        } catch {
+            localStorage.removeItem('token');
+            localStorage.removeItem('refresh_token');
+            localStorage.removeItem('userData');
+            document.cookie = 'isAuthenticated=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+            window.location.reload();
+        }
+    }
+
+    if (response.status === 403) throw new Error('Insufficient permissions');
+    if (!response.ok) throw new Error('Request failed');
+    return response.json();
+}
 
 export async function AuthCheck() {
     try {
@@ -67,27 +128,34 @@ export async function addClient(client) {
 
         const res = await response.json();
         console.log(res);
+        return true
     } catch (error) {
         console.error('Error:', error);
+        return false
     }
 }
 
-export async function getClients() {
-    try {
-        const response = await fetch(`http://${ip}:9000/*clients`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        });
+// export async function getClients() {
+//     try {
+//         const response = await fetch(`/api/*clients`, {
+//             method: 'GET',
+//             headers: {
+//                 'Content-Type': 'application/json',
+//             },
+//         });
 
-        const clients = await response.json();
-        console.log('SERVER: ', clients);
-        return clients;
-    } catch (error) {
-        console.error('Error:', error);
-        return [];
-    }
+//         const clients = await response.json();
+//         console.log('SERVER: ', clients);
+//         return clients;
+//     } catch (error) {
+//         console.error('Error:', error);
+//         return [];
+//     }
+// }
+
+export const getClients = async () => {
+    const clients = await apiFetch(`/api/*clients`, { method: 'GET' });
+    return clients;
 }
 
 export async function deleteClient(clientId) {
@@ -95,33 +163,40 @@ export async function deleteClient(clientId) {
         const response = await fetch(`http://${ip}:9000/-client/${clientId}`, {
             method: 'DELETE',
             headers: {
-                'Content-Type': 'application/json',
+                // 'Content-Type': 'application/json',
+                "Authorization": `Bearer ${token}`
             },
         });
-
-        const res = await response.json();
-        console.log(res);
+        if (response.status === 403) throw new Error('Insufficient permissions');
+        if (response.status === 401) throw new Error('Unauthorized');
+        return await response.json();
     } catch (error) {
         console.error('Error:', error);
+        throw error; 
     }
 }
 
-export async function updateClient(clientId, payload) {
-    console.log(payload);
-    try {
-        const response = await fetch(`http://${ip}:9000/~client/${clientId}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(payload),
-        });
+// export async function updateClient(clientId, payload) {
+//     // console.log(payload);
+//     try {
+//         const response = await fetch(`http://${ip}:9000/~client/${clientId}`, {
+//             method: 'PUT',
+//             headers: {
+//                 'Content-Type': 'application/json',
+//                  "Authorization": `Bearer ${token}`
+//             },
+//             body: JSON.stringify(payload),
+//         });
 
-        const res = await response.json();
-        console.log(res);
-    } catch (error) {
-        console.error('Error:', error);
-    }
+//         const res = await response.json();
+//         console.log(res);
+//     } catch (error) {
+//         console.error('Error:', error);
+//     }
+// }
+
+export const updateClient = async (clientId, payload) => {
+    return await apiFetch(`/api/~client/${clientId}`,{method: 'PUT', body: JSON.stringify(payload),})
 }
 
 export async function getClient(clientId) {

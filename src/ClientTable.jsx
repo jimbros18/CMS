@@ -4,10 +4,13 @@ import ClientForm from './ClientForm';
 import UpdateForm from './updateForm';
 import ViewForm from './ViewForm';
 import {getClients, deleteClient, getClient } from './API/server_api';
+import {SignOutAPI} from './API/server_api';
+import Swal from 'sweetalert2';
+import {deleted, confirmDelete, noPermission} from "./utils/actions";
 
 export default function Table() {
     const [viewForm, setViewForm] = useState(false);
-    const [NewForm, setNewForm] = useState(false); // state to control rendering
+    const [NewForm, setNewForm] = useState(false);
     const [updateForm, setUpdateForm] = useState(false);
     const [allClients, setAllClients] = useState([]);
     const [activeRow, setActiveRow] = useState(null);
@@ -16,14 +19,15 @@ export default function Table() {
 const columns = [
     { header: 'ID',          width: 'w-[10px]',  value: (row) => row[0] },
     { header: 'Date',        width: 'w-[40px]',  value: (row) => formatDate(row[1]) },
-    { header: 'Name',        width: 'w-[60px]', value: (row) => `${row[2]} ${row[3]}` },
+    { header: 'Name',        width: 'w-[50px]', value: (row) => `${row[2]} ${row[3]}` },
     { header: 'Address',     width: 'w-[80px]', value: (row) => `${row[4] || ''}, ${row[5] || ''}, ${row[6] || ''}` },
-    { header: 'Plan',        width: 'w-[60px]', value: (row) => row[7] },
+    { header: 'Plan',        width: 'w-[50px]', value: (row) => row[7] },
     { header: 'Coffin',      width: 'w-[50px]', value: (row) => row[8] },
-    { header: 'Amount',width: 'w-[40px]', value: (row) => {const total = Number(row[10]) + Number(row[11]); return total ? total : '';} },
-    { header: 'Burial Date', width: 'w-[50px]',  value: (row) => formatDate(row[9]) },
+    { header: 'Embalmer',    width: 'w-[40px]', value: (row) => row[9] },
+    { header: 'Amount',      width: 'w-[40px]', value: (row) => {const total = Number(row[11]) + Number(row[12]); return total ? total : '';} },
+    { header: 'Burial Date', width: 'w-[50px]',  value: (row) => formatDate(row[10]) },
     { header: 'Status',      width: 'w-[40px]',  value: (row) => row[0] },
-    { header: 'Actions',     width: 'w-[60px]',  value: (row) => row[0] },
+    { header: 'Actions',     width: 'w-[40px]',  value: (row) => row[0] },
 ];
 
 
@@ -42,12 +46,19 @@ const columns = [
     }
 
     const handleDelete = async (row) => {
-       const name = `${row[2]} ${row[3]} ${row[4]}`;
-       await deleteClient(row[0]);
-       await fetchClients();
-       console.log (`Deleting client: ID: ${row[0]}, Name: ${name}`);
-        };
-    
+        const name = `${row[2]} ${row[3]}`;
+    try {
+        if (!(await confirmDelete(name))) return;
+        const res = await deleteClient(row[0]);
+        if (!res) return;
+        deleted(name)
+        fetchClients();
+    } catch (error) {
+        noPermission()    
+    }
+};
+
+
     const getDaysLeft = (dateStr) => {
         if (!dateStr) return null;
         const start = new Date(dateStr);
@@ -179,6 +190,7 @@ const columns = [
                         </button> 
                         <UpdateForm
                             setUpdateForm={setUpdateForm}
+                            setViewForm = {setViewForm}
                             selectedClient={selectedClient}
                             data={selectedClient}
                             onFormSubmitted={ async () => {                              
@@ -228,14 +240,14 @@ const columns = [
                 
             )}
             <div className="table-container w-full overflow-x-auto rounded px-4 py-2">
-                <table className="table-fixed w-full border-separate border-spacing-y-1">
+                <table className="table-fixed w-full border-separate border-spacing-y-1 text-xs min-w-[1200px]">
                     <thead>
-                        <tr className="bg-slate-900 text-slate-100 text-[11px]">
+                        <tr className="bg-slate-900 text-slate-100">
                             {columns.map((col, i) => {
                                 return (
                                     <th
                                         key={i}
-                                        className={`px-2 py-1 text-left text-[15px] font-semibold uppercase tracking-[0.35px] ${col.width} ${col.header === 'Amount' ? 'text-center' : 'text-left'}`}
+                                        className={`px-2 py-2 text-left text-[15px] font-semibold uppercase tracking-[0.35px] ${col.width} ${col.header === 'Amount' ? 'text-center' : 'text-left'}`}
                                     >
                                         {col.header}
                                     </th>
@@ -243,7 +255,7 @@ const columns = [
                             })}
                         </tr>
                     </thead>
-                    <tbody className="text-lg text-white">
+                    <tbody className="text-white">
                         {filteredClients.map((row, rowIndex) => {
                             const isActive = activeRow === rowIndex;
                             return (
@@ -273,7 +285,7 @@ const columns = [
                                             return (
                                                 <td
                                                     key={i}
-                                                    className={`${col.width} ${alignmentClass} truncate px-2 text-[13px]`}
+                                                    className={`px-2 py-3 ${col.width} ${alignmentClass} truncate`}
                                                 >
                                                     {value}
                                                 </td>
@@ -281,21 +293,21 @@ const columns = [
                                         }
                                         if (col.header === 'Date') {
                                             return (
-                                                <td className={`truncate px-2 align-top text-[13px] ${col.width} ${alignmentClass} `} key={i}>
+                                                <td className={`truncate  ${col.width} ${alignmentClass} `} key={i}>
                                                     {value ? formatDate(value) : ''}
                                                 </td>
                                             );
                                         }
                                         if (col.header === 'Name') {
                                             return (
-                                                <td className={`truncate px-2 align-top text-[13px] ${col.width} ${alignmentClass}`} key={i}>
+                                                <td className={`trunc ${col.width} ${alignmentClass}`} key={i}>
                                                    {value}
                                                 </td>
                                             )
                                         }
                                         if (col.header === 'Address') {
                                             return (
-                                                <td className={`truncate px-2 align-top text-[13px] ${col.width} ${alignmentClass}`} key={i}>
+                                                <td className={`truncate ${col.width} ${alignmentClass}`} key={i}>
                                                     {value}
                                                 </td>
                                             )
@@ -304,7 +316,7 @@ const columns = [
                                             return (
                                                 <td
                                                     key={i}
-                                                    className={`truncate px-5 align-top text-[13px] text-left ${col.width} ${alignmentClass}}`}
+                                                    className={`truncate text-left ${col.width} ${alignmentClass}}`}
                                                 >
                                                     {value !== 'None' && value !== '' ? (
                                                         <span className="inline-flex items-center justify-center bg-orange-400 text-white px-1 py-0.5 rounded text-xs text-left">
@@ -316,7 +328,7 @@ const columns = [
                                         }
                                         if (col.header === 'Burial Date') {
                                             return (
-                                                <td key={i} className={`truncate px-5 align-top text-[13px] text-left ${col.width} ${alignmentClass} }`}>
+                                                <td key={i} className={`truncate px-5 text-left ${col.width} ${alignmentClass} }`}>
                                                     {value ? (formatDate(value)) : null}
                                                 </td>
                                             );
@@ -325,7 +337,7 @@ const columns = [
                                             const days = getDaysLeft(row[1]);
                                             const balance = row[11]; // adjust index to your total_paid column
                                             return (
-                                                <td key={i} className={` ${col.width} ${alignmentClass} truncate px-2 align-top text-[13px] text-left`}>
+                                                <td key={i} className={` ${col.width} ${alignmentClass} truncate px-2 text-left`}>
                                                     {balance > 0 && days < 0 ? (
                                                         <span className="inline-block text-center bg-red-200 text-red-700 px-1 py-0.5 rounded text-xs font-medium">
                                                             {`-₱ ${balance.toLocaleString()}`}
@@ -358,7 +370,7 @@ const columns = [
                                             return (
                                                 <td
                                                     key={i}
-                                                    className={`${col.width} px-2 py-1 align-middle`}
+                                                    className={`${col.width} py-1 align-middle`}
                                                 >
                                                     <div className="flex px-2 gap-2">
                                                         <button
@@ -384,7 +396,7 @@ const columns = [
                                         if (col.header === 'Amount') {
                                             const amount = Number(value);
                                             return (
-                                                <td key={i} className={`${col.width} px-2 py-1 text-[13px] align-middle`}>
+                                                <td key={i} className={`${col.width} align-middle`}>
                                                     {value && value !== '0' ? `₱ ${value.toLocaleString()}` : ''}
                                                 </td>
                                             );
@@ -392,7 +404,7 @@ const columns = [
                                         return (
                                             <td
                                                 key={i}
-                                                className={`truncate px-2 align-top text-[13px] ${col.width} ${alignmentClass}`}
+                                                className={`truncate ${col.width} ${alignmentClass}`}
                                             >
                                                 {(value != null ? value.toLocaleString(): null)}
                                             </td>

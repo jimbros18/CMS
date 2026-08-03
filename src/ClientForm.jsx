@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Save, Trash, Pencil, Plus, XCircle } from 'lucide-react';
 import {addClient, getClients, getCoffins} from './API/server_api';
 import { PriceBreakdown } from './ViewFormSections';
+import { addNewNotif } from './utils/actions';
 import {
     Charges,
     ChargeTable,
@@ -42,7 +43,7 @@ function ClientForm({ onFormSubmitted }) {
     const [payments, setPayments] = useState([]);
     const [showPayment, setShowPayment] = useState(false);
     const [inclusions, setInclusions] = useState([]);
-    const [staff, setStaff] = useState([]);
+    const [staff, setStaff] = useState({});
     const [lights, setLights] = useState([]);
     const [returned, setReturned] = useState([]);
 
@@ -53,6 +54,9 @@ function ClientForm({ onFormSubmitted }) {
         setOtherCharges([{ item_service: '', amount: 0, details: '' }]);
         setPayments([{ date_paid: '', amount_paid:'', details: '' }]);
         setInclusions([]);
+        setStaff([{ embalmer: '', driver: '', helper: '', plate_num: '' }]);
+        setLights([]);
+        setReturned([]);
     };
     // ===================== SUBMIT =======================
     const handleSubmit = async (e) => {
@@ -63,22 +67,23 @@ function ClientForm({ onFormSubmitted }) {
             inclusions,
             otherCharges,
             assistance,
-            payments
+            payments,
+            lights,
+            staff: [staff],
+            returned
         };
 
-        console.log(payload);
+        console.log('sent: ', payload);
         setSubmitStatus('Saving client data...');
-
+        const name = `${clientData.deceasedFirst} ${clientData.deceasedLast}`;
         try {
             await addClient(payload);
-            setSubmitStatus('Client data saved.');
+            addNewNotif(name, true);
             resetForm();
-            if (typeof onFormSubmitted === 'function') {
-                onFormSubmitted();
-            }
+            if (typeof onFormSubmitted === 'function') onFormSubmitted();
         } catch (error) {
+            addNewNotif(name, false, error.message);
             console.error('Save failed:', error);
-            setSubmitStatus('Failed to save client data.');
         } finally {
             setTimeout(() => setSubmitStatus(''), 3000);
         }
@@ -107,7 +112,7 @@ function ClientForm({ onFormSubmitted }) {
                         <section className="section flex flex-col-reverse items-start">
                             <ChargeTable otherCharges={otherCharges} setOtherCharges = {setOtherCharges} />
                         </section>
-                        {/* ================= DSWD SECTION ================= */}
+                        {/* ================= ASSISTANCE SECTION ================= */}
                         <section className="section">
                             <AssistanceTable assistance={assistance} setAssistance={setAssistance} />
                         </section>

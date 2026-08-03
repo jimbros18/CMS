@@ -13,6 +13,7 @@ export default function App() {
     const [activeKey, setActiveKey] = useState('clients');
     const [signingIn, setSigningIn] = useState(false);
     const [loggingOut, setloggingOut] = useState(false);
+    const [userData, setUserData] = useState(JSON.parse(localStorage.getItem('userData') || 'null'));
 
     useEffect(() => {
         console.log('🔄 isAuthenticated changed to:', isAuthenticated);
@@ -48,6 +49,11 @@ export default function App() {
             if (res && res.status === 'success') {
                 // setIsAuthenticated(true);
                 setSigningIn(true)
+                setUserData(res)
+                localStorage.setItem('userData', JSON.stringify(res));
+                localStorage.setItem('token', res.token);
+                localStorage.setItem('refresh_token', res.refresh_token);
+                // console.log('user data: ', userData)
             } else {
                 alert(res?.message || 'Invalid email or password');
             }
@@ -68,6 +74,8 @@ export default function App() {
                 setIsAuthenticated(false);
                 setActiveKey('clients');
                 setloggingOut(true)
+                setUserData(null);
+                localStorage.removeItem('userData');
             } else {
                 alert('Sign out failed');
             }
@@ -125,6 +133,7 @@ export default function App() {
                 activeKey={activeKey} 
                 onItemClick={handleItemClick}
                 OnSignOut={OnSignOut}
+                userData={userData}
             />
             <Content activeKey={activeKey} />
         </div>

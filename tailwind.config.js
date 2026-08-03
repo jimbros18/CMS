@@ -11,6 +11,9 @@ export default {
             animation: {
                 jump: 'jumpHigh 0.6s ease-in-out infinite',
             },
+            fontFamily: {
+                'noto-mono': ['"Noto Sans Mono"', 'monospace'],
+            }
         },
     },
     plugins: [],

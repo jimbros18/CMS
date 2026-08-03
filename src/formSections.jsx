@@ -322,7 +322,6 @@ export function ClientInfo({clientData, setClientData}) {
 
 export function Inclusions({ xcoffin, plan, inclusions, setInclusions }) {
     const [coffins, setCoffins] = useState([]);
-    console.log('plan: ', plan);
     useEffect(() => {
         const load = async () => {
             const data = await getCoffins();
@@ -359,7 +358,6 @@ export function Inclusions({ xcoffin, plan, inclusions, setInclusions }) {
                     : (
                         incs.map((item) => {
                             const isChecked = checked[item] ?? false;
-                            console.log('plan:', plan, 'condition:', plan !== "" && plan !== "None");
                             return (
                                 <label key={item}
                                     className={`flex items-center gap-2 py-1 rounded transition-colors ${
@@ -876,9 +874,7 @@ export function Assistance({tempData, setTempData}) {
     );
 }
 
-export function Staff({ staff, setStaff}) {
-    // const s = Array.isArray(staff) ? staff[0] : staff;
-        
+export function Staff({ staff, setStaff}) {        
     const handleChange = (e) => {
         const { name, value } = e.target;
         setStaff((prev) => ({ ...prev, [name]: value }));

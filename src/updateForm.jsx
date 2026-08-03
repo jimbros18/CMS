@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Save, Trash, Pencil, Plus, X, Circle } from 'lucide-react';
 import {updateClient, getClients, getCoffins} from './API/server_api';
 import {PriceBreakdown } from './ViewFormSections';
-
+import { updateNotif } from './utils/actions';
 import {
     Charges,
     ChargeTable,
@@ -18,7 +18,7 @@ import {
 
 
 // ================ UPDATE CLIENT FORM ===================
-export default function UpdateForm({ data, onFormSubmitted, setUpdateForm, selectedClient }) {
+export default function UpdateForm({ data, onFormSubmitted, setUpdateForm, setViewForm, selectedClient }) {
     const [resetKey, setResetKey] = useState(0);
     const [client, setClientData] = useState(data.client || {});
     const [assistance, setAssistance] = useState(Array.isArray(data.assistance) ? data.assistance : []);
@@ -56,17 +56,18 @@ export default function UpdateForm({ data, onFormSubmitted, setUpdateForm, selec
         };
 
         setSubmitStatus('Updating client data...');
+        const name = `${client.deceasedFirst} ${client.deceasedLast}`;
         try {
             await updateClient(client.id, payload);
             setCommittedCoffin(client["coffin"]);
-            setSubmitStatus('Client data updated.');
-            
+            setSubmitStatus('Client data updated.');            
             if (typeof onFormSubmitted === 'function') {
                 onFormSubmitted();
             }
+            updateNotif(name, true)
         } catch (error) {
-            console.error('Update failed:', error);
             setSubmitStatus('Failed to update client data.');
+            updateNotif(name, true, error.message)
         } finally {
             setTimeout(() => setSubmitStatus(''), 3000);
         }
@@ -78,6 +79,9 @@ export default function UpdateForm({ data, onFormSubmitted, setUpdateForm, selec
         setPayments(data.payments || []);
         setOtherCharges(data.otherCharges || []);
         setInclusions(data.inclusions || []);
+        setUpdateForm(false)
+        setViewForm(true)
+        // selectedClient(null)
         console.log("Data discarded, form reset to original data.");
     };
 

@@ -16,7 +16,15 @@ export default function SignIn({ OnSignIn }) {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-900">
+        <div className="min-h-screen flex flex-col items-center justify-center bg-gray-900">
+            <h1 className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 to-teal-500 text-5xl font-black">
+               LORD ANTHONY FUNERAL HOMES
+            </h1>
+
+        <h2 className="mb-[100px] text-xl md:text-2xl font-semibold tracking-widest text-white animate-pulseGlowSoft">
+        CLIENT MANAGEMENT SYSTEM
+        </h2>
+
             <div className="bg-gray-800 border border-gray-700 rounded-xl p-8 w-full max-w-sm">
                 
                 <div className="mb-6">
