@@ -155,6 +155,7 @@ export async function addClient(client) {
 
 export const getClients = async () => {
     const clients = await apiFetch(`/api/*clients`, { method: 'GET' });
+    console.log('SERVER: ', clients);
     return clients;
 }
 
@@ -212,7 +213,7 @@ export async function getClient(clientId) {
         );
 
         const client = await response.json();
-        // console.log(`SERVER: ${JSON.stringify(client)}`);
+        console.log(`client: ${JSON.stringify(client)}`);
         return client;
     } catch (error) {
         console.error('Error:', error);
@@ -230,6 +231,7 @@ export async function getCoffins() {
         });
 
         const coffins = await response.json();
+        console.log('Coffins:', coffins);
         return coffins;
     } catch (error) {
         console.error('Error:', error);

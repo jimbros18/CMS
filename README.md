@@ -1,16 +1,95 @@
-# React + Vite
+# CMS — Funeral Clients Management System
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A React-based web application for managing funeral service clients. Built for internal use by funeral home staff to handle client records, payments, assistance, inclusions, lights, staff assignments, and reporting.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Tech Stack
 
-## React Compiler
+- React + Vite
+- Tailwind CSS
+- SweetAlert2
+- Lucide React (icons)
+- TanStack Table
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+---
 
-## Expanding the ESLint configuration
+## Features
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- **Client management** — add, view, update, and delete client records
+- **Inclusions** — track items included per coffin type
+- **Other charges** — itemized charges per client
+- **Payments** — payment tracking with balance computation
+- **Assistance** — external assistance providers (DSWD, LGU, etc.)
+- **Lights & staff** — assign lights inventory and staff per client
+- **Reports** — grouped reporting by client with expandable charge breakdowns
+- **Authentication** — email/password login via Supabase Auth
+- **Role-based access** — admins can delete; moderators can view and update
+- **Session persistence** — token refresh with localStorage + httpOnly cookie
+
+---
+
+## Project Structure
+
+```
+CMS/
+├── src/
+│   ├── App.jsx
+│   ├── main.jsx
+│   ├── components/
+│   │   ├── ClientTable.jsx
+│   │   ├── updateForm.jsx
+│   │   ├── formSections.jsx
+│   │   ├── ViewFormSections.jsx
+│   │   ├── Reports.jsx
+│   │   ├── Sidebar.jsx
+│   │   ├── Content.jsx
+│   │   └── SignIn.jsx
+│   └── API/
+│       └── server_api.js
+├── index.html
+├── package.json
+├── tailwind.config.js
+└── vite.config.js
+```
+
+---
+
+## Setup
+
+### Prerequisites
+
+- Node.js 18+
+- Backend API running (see [CMS_BE](https://github.com/jimbros18/CMS_BE))
+
+### Install and run
+
+```bash
+npm install
+npm run dev
+```
+
+### Environment
+
+Update the `ip` variable in `src/API/server_api.js` to point to your backend:
+
+```javascript
+const ip = '192.168.x.x:9000'; // your backend IP and port
+```
+
+---
+
+## Roles
+
+| Role        | Permissions                             |
+| ----------- | --------------------------------------- |
+| `admin`     | Full access — view, add, update, delete |
+| `moderator` | View and update only — cannot delete    |
+
+Roles are managed via the `profiles` table in Supabase.
+
+---
+
+## License
+
+Internal use only — L.A.F.H Funeral Services.

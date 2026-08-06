@@ -318,7 +318,7 @@ const columns = [
                                                     key={i}
                                                     className={`truncate text-left ${col.width} ${alignmentClass}}`}
                                                 >
-                                                    {value !== 'None' && value !== '' ? (
+                                                    {value !== "None" && value !== '' ? (
                                                         <span className="inline-flex items-center justify-center bg-orange-400 text-white px-1 py-0.5 rounded text-xs text-left">
                                                             {value}
                                                         </span>

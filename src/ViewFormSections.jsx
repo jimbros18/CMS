@@ -104,7 +104,7 @@ export function ClientView({ client = {}, formatDate, intermentDate }) {
     );
 }
 
-export function Inclusions({ xcoffin, inclusions, setInclusions }) {
+export function Inclussions({ xcoffin, inclussions, setInclusions }) {
     const [coffins, setCoffins] = useState([]);
 
     useEffect(() => {
