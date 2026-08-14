@@ -1,9 +1,6 @@
 import { useState, useEffect } from 'react';
 
-const ip = "10.0.2.88"
-// const ip = '192.168.1.3';
-
-// const token = localStorage.getItem('token');
+const ip = "192.168.0.251";
 
 async function refreshToken() {
     const refresh_token = localStorage.getItem('refresh_token');
@@ -135,28 +132,8 @@ export async function addClient(client) {
     }
 }
 
-// export async function getClients() {
-//     try {
-//         const response = await fetch(`/api/*clients`, {
-//             method: 'GET',
-//             headers: {
-//                 'Content-Type': 'application/json',
-//             },
-//         });
-
-//         const clients = await response.json();
-//         console.log('SERVER: ', clients);
-//         return clients;
-//     } catch (error) {
-//         console.error('Error:', error);
-//         return [];
-//     }
-// }
-
 export const getClients = async () => {
-    const clients = await apiFetch(`/api/*clients`, { method: 'GET' });
-    console.log('SERVER: ', clients);
-    return clients;
+    return await apiFetch(`/api/*clients`, { method: 'GET' });
 }
 
 export async function deleteClient(clientId) {
@@ -177,24 +154,6 @@ export async function deleteClient(clientId) {
     }
 }
 
-// export async function updateClient(clientId, payload) {
-//     // console.log(payload);
-//     try {
-//         const response = await fetch(`http://${ip}:9000/~client/${clientId}`, {
-//             method: 'PUT',
-//             headers: {
-//                 'Content-Type': 'application/json',
-//                  "Authorization": `Bearer ${token}`
-//             },
-//             body: JSON.stringify(payload),
-//         });
-
-//         const res = await response.json();
-//         console.log(res);
-//     } catch (error) {
-//         console.error('Error:', error);
-//     }
-// }
 
 export const updateClient = async (clientId, payload) => {
     return await apiFetch(`/api/~client/${clientId}`,{method: 'PUT', body: JSON.stringify(payload),})
@@ -231,7 +190,6 @@ export async function getCoffins() {
         });
 
         const coffins = await response.json();
-        console.log('Coffins:', coffins);
         return coffins;
     } catch (error) {
         console.error('Error:', error);
