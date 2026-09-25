@@ -10,7 +10,7 @@ import {
     Payments,
     PaymentsTable,
     AssistanceTable,
-    Inclusions,
+    Inclussions,
     Staff,
     Lights
 } from './formSections';
@@ -28,7 +28,7 @@ export default function UpdateForm({ data, onFormSubmitted, setUpdateForm, setVi
     const [chargeData, setchargeData] = useState({item_service: '', amount: 0, details: ''});
     const [showPayment, setShowPayment] = useState(false);
     const [submitStatus, setSubmitStatus] = useState('');
-    const [inclusions, setInclusions] = useState(data.inclusions || []);
+    const [inclussions, setInclussions] = useState(data.inclussions || []);
     const [committedCoffin, setCommittedCoffin] = useState(data.client?.coffin || '');
     const [staff, setStaff] = useState(data.staff?.[0] || {});
     const [lights, setLights] = useState((data.lights || []).map(l => typeof l === 'object' ? l.id : l));
@@ -37,7 +37,7 @@ export default function UpdateForm({ data, onFormSubmitted, setUpdateForm, setVi
     useEffect(() => {
         const currentCoffin = client["coffin"];
         if (currentCoffin !== committedCoffin) {
-            setInclusions([]); // clear draft inclusions on coffin change
+            setInclussions([]); // clear draft inclussions on coffin change
         }
     }, [client["coffin"]]);
 
@@ -46,11 +46,11 @@ export default function UpdateForm({ data, onFormSubmitted, setUpdateForm, setVi
         if (e && e.preventDefault) e.preventDefault();
             const payload = {
             client,
-            inclusions,
+            inclussions,
             otherCharges,
             payments,
             assistance,
-            staff: [staff],
+            staff: staff,
             lights,
             returned
         };
@@ -58,6 +58,7 @@ export default function UpdateForm({ data, onFormSubmitted, setUpdateForm, setVi
         setSubmitStatus('Updating client data...');
         const name = `${client.deceasedFirst} ${client.deceasedLast}`;
         try {
+            console.log("Submitting payload:", payload);
             await updateClient(client.id, payload);
             setCommittedCoffin(client["coffin"]);
             setSubmitStatus('Client data updated.');            
@@ -78,7 +79,7 @@ export default function UpdateForm({ data, onFormSubmitted, setUpdateForm, setVi
         setAssistance(Array.isArray(data.assistance) ? data.assistance : [])
         setPayments(data.payments || []);
         setOtherCharges(data.otherCharges || []);
-        setInclusions(data.inclusions || []);
+        setInclussions(data.inclussions || []);
         setUpdateForm(false)
         setViewForm(true)
         // selectedClient(null)
@@ -101,10 +102,10 @@ export default function UpdateForm({ data, onFormSubmitted, setUpdateForm, setVi
                                 />
                             </div>
                             <section className="section flex flex-col-reverse items-start">
-                                <Inclusions 
+                                <Inclussions 
                                     xcoffin = {client["coffin"]}
-                                    inclusions={inclusions}
-                                    setInclusions={setInclusions}
+                                    inclussions={inclussions}
+                                    setInclussions={setInclussions}
                                 />
                                 </section>
                             <section className="section flex flex-col-reverse items-start">

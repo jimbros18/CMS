@@ -11,7 +11,7 @@ import {
     Payments,
     PaymentsTable,
     AssistanceTable,
-    Inclusions,
+    Inclussions,
     Staff,
     Lights
 } from './formSections';
@@ -42,7 +42,7 @@ function ClientForm({ onFormSubmitted }) {
     const [submitStatus, setSubmitStatus] = useState('');
     const [payments, setPayments] = useState([]);
     const [showPayment, setShowPayment] = useState(false);
-    const [inclusions, setInclusions] = useState([]);
+    const [inclussions, setInclussions] = useState([]);
     const [staff, setStaff] = useState({});
     const [lights, setLights] = useState([]);
     const [returned, setReturned] = useState([]);
@@ -53,7 +53,7 @@ function ClientForm({ onFormSubmitted }) {
         setAssistance([{gl_date: "", ci_number: "", provider:"", processor: "", amount: 0}]);
         setOtherCharges([{ item_service: '', amount: 0, details: '' }]);
         setPayments([{ date_paid: '', amount_paid:'', details: '' }]);
-        setInclusions([]);
+        setInclussions([]);
         setStaff([{ embalmer: '', driver: '', helper: '', plate_num: '' }]);
         setLights([]);
         setReturned([]);
@@ -64,7 +64,7 @@ function ClientForm({ onFormSubmitted }) {
 
         const payload = {
             client: clientData,
-            inclusions,
+            inclussions,
             otherCharges,
             assistance,
             payments,
@@ -102,11 +102,11 @@ function ClientForm({ onFormSubmitted }) {
                                 {submitStatus}
                             </div>
                         )}
-                        <Inclusions  
+                        <Inclussions  
                             xcoffin ={clientData["coffin"]}
                             plan={clientData["plan"]}
-                            inclusions={inclusions}
-                            setInclusions={setInclusions}
+                            inclussions={inclussions}
+                            setInclussions={setInclussions}
                         />
                         {/* ================= OTHER CHARGES ================= */}
                         <section className="section flex flex-col-reverse items-start">

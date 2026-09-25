@@ -320,7 +320,7 @@ export function ClientInfo({clientData, setClientData}) {
     );
 }
 
-export function Inclusions({ xcoffin, plan, inclusions, setInclusions }) {
+export function Inclussions({ xcoffin, plan, inclussions, setInclussions }) {
     const [coffins, setCoffins] = useState([]);
     useEffect(() => {
         const load = async () => {
@@ -335,25 +335,25 @@ export function Inclusions({ xcoffin, plan, inclusions, setInclusions }) {
 
     const checked = useMemo(() => {
         return incs.reduce((acc, item) => {
-            acc[item] = inclusions.includes(item);
+            acc[item] = inclussions.includes(item);
             return acc;
         }, {});
-    }, [incs, inclusions]);
+    }, [incs, inclussions]);
 
     const handleChange = (e) => {
         const { value, checked } = e.target;
-        setInclusions((prev) =>
+        setInclussions((prev) =>
             checked ? [...prev, value] : prev.filter((item) => item !== value));
     };
 
     return (
         <div className="w-full text-gray-800 py-6">
-            <h2 className="text-gray-800 mb-4 text-left">Inclusions</h2>
+            <h2 className="text-gray-800 mb-4 text-left">Inclussions</h2>
             <div className="py-3 rounded">
                 <div className="flex flex-col text-sm">
                     {(plan !== "" && plan !== "None" ) ? 
                         <p className="pl-5 text-gray-600 text-sm">
-                            Inclusions will be provided by {plan}.
+                            Inclussions will be provided by {plan}.
                         </p> 
                     : (
                         incs.map((item) => {

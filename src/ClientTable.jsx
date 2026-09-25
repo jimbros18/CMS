@@ -17,17 +17,17 @@ export default function Table() {
     const [selectedClient, setSelectedClient] = useState(null);
     
 const columns = [
-    { header: 'ID',          width: 'w-[10px]',  value: (row) => row[0] },
-    { header: 'Date',        width: 'w-[40px]',  value: (row) => formatDate(row[1]) },
-    { header: 'Name',        width: 'w-[50px]', value: (row) => `${row[2]} ${row[3]}` },
-    { header: 'Address',     width: 'w-[80px]', value: (row) => `${row[4] || ''}, ${row[5] || ''}, ${row[6] || ''}` },
-    { header: 'Plan',        width: 'w-[50px]', value: (row) => row[7] },
-    { header: 'Coffin',      width: 'w-[50px]', value: (row) => row[8] },
-    { header: 'Embalmer',    width: 'w-[40px]', value: (row) => row[9] },
-    { header: 'Amount',      width: 'w-[40px]', value: (row) => {const total = Number(row[11]) + Number(row[12]); return total ? total : '';} },
-    { header: 'Burial Date', width: 'w-[50px]',  value: (row) => formatDate(row[10]) },
-    { header: 'Status',      width: 'w-[40px]',  value: (row) => row[0] },
-    { header: 'Actions',     width: 'w-[40px]',  value: (row) => row[0] },
+    { header: 'ID',          width: 'w-[10px]',  value: (row) => row['id'] },
+    { header: 'Date',        width: 'w-[40px]',  value: (row) => formatDate(row['dateServiced']) },
+    { header: 'Name',        width: 'w-[50px]', value: (row) => `${row['deceasedFirst']} ${row['deceasedLast']}` },
+    { header: 'Address',     width: 'w-[80px]', value: (row) => `${row['barangay'] || ''}, ${row['city'] || ''}, ${row['province'] || ''}` },
+    { header: 'Plan',        width: 'w-[50px]', value: (row) => row['plan'] },
+    { header: 'Coffin',      width: 'w-[50px]', value: (row) => row['coffin'] },
+    { header: 'Embalmer',    width: 'w-[40px]', value: (row) => row['embalmer'] },
+    { header: 'Amount',      width: 'w-[40px]', value: (row) => {const total = Number(row['total_paid']) + Number(row['balance']); return total ? total : '';} },
+    { header: 'Burial Date', width: 'w-[50px]',  value: (row) => formatDate(row['interment_datetime']) },
+    { header: 'Status',      width: 'w-[40px]',  value: (row) => row['id'] },
+    { header: 'Actions',     width: 'w-[40px]',  value: (row) => row['id'] },
 ];
 
 
@@ -264,7 +264,7 @@ const columns = [
                                     className={`hover:bg-blue-500 cursor-pointer ${isActive ? 'bg-blue-300' : rowIndex % 2 === 0 ? 'bg-slate-700' : 'bg-gray-800'}`}
                                     onDoubleClick={async (e) => {
                                             e.stopPropagation();                                                                    
-                                            const clientId = row[0];           
+                                            const clientId = row['id'];           
                                             if (!clientId) return;
                                             try {
                                                 const data = await getClient(clientId);
@@ -334,8 +334,8 @@ const columns = [
                                             );
                                         }
                                         if (col.header === 'Status') {
-                                            const days = getDaysLeft(row[1]);
-                                            const balance = row[11]; // adjust index to your total_paid column
+                                            const days = getDaysLeft(row['dateServiced']);
+                                            const balance = row['total_paid']; // adjust index to your total_paid column
                                             return (
                                                 <td key={i} className={` ${col.width} ${alignmentClass} truncate px-2 text-left`}>
                                                     {balance > 0 && days < 0 ? (

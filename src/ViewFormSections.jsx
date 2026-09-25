@@ -104,7 +104,7 @@ export function ClientView({ client = {}, formatDate, intermentDate }) {
     );
 }
 
-export function Inclussions({ xcoffin, inclussions, setInclusions }) {
+export function Inclussions({ xcoffin, inclussions, setInclussions }) {
     const [coffins, setCoffins] = useState([]);
 
     useEffect(() => {
@@ -119,8 +119,8 @@ export function Inclussions({ xcoffin, inclussions, setInclusions }) {
     const incs = match ? JSON.parse(match.items || "[]") : [];
 
     const toggleItem = (item) => {
-        if (inclusions.includes(item)) return;
-        setInclusions([...inclusions, item]);
+        if (inclussions.includes(item)) return;
+        setInclussions([...inclussions, item]);
     };
 
     return (
@@ -145,7 +145,7 @@ export function Inclussions({ xcoffin, inclussions, setInclusions }) {
                 )}
 
                 {incs.map((item) => {
-                    const isIncluded = inclusions.includes(item);
+                    const isIncluded = inclussions.includes(item);
 
                     return (
                         <button

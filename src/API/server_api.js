@@ -133,8 +133,10 @@ export async function addClient(client) {
 }
 
 export const getClients = async () => {
-    return await apiFetch(`/api/*clients`, { method: 'GET' });
-}
+    const res = await apiFetch(`/api/*clients`, { method: 'GET' });
+    // console.log('getClients response:', res);
+    return res;
+};
 
 export async function deleteClient(clientId) {
     try {
@@ -156,7 +158,9 @@ export async function deleteClient(clientId) {
 
 
 export const updateClient = async (clientId, payload) => {
-    return await apiFetch(`/api/~client/${clientId}`,{method: 'PUT', body: JSON.stringify(payload),})
+    const res = await apiFetch(`/api/~client/${clientId}`,{method: 'PUT', body: JSON.stringify(payload),})
+    console.log('updateClient response:', res);
+    return res;
 }
 
 export async function getClient(clientId) {
@@ -172,7 +176,7 @@ export async function getClient(clientId) {
         );
 
         const client = await response.json();
-        console.log(`client: ${JSON.stringify(client)}`);
+        // console.log(`client: ${JSON.stringify(client)}`);
         return client;
     } catch (error) {
         console.error('Error:', error);
