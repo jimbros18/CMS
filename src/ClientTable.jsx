@@ -377,7 +377,7 @@ const columns = [
                                                             className="inline-flex h-5 w-5 items-center justify-center rounded bg-emerald-500 text-white transition hover:bg-emerald-600"
                                                             onClick={async (e) => {
                                                                 e.stopPropagation();
-                                                                const data = await getClient(row[0]);
+                                                                const data = await getClient(row['id']);
                                                                 if (data) { setSelectedClient(data); setUpdateForm(true); }
                                                             }}
                                                         >

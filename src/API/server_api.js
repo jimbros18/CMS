@@ -1,32 +1,15 @@
 import { useState, useEffect } from 'react';
+import PocketBase from 'pocketbase';
 
-const ip = "192.168.0.251";
+const pb = new PocketBase('http://127.0.0.1:8090');
 
-async function refreshToken() {
-    const refresh_token = localStorage.getItem('refresh_token');
-    const res = await fetch(`/api/refresh_token`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ refresh_token })
-    });
-    if (!res.ok) throw new Error('Session expired');
-    const data = await res.json();
-    localStorage.setItem('token', data.token);
-    localStorage.setItem('refresh_token', data.refresh_token);
+const ip = "10.0.2.88";
 
-    if (!localStorage.getItem('userData') && data.user) {
-        localStorage.setItem('userData', JSON.stringify({
-            user: data.user,
-            username: data.username,
-            branch: data.branch,
-            role: data.role
-        }));
-    }
-    return data.token;
-}
 
 export async function apiFetch(url, options = {}) {
-    let token = localStorage.getItem('token');
+    // 1. Always read the token from PocketBase, never from localStorage
+    let token = pb.authStore.token;
+
     let response = await fetch(url, {
         ...options,
         headers: {
@@ -36,9 +19,13 @@ export async function apiFetch(url, options = {}) {
         }
     });
 
+    // 2. On 401, let PocketBase refresh the token itself, then retry once
     if (response.status === 401) {
         try {
-            token = await refreshToken();
+            // authRefresh validates + rotates the token and updates pb.authStore
+            await pb.collection('users').authRefresh({ requestKey: null });
+            token = pb.authStore.token;
+
             response = await fetch(url, {
                 ...options,
                 headers: {
@@ -48,16 +35,14 @@ export async function apiFetch(url, options = {}) {
                 }
             });
         } catch {
-            localStorage.removeItem('token');
-            localStorage.removeItem('refresh_token');
-            localStorage.removeItem('userData');
-            document.cookie = 'isAuthenticated=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+            // Refresh failed → token is dead. Clear and bounce to sign-in.
+            pb.authStore.clear();
             window.location.reload();
         }
     }
 
     if (response.status === 403) throw new Error('Insufficient permissions');
-    if (!response.ok) throw new Error('Request failed');
+    if (!response.ok) throw new Error(`Request failed (${response.status})`);
     return response.json();
 }
 
@@ -163,26 +148,32 @@ export const updateClient = async (clientId, payload) => {
     return res;
 }
 
-export async function getClient(clientId) {
-    try {
-        const response = await fetch(
-            `http://${ip}:9000/getclient/${clientId}`,
-            {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            },
-        );
-
-        const client = await response.json();
-        // console.log(`client: ${JSON.stringify(client)}`);
-        return client;
-    } catch (error) {
-        console.error('Error:', error);
-        return null;
-    }
+export const getClient = async (clientId) => {
+    const res = await apiFetch(`/api/getclient/${clientId}`, { method: 'GET' });
+    console.log('getClient response:', res);
+    return res;
 }
+
+// export async function getClient(clientId) {
+//     try {
+//         const response = await fetch(
+//             `http://api/getclient/${clientId}`,
+//             {
+//                 method: 'GET',
+//                 headers: {
+//                     'Content-Type': 'application/json',
+//                 },
+//             },
+//         );
+
+//         const client = await response.json();
+//         // console.log(`client: ${JSON.stringify(client)}`);
+//         return client;
+//     } catch (error) {
+//         console.error('Error:', error);
+//         return null;
+//     }
+// }
 
 export async function getCoffins() {
     try {

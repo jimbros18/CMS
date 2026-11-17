@@ -4,8 +4,10 @@ import './styles/app.css';
 import SignIn from './SignIn';
 import Sidebar from './Sidebar.jsx';
 import Content from './Content.jsx';
-import { SignInAPI, SignOutAPI, AuthCheck } from './API/server_api.js';
-import LoadingScreen from './LoadingScreen'
+import LoadingScreen from './LoadingScreen';
+import PocketBase from 'pocketbase';
+
+const pb = new PocketBase('http://127.0.0.1:8090');
 
 export default function App() {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -13,7 +15,7 @@ export default function App() {
     const [activeKey, setActiveKey] = useState('clients');
     const [signingIn, setSigningIn] = useState(false);
     const [loggingOut, setloggingOut] = useState(false);
-    const [userData, setUserData] = useState(JSON.parse(localStorage.getItem('userData') || 'null'));
+    const [userData, setUserData] = useState(pb.authStore.record);
 
     useEffect(() => {
         console.log('🔄 isAuthenticated changed to:', isAuthenticated);
@@ -29,117 +31,95 @@ export default function App() {
         checkAuthStatus();
     }, []);
 
-   const checkAuthStatus = async () => {
+    const checkAuthStatus = async () => {
         try {
-            const response = await AuthCheck();
-            if (response && response.ok) {
+            // If a token exists in local storage, PocketBase restores it automatically.
+            // Validate it against the server (handles expiry / user deletion).
+            if (pb.authStore.isValid) {
+                await pb.collection('users').authRefresh();
+                setUserData(pb.authStore.record);
                 setIsAuthenticated(true);
             } else {
                 setIsAuthenticated(false);
             }
         } catch (error) {
             console.error('Auth check failed:', error);
+            pb.authStore.clear();
             setIsAuthenticated(false);
         }
     };
 
-    const OnSignIn = async ({ email, password }) => {
-        try {
-            const res = await SignInAPI({ email, password });
-            if (res && res.status === 'success') {
-                // setIsAuthenticated(true);
-                setSigningIn(true)
-                setUserData(res)
-                localStorage.setItem('userData', JSON.stringify(res));
-                localStorage.setItem('token', res.token);
-                localStorage.setItem('refresh_token', res.refresh_token);
-                // console.log('user data: ', userData)
-            } else {
-                alert(res?.message || 'Invalid email or password');
-            }
-        } catch (error) {
-            console.error('Sign in error:', error);
-            alert(error.message || 'An error occurred during sign in');
-        }
+    const OnSignedIn = async (record) => {
+        // Called by SignIn after PocketBase sign-in succeeds.
+        // Token is already stored in pb.authStore by the SDK.
+        setUserData(record);
+        setSigningIn(true);
     };
 
     const OnSignOut = async () => {
         console.log('🚪 OnSignOut called, current isAuthenticated:', isAuthenticated);
-        
-        try {
-            const response = await SignOutAPI();
-            console.log('SignOut response:', response);
-            
-            if (response && response.ok) {
-                setIsAuthenticated(false);
-                setActiveKey('clients');
-                setloggingOut(true)
-                setUserData(null);
-                localStorage.removeItem('userData');
-            } else {
-                alert('Sign out failed');
-            }
-        } catch (error) {
-            console.error('Sign out error:', error);
-            alert('An error occurred during sign out');
-        }
+        pb.authStore.clear();
+        setUserData(null);
+        setloggingOut(true);
     };
 
-     const handleItemClick = (key, func) => {
-        setActiveKey(key); 
+    const handleItemClick = (key, func) => {
+        setActiveKey(key);
         if (func && typeof func === 'function') {
-            func(); 
+            func();
         }
     };
 
     if (loading) return (
-    <LoadingScreen
-        variant="spinner"
-        title="Setting things up…"
-        subtitle="Wait sa kadali"
-        duration={1000}
-        onDone={() => setLoading(false)}
-    />
-    )
+        <LoadingScreen
+            variant="spinner"
+            title="Setting things up…"
+            subtitle="Wait sa kadali"
+            duration={1000}
+            onDone={() => setLoading(false)}
+        />
+    );
 
     if (signingIn) return (
-    <LoadingScreen
-        variant="bars"
-        title="Setting things up…"
-        subtitle="Loading your workspace"
-        duration={2000}
-        onDone={() => {
-        setSigningIn(false)
-        setIsAuthenticated(true)
-        }}
-    />
-    )
-     if (loggingOut) return (
-    <LoadingScreen
-        variant="bars"
-        title="Wait a bit...."
-        subtitle="Logging you out."
-        duration={2000}
-        onDone={() => {
-        setloggingOut(false)
-        setIsAuthenticated(false)
-        }}
-    />
-    )
+        <LoadingScreen
+            variant="bars"
+            title="Setting things up…"
+            subtitle="Loading your workspace"
+            duration={2000}
+            onDone={() => {
+                setSigningIn(false);
+                setIsAuthenticated(true);
+            }}
+        />
+    );
+
+    if (loggingOut) return (
+        <LoadingScreen
+            variant="bars"
+            title="Wait a bit...."
+            subtitle="Logging you out."
+            duration={2000}
+            onDone={() => {
+                setloggingOut(false);
+                setIsAuthenticated(false);
+                setUserData(null);
+            }}
+        />
+    );
 
     return isAuthenticated ? (
         <div className='flex flex-row w-full'>
-            <Sidebar 
-                activeKey={activeKey} 
+            <Sidebar
+                activeKey={activeKey}
                 onItemClick={handleItemClick}
                 OnSignOut={OnSignOut}
                 userData={userData}
             />
-            <Content activeKey={activeKey} />
+            <Content activeKey={activeKey} userData={userData} />
         </div>
     ) : (
         <div className='w-full flex justify-center items-center h-screen bg-gray-900'>
-            <SignIn OnSignIn={OnSignIn} />
+            <SignIn onSignedIn={OnSignedIn} />
         </div>
     );
 }

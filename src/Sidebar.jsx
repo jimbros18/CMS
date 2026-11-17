@@ -93,13 +93,11 @@ export default function Sidebar({ activeKey, onItemClick, OnSignOut, userData })
                                                         {userData?.username?.[0]?.toUpperCase()}
                                                     </div>
                                                     <div className="flex flex-col">
-                                                        <span className="text-sm font-medium text-white text-left">{userData?.username}</span>
+                                                        <span className="text-sm font-medium text-white text-right">{userData?.name}</span>
                                                         <span className="text-xs text-slate-400">{userData?.role}</span>
                                                     </div>
-                                                    <button className='px-2 py-2 '
-                                                            // onClick={}
-                                                    >
-                                                    <ChevronDown size={25} className="ml-10 transition-transform duration-200 hover:bg-blue-500 hover: rounded-full hover:scale-110" />
+                                                    <button type="button" onClick={OnSignOut} className="px-2 py-2">
+                                                        <ChevronDown size={25} className="ml-10 transition-transform duration-200 hover:bg-blue-500 hover: rounded-full hover:scale-110" />
                                                     </button>
                                                     
                                                 </div>

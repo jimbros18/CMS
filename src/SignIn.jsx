@@ -1,9 +1,13 @@
 import { useState } from 'react';
+import PocketBase from 'pocketbase';
 
-export default function SignIn({ OnSignIn }) {
+const pb = new PocketBase('http://127.0.0.1:8090');
+
+export default function SignIn({ onSignedIn }) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -12,7 +16,19 @@ export default function SignIn({ OnSignIn }) {
             return;
         }
         setError('');
-        OnSignIn({ email, password });
+        setLoading(true);
+
+        try {
+            // This is the actual PocketBase sign-in
+            const authData = await pb.collection('users').authWithPassword(email, password);
+            if (onSignedIn) onSignedIn(authData.record);
+            console.log('Sign-in successful:', authData.record);
+        } catch (err) {
+            // PocketBase returns 400 for wrong credentials
+            setError('Invalid email or password.');
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -21,12 +37,11 @@ export default function SignIn({ OnSignIn }) {
                LORD ANTHONY FUNERAL HOMES
             </h1>
 
-        <h2 className="mb-[100px] text-xl md:text-2xl font-semibold tracking-widest text-white animate-pulseGlowSoft">
-        CLIENT MANAGEMENT SYSTEM
-        </h2>
+            <h2 className="mb-[100px] text-xl md:text-2xl font-semibold tracking-widest text-white animate-pulseGlowSoft">
+                CLIENT MANAGEMENT SYSTEM
+            </h2>
 
             <div className="bg-gray-800 border border-gray-700 rounded-xl p-8 w-full max-w-sm">
-                
                 <div className="mb-6">
                     <h1 className="text-2xl font-medium text-white mb-1">Sign in</h1>
                     <p className="text-sm text-gray-400">Welcome back. Enter your credentials to continue.</p>
@@ -63,16 +78,16 @@ export default function SignIn({ OnSignIn }) {
 
                     <button
                         type="submit"
-                        className="w-full bg-white text-gray-900 font-medium text-sm py-2 rounded hover:bg-gray-100 transition-colors"
+                        disabled={loading}
+                        className="w-full bg-white text-gray-900 font-medium text-sm py-2 rounded hover:bg-gray-100 transition-colors disabled:opacity-50"
                     >
-                        Sign in
+                        {loading ? 'Signing in...' : 'Sign in'}
                     </button>
                 </form>
 
                 <p className="text-xs text-gray-400 text-center">
                     Don't have an account? <a href="#" className="text-blue-400 hover:text-blue-300">Contact your administrator.</a>
                 </p>
-
             </div>
         </div>
     );
