@@ -9,6 +9,9 @@ export default function SignIn({ onSignedIn }) {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
 
+
+    pb.authStore.clear();
+    
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!email || !password) {
@@ -24,8 +27,10 @@ export default function SignIn({ onSignedIn }) {
             if (onSignedIn) onSignedIn(authData.record);
             console.log('Sign-in successful:', authData.record);
         } catch (err) {
-            // PocketBase returns 400 for wrong credentials
-            setError('Invalid email or password.');
+            console.error('PocketBase auth error:', err);
+            console.error('Status:', err?.status);
+            console.error('Response:', err?.response);
+            setError(err?.response?.message || err?.message || 'Sign-in failed.');
         } finally {
             setLoading(false);
         }

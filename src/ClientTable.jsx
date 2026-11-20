@@ -46,10 +46,11 @@ const columns = [
     }
 
     const handleDelete = async (row) => {
-        const name = `${row[2]} ${row[3]}`;
+        console.log('delete?', row)
+        const name = `${row['deceasedFirst']} ${row['deceasedLast']}`;
     try {
         if (!(await confirmDelete(name))) return;
-        const res = await deleteClient(row[0]);
+        const res = await deleteClient(row['id']);
         if (!res) return;
         deleted(name)
         fetchClients();
@@ -250,7 +251,8 @@ const columns = [
                                 return (
                                     <th
                                         key={i}
-                                        className={`px-2 py-2 text-left text-[15px] font-semibold uppercase tracking-[0.35px] ${col.width} ${col.header === 'Amount' ? 'text-center' : 'text-left'}`}
+                                        className={`px-2 py-2 text-left text-[15px] font-semibold uppercase tracking-[0.35px] 
+                                                    ${col.width} ${col.header === 'Amount' || 'Plan' ? 'text-center' : 'text-left'}`}
                                     >
                                         {col.header}
                                     </th>
@@ -319,7 +321,7 @@ const columns = [
                                             return (
                                                 <td
                                                     key={i}
-                                                    className={`truncate text-left ${col.width} ${alignmentClass}}`}
+                                                    className={`truncate text-center ${col.width} ${alignmentClass}}`}
                                                 >
                                                     {value !== "None" && value !== '' ? (
                                                         <span className="inline-flex items-center justify-center bg-orange-400 text-white px-1 py-0.5 rounded text-xs text-left">

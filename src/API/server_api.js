@@ -3,8 +3,7 @@ import PocketBase from 'pocketbase';
 
 const pb = new PocketBase('http://127.0.0.1:8090');
 
-const ip = "10.0.2.88";
-
+// const ip = '192.168.1.4';
 
 export async function apiFetch(url, options = {}) {
     // 1. Always read the token from PocketBase, never from localStorage
@@ -14,9 +13,9 @@ export async function apiFetch(url, options = {}) {
         ...options,
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
-            ...options.headers
-        }
+            Authorization: `Bearer ${token}`,
+            ...options.headers,
+        },
     });
 
     // 2. On 401, let PocketBase refresh the token itself, then retry once
@@ -30,9 +29,9 @@ export async function apiFetch(url, options = {}) {
                 ...options,
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`,
-                    ...options.headers
-                }
+                    Authorization: `Bearer ${token}`,
+                    ...options.headers,
+                },
             });
         } catch {
             // Refresh failed → token is dead. Clear and bounce to sign-in.
@@ -110,10 +109,10 @@ export async function addClient(client) {
 
         const res = await response.json();
         console.log(res);
-        return true
+        return true;
     } catch (error) {
         console.error('Error:', error);
-        return false
+        return false;
     }
 }
 
@@ -125,21 +124,24 @@ export const getClients = async () => {
 
 export async function deleteClient(clientId) {
     return await apiFetch(`/api/-client/${clientId}`, {
-        method: 'DELETE'
+        method: 'DELETE',
     });
 }
 
 export const updateClient = async (clientId, payload) => {
-    const res = await apiFetch(`/api/~client/${clientId}`,{method: 'PUT', body: JSON.stringify(payload),})
+    const res = await apiFetch(`/api/~client/${clientId}`, {
+        method: 'PUT',
+        body: JSON.stringify(payload),
+    });
     console.log('updateClient response:', res);
     return res;
-}
+};
 
 export const getClient = async (clientId) => {
     const res = await apiFetch(`/api/getclient/${clientId}`, { method: 'GET' });
     console.log('getClient response:', res);
     return res;
-}
+};
 
 // export async function getClient(clientId) {
 //     try {
@@ -164,7 +166,7 @@ export const getClient = async (clientId) => {
 
 export async function getCoffins() {
     try {
-        const response = await fetch(`http://${ip}:9000/coffins`, {
+        const response = await fetch(`api/coffins`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -181,7 +183,7 @@ export async function getCoffins() {
 
 export async function getPlans() {
     try {
-        const response = await fetch(`http://${ip}:9000/plans`, {
+        const response = await fetch(`api/plans`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -241,7 +243,7 @@ export async function getBarangays(cityCode) {
 
 export async function getLights() {
     try {
-        const response = await fetch(`http://${ip}:9000/lights`, {
+        const response = await fetch(`api/lights`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -258,7 +260,7 @@ export async function getLights() {
 
 export async function getAsstProviders() {
     try {
-        const response = await fetch(`http://${ip}:9000/asst_providers`, {
+        const response = await fetch(`api/asst_providers`, {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
         });
