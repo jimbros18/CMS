@@ -119,28 +119,15 @@ export async function addClient(client) {
 
 export const getClients = async () => {
     const res = await apiFetch(`/api/*clients`, { method: 'GET' });
-    // console.log('getClients response:', res);
+    console.log('All Clients:', res);
     return res;
 };
 
 export async function deleteClient(clientId) {
-    try {
-        const response = await fetch(`http://${ip}:9000/-client/${clientId}`, {
-            method: 'DELETE',
-            headers: {
-                // 'Content-Type': 'application/json',
-                "Authorization": `Bearer ${token}`
-            },
-        });
-        if (response.status === 403) throw new Error('Insufficient permissions');
-        if (response.status === 401) throw new Error('Unauthorized');
-        return await response.json();
-    } catch (error) {
-        console.error('Error:', error);
-        throw error; 
-    }
+    return await apiFetch(`/api/-client/${clientId}`, {
+        method: 'DELETE'
+    });
 }
-
 
 export const updateClient = async (clientId, payload) => {
     const res = await apiFetch(`/api/~client/${clientId}`,{method: 'PUT', body: JSON.stringify(payload),})

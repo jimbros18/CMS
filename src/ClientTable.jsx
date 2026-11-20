@@ -79,19 +79,22 @@ const columns = [
         return `${month}-${day}-${year}`;
     };
 
-    allClients.forEach(row => {
+
+    const clientsArray = Array.isArray(allClients) ? allClients : allClients.clients;
+    clientsArray .forEach(row => {
         const date = new Date(row[1]);
         const month = date.toLocaleString('en-US', { month: 'long' });
         const year = date.getFullYear();
     });
 
-    const months = [...new Set(allClients.map(row => new Date(row[1]).toLocaleString('en-US', { month: 'long' })))];
-    const years = [...new Set(allClients.map(row => new Date(row[1]).getFullYear()))];
+
+    const months = [...new Set(clientsArray.map(row => new Date(row.dateServiced).toLocaleString('en-US', { month: 'long' })))];
+    const years = [...new Set(clientsArray.map(row => new Date(row.dateServiced).getFullYear()))];
 
     const [selectedMonth, setSelectedMonth] = useState('');
     const [selectedYear, setSelectedYear] = useState('');
 
-    const filteredClients = allClients.filter(row => {
+    const filteredClients = clientsArray.filter(row => {
         const date = new Date(row[1]);
         const month = date.toLocaleString('en-US', { month: 'long' });
         const year = date.getFullYear();
