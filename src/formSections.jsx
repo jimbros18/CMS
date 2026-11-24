@@ -321,6 +321,10 @@ export function ClientInfo({clientData, setClientData}) {
 }
 
 export function Inclussions({ xcoffin, plan, inclussions, setInclussions }) {
+    // console.log('plan: ', plan)
+    // console.log('incs: ', inclussions)
+    // console.log('coffin: ', xcoffin)
+
     const [coffins, setCoffins] = useState([]);
     useEffect(() => {
         const load = async () => {
@@ -333,6 +337,12 @@ export function Inclussions({ xcoffin, plan, inclussions, setInclussions }) {
     const match = coffins.find((c) => c.coffin_name === xcoffin);
     const incs = match ? JSON.parse(match.items || "[]") : [];
 
+        // 1. Check if plan has a value
+    const hasPlan = plan && String(plan).trim() !== "" && String(plan).trim().toLowerCase() !== "none";
+    
+    // 2. Check if coffin has a value
+    const hasCoffin = xcoffin && String(xcoffin).trim() !== "";
+
     const checked = useMemo(() => {
         return incs.reduce((acc, item) => {
             acc[item] = inclussions.includes(item);
@@ -340,22 +350,28 @@ export function Inclussions({ xcoffin, plan, inclussions, setInclussions }) {
         }, {});
     }, [incs, inclussions]);
 
-    const handleChange = (e) => {
-        const { value, checked } = e.target;
-        setInclussions((prev) =>
-            checked ? [...prev, value] : prev.filter((item) => item !== value));
-    };
+const handleChange = (e) => {
+    const { value, checked } = e.target;
+    setInclussions((prev) => {
+        const current = Array.isArray(prev) ? prev : [];      
+        if (checked) {
+            return current.includes(value) ? current : [...current, value];
+        } else {
+            return current.filter((item) => item !== value);
+        }
+    });
+};
 
     return (
         <div className="w-full text-gray-800 py-6">
             <h2 className="text-gray-800 mb-4 text-left">Inclussions</h2>
             <div className="py-3 rounded">
                 <div className="flex flex-col text-sm">
-                    {(plan !== "" && plan !== "None" ) ? 
+                    {hasPlan ? ( 
                         <p className="pl-5 text-gray-600 text-sm">
                             Inclussions will be provided by {plan}.
                         </p> 
-                    : (
+                    ) : hasCoffin ? (
                         incs.map((item) => {
                             const isChecked = checked[item] ?? false;
                             return (
@@ -377,7 +393,12 @@ export function Inclussions({ xcoffin, plan, inclussions, setInclussions }) {
                                     {item}
                                 </label>
                             );
-                        })
+                        }) 
+                    ): (
+                        <p className="pl-5 text-gray-400 italic text-sm">
+                            No inclusions available.
+                        </p>
+                        
                     )}
                 </div>
             </div>

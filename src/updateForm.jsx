@@ -34,6 +34,9 @@ export default function UpdateForm({ data, onFormSubmitted, setUpdateForm, setVi
     const [lights, setLights] = useState((data.lights || []).map(l => typeof l === 'object' ? l.id : l));
     const [returned, setReturned] = useState(data.returned || []);
 
+    // console.log('xcoffin: ', client["coffin"]);
+    console.log('PLAN: ', client["plan"]);
+    
     useEffect(() => {
         const currentCoffin = client["coffin"];
         if (currentCoffin !== committedCoffin) {
@@ -104,7 +107,8 @@ export default function UpdateForm({ data, onFormSubmitted, setUpdateForm, setVi
                             <section className="section flex flex-col-reverse items-start">
                                 <Inclussions 
                                     xcoffin = {client["coffin"]}
-                                    inclussions={inclussions}
+                                    plan={client["plan"] || ""}
+                                    inclussions={inclussions || []}
                                     setInclussions={setInclussions}
                                 />
                                 </section>

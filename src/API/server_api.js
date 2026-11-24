@@ -137,34 +137,12 @@ export const updateClient = async (clientId, payload) => {
 
 export const getClient = async (clientId) => {
     const res = await apiFetch(`/api/getclient/${clientId}`, { method: 'GET' });
-    console.log('getClient response:', res);
     return res;
-}
-
-// export async function getClient(clientId) {
-//     try {
-//         const response = await fetch(
-//             `http://api/getclient/${clientId}`,
-//             {
-//                 method: 'GET',
-//                 headers: {
-//                     'Content-Type': 'application/json',
-//                 },
-//             },
-//         );
-
-//         const client = await response.json();
-//         // console.log(`client: ${JSON.stringify(client)}`);
-//         return client;
-//     } catch (error) {
-//         console.error('Error:', error);
-//         return null;
-//     }
-// }
+};
 
 export async function getCoffins() {
     try {
-        const response = await fetch(`http://${ip}:9000/coffins`, {
+        const response = await fetch(`api/coffins`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -181,7 +159,7 @@ export async function getCoffins() {
 
 export async function getPlans() {
     try {
-        const response = await fetch(`http://${ip}:9000/plans`, {
+        const response = await fetch(`/api/plans`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -195,6 +173,23 @@ export async function getPlans() {
         return [];
     }
 }
+
+export async function getIncAccs() {
+    try {
+        const response = await fetch(`/api/inc_accs`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+        const inc_accs = await response.json();
+        return inc_accs;
+    } catch (error) {
+        console.error('Error:', error);
+        return [];
+    }
+}
+
 
 export async function getProvinces() {
     try {

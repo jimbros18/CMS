@@ -250,7 +250,7 @@ const columns = [
                                 return (
                                     <th
                                         key={i}
-                                        className={`px-2 py-2 text-left text-[15px] font-semibold uppercase tracking-[0.35px] ${col.width} ${col.header === 'Amount' ? 'text-center' : 'text-left'}`}
+                                        className={`px-2 py-2 text-left text-[15px] font-semibold uppercase tracking-[0.35px] ${col.width} ${col.header === 'Amount' ? 'text-center' : 'text-left'} ${col.header === 'Plan' ? 'pl-8' : ''}`}
                                     >
                                         {col.header}
                                     </th>
@@ -317,12 +317,12 @@ const columns = [
                                         }
                                         if (col.header === 'Plan') {
                                             return (
-                                                <td
+                                                <td 
                                                     key={i}
-                                                    className={`truncate text-left ${col.width} ${alignmentClass}}`}
+                                                    className={`truncate text-left pl-8 ${col.width} ${alignmentClass}}`}
                                                 >
                                                     {value !== "None" && value !== '' ? (
-                                                        <span className="inline-flex items-center justify-center bg-orange-400 text-white px-1 py-0.5 rounded text-xs text-left">
+                                                        <span className="inline-flex items-center justify-center bg-orange-400 text-white px-1 py-0.5 rounded text-xs">
                                                             {value}
                                                         </span>
                                                     ) : null}

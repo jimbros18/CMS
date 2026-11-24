@@ -1,4 +1,3 @@
-import { Save, Trash, Pencil, Plus, XCircle } from 'lucide-react';
 import { useState, useEffect, useMemo} from 'react';
 import { getCoffins, getLights } from './API/server_api';
 
@@ -104,7 +103,7 @@ export function ClientView({ client = {}, formatDate, intermentDate }) {
     );
 }
 
-export function Inclussions({ xcoffin, inclussions, setInclussions }) {
+export function Inclussions({ xcoffin, inclussions }) {
     const [coffins, setCoffins] = useState([]);
 
     useEffect(() => {
@@ -118,50 +117,35 @@ export function Inclussions({ xcoffin, inclussions, setInclussions }) {
     const match = coffins.find((c) => c.coffin_name === xcoffin);
     const incs = match ? JSON.parse(match.items || "[]") : [];
 
-    const toggleItem = (item) => {
-        if (inclussions.includes(item)) return;
-        setInclussions([...inclussions, item]);
-    };
-
     return (
         <section className="w-full bg-white border border-slate-200 rounded-xl shadow-sm p-6 space-y-4">
-            
-            {/* Header */}
             <div>
                 <h2 className="text-lg font-semibold text-slate-900">
                     Inclusions
                 </h2>
-                <p className="text-sm text-slate-500">
-                    Items included with selected coffin
-                </p>
             </div>
 
-            {/* Content */}
             <div className="flex flex-wrap gap-2">
                 {incs.length === 0 && (
                     <p className="text-sm text-slate-400 italic">
                         No inclusions available
                     </p>
                 )}
-
                 {incs.map((item) => {
                     const isIncluded = inclussions.includes(item);
-
                     return (
-                        <button
+                        <div
                             key={item}
-                            onClick={() => toggleItem(item)}
-                            disabled={isIncluded}
                             className={`
-                                px-3 py-1.5 rounded-full text-sm transition-all border
+                                inline-block px-3 py-1.5 rounded-full text-sm border transition-all
                                 ${isIncluded
-                                    ? "bg-blue-100 text-blue-700 border-blue-200 font-medium cursor-default"
-                                    : "bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100"
+                                    ? "bg-blue-100 text-blue-700 border-blue-200 font-medium"
+                                    : "bg-slate-50 text-slate-700 border-slate-200"
                                 }
                             `}
                         >
                             {item}
-                        </button>
+                        </div>
                     );
                 })}
             </div>

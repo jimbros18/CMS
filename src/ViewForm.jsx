@@ -28,7 +28,7 @@ export default function ViewForm({client_data, onClose}) {
         <div className="viewform-container inline-flex flex-row p-6 gap-6 w-8/12">        
             <div className="flex flex-col border border-gray-300 text-left rounded shadow-lg bg-white p-6 w-[60%]" >
                 <ClientView client={client} formatDate={formatDate} intermentDate={intermentDate} />
-                <Inclussions xcoffin = {client["coffin"]} inclussions={inclussions}/>
+                <Inclussions xcoffin = {client["coffin"]} inclussions={inclussions  || []} />
                 <ChargeTableView otherCharges={otherCharges} />
                 <AssistanceTableView assistance={assistance} />
                 <PaymentsView payments={payments} />
