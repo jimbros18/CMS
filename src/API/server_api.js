@@ -3,9 +3,6 @@ import PocketBase from 'pocketbase';
 
 const pb = new PocketBase('http://127.0.0.1:8090');
 
-const ip = "10.0.2.88";
-
-
 export async function apiFetch(url, options = {}) {
     // 1. Always read the token from PocketBase, never from localStorage
     let token = pb.authStore.token;
@@ -100,7 +97,7 @@ export const SignOutAPI = async () => {
 
 export async function addClient(client) {
     try {
-        const response = await fetch(`http://${ip}:9000/+client`, {
+        const response = await fetch(`/api/+client`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -109,7 +106,7 @@ export async function addClient(client) {
         });
 
         const res = await response.json();
-        console.log(res);
+        console.log('BE res:', res);
         return true
     } catch (error) {
         console.error('Error:', error);
@@ -119,7 +116,7 @@ export async function addClient(client) {
 
 export const getClients = async () => {
     const res = await apiFetch(`/api/*clients`, { method: 'GET' });
-    console.log('All Clients:', res);
+    // console.log('All Clients:', res);
     return res;
 };
 
@@ -142,7 +139,7 @@ export const getClient = async (clientId) => {
 
 export async function getCoffins() {
     try {
-        const response = await fetch(`api/coffins`, {
+        const response = await fetch(`/api/coffins`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -190,7 +187,6 @@ export async function getIncAccs() {
     }
 }
 
-
 export async function getProvinces() {
     try {
         const res = await fetch(`https://psgc.cloud/api/provinces`);
@@ -236,7 +232,7 @@ export async function getBarangays(cityCode) {
 
 export async function getLights() {
     try {
-        const response = await fetch(`http://${ip}:9000/lights`, {
+        const response = await fetch(`/api/lights`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -253,7 +249,7 @@ export async function getLights() {
 
 export async function getAsstProviders() {
     try {
-        const response = await fetch(`http://${ip}:9000/asst_providers`, {
+        const response = await fetch(`/api/asst_providers`, {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
         });
@@ -266,7 +262,13 @@ export async function getAsstProviders() {
 }
 
 export async function getAllClientInfos() {
-    const res = await fetch(`http://${ip}:9000/clients/charges`);
+    const res = await fetch(`/api/clients/charges`);
+    const data = await res.json();
+    return data;
+}
+
+export async function getFullData(selectedMonth) {
+    const res = await fetch(`/api/dashboard?month=${selectedMonth}`);
     const data = await res.json();
     return data;
 }

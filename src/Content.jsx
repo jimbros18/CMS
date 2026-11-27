@@ -1,9 +1,12 @@
 import Table from './ClientTable';
 import reportTbl from './Reports';
+import DashboardUI from './Dashboard';
 
 const components = {
     'clients': Table,
-    'reports': reportTbl
+    'reports': reportTbl,
+    'dashboard': DashboardUI
+
 }
 
 export default function Content({ activeKey, userData }) {

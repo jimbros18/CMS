@@ -4,8 +4,6 @@ import ClientForm from './ClientForm';
 import UpdateForm from './updateForm';
 import ViewForm from './ViewForm';
 import {getClients, deleteClient, getClient } from './API/server_api';
-import {SignOutAPI} from './API/server_api';
-import Swal from 'sweetalert2';
 import {deleted, confirmDelete, noPermission} from "./utils/actions";
 
 export default function Table() {

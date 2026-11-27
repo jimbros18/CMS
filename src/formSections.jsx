@@ -83,6 +83,25 @@ export function ClientInfo({clientData, setClientData}) {
                 }
             }
 
+            if (name === 'birthdate' || name === 'dateOfDeath') {
+                const birth = name === 'birthdate' ? value : updated.birthdate;
+                const death = name === 'dateOfDeath' ? value : updated.dateOfDeath;
+
+                if (birth && death) {
+                    const birthDate = new Date(birth);
+                    const deathDate = new Date(death);
+                    
+                    let age = deathDate.getFullYear() - birthDate.getFullYear();
+                    const monthDiff = deathDate.getMonth() - birthDate.getMonth();
+                    
+                    // Adjust if the death date is before the birth month/day
+                    if (monthDiff < 0 || (monthDiff === 0 && deathDate.getDate() < birthDate.getDate())) {
+                        age--;
+                    }
+                    
+                    updated.age = age >= 0 ? age : ''; 
+                }
+            }
             return updated;
         });
     };
@@ -157,6 +176,41 @@ export function ClientInfo({clientData, setClientData}) {
                                 placeholder="Last Name"
                                 className="w-full rounded px-2 py-1 bg-gray-700 text-white"
                                 required
+                            />
+                        </div>
+                    </div>
+
+                    {/* 🔥 NEW: Birthdate, Date of Death, Age */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-2 col-span-full text-left">
+                        <div className="flex flex-col gap-1">
+                            <label>Birthdate</label>
+                            <input
+                                type="date"
+                                name="birthdate"
+                                value={clientData.birthdate || ''}
+                                onChange={handleClientChange}
+                                className="w-full rounded px-2 py-1 bg-gray-700 text-white"
+                            />
+                        </div>
+                        <div className="flex flex-col gap-1">
+                            <label>Date of Death</label>
+                            <input
+                                type="date"
+                                name="dateOfDeath"
+                                value={clientData.dateOfDeath || ''}
+                                onChange={handleClientChange}
+                                className="w-full rounded px-2 py-1 bg-gray-700 text-white"
+                            />
+                        </div>
+                        <div className="flex flex-col gap-1">
+                            <label>Age</label>
+                            <input
+                                type="number"
+                                name="age"
+                                value={clientData.age || ''}
+                                onChange={handleClientChange}
+                                placeholder="Auto or Manual"
+                                className="w-full rounded px-2 py-1 bg-gray-700 text-white"
                             />
                         </div>
                     </div>
@@ -396,7 +450,7 @@ const handleChange = (e) => {
                         }) 
                     ): (
                         <p className="pl-5 text-gray-400 italic text-sm">
-                            No inclusions available.
+                            No inclussions available.
                         </p>
                         
                     )}
@@ -1008,8 +1062,8 @@ export function Lights({ lights, setLights, returned, setReturned}) {
                         const isChecked = lights.includes(item.id);
                         const isReturned = returned.includes(item.id); // ✅ item.id not lights.id
                         return (
-                            <div className={`flex flex-row gap-2 mb-2 ${isChecked ? 'bg-blue-50 rounded' : ''}`}> 
-                                <label key={item.id}
+                            <div key={item.id} className={`flex flex-row gap-2 mb-2 ${isChecked ? 'bg-blue-50 rounded' : ''}`}> 
+                                <label 
                                     className={`flex items-center gap-2 py-1 rounded transition-colors w-full ${
                                         isChecked
                                             ? "bg-blue-50 text-blue-700 font-medium"

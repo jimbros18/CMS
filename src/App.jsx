@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import React from 'react';
 import './styles/app.css';
 import SignIn from './SignIn';
 import Sidebar from './Sidebar.jsx';
@@ -33,10 +32,8 @@ export default function App() {
 
     const checkAuthStatus = async () => {
         try {
-            // If a token exists in local storage, PocketBase restores it automatically.
-            // Validate it against the server (handles expiry / user deletion).
             if (pb.authStore.isValid) {
-                await pb.collection('users').authRefresh();
+                await pb.collection('users').authRefresh({ requestKey: null });
                 setUserData(pb.authStore.record);
                 setIsAuthenticated(true);
             } else {

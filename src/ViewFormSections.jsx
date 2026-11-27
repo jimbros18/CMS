@@ -4,6 +4,24 @@ import { getCoffins, getLights } from './API/server_api';
 export function ClientView({ client = {}, formatDate, intermentDate }) {
     const displayValue = (value) => (value || '—');
 
+    const calculateAge = () => {
+        if (!client.birthdate || !client.dateOfDeath) {
+            return client.age || '—';
+        }
+        
+        const birth = new Date(client.birthdate);
+        const death = new Date(client.dateOfDeath);
+        
+        let age = death.getFullYear() - birth.getFullYear();
+        const monthDiff = death.getMonth() - birth.getMonth();
+        
+        if (monthDiff < 0 || (monthDiff === 0 && death.getDate() < birth.getDate())) {
+            age--;
+        }
+        
+        return age;
+    };
+
     return (
         <section className="w-full bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-6">
             
@@ -42,6 +60,27 @@ export function ClientView({ client = {}, formatDate, intermentDate }) {
                         .filter(Boolean)
                         .join(' ') || '—'}
                 </p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 border-t pt-4">
+                <div>
+                    <p className="text-xs text-slate-500 uppercase">Birthdate</p>
+                    <p className="text-base text-slate-800">
+                        {displayValue(formatDate(client.birthdate)) || '—'}
+                    </p>
+                </div>
+                <div>
+                    <p className="text-xs text-slate-500 uppercase">Date of Death</p>
+                    <p className="text-base text-slate-800">
+                        {displayValue(formatDate(client.dateOfDeath)) || '—'}
+                    </p>
+                </div>
+                <div>
+                    <p className="text-xs text-slate-500 uppercase">Age</p>
+                    <p className="text-base text-slate-800">
+                        {calculateAge() || '—'}
+                    </p>
+                </div>
             </div>
 
             {/* Address */}
@@ -315,7 +354,7 @@ export function PriceBreakdown({client, assistance, payments, otherCharges}) {
                 </div>
                 {assistance.map((ass) => {
                     return (
-                        <div className='flex justify-between w-full'>
+                        <div key={ass.id} className='flex justify-between w-full'>
                             <h3 className='text-gray-800 font-bold'>{ass.provider}:</h3>
                             <h3 className='text-gray-800 font-bold'>{ass?.amount ? `${Number(ass.amount).toLocaleString()}` : 0}</h3>
                         </div>

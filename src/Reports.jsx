@@ -9,7 +9,7 @@ const columns = {
     "Coffin": "coffin",
     "Plan": "plan",
     "Amount": "coffinAmount",
-    "Inclusions": "inclusions",
+    "Inclussions": "inclussions",
     "Other Charges": "otherCharges",
 };
 
@@ -26,7 +26,7 @@ export default function reportTbl() {
         load();
     }, []);
 
-    console.log('Reports: ', clients)
+    // console.log('Reports: ', clients)
 
     const formatDate = (val) => {
         const d = new Date(val);
@@ -92,7 +92,7 @@ export default function reportTbl() {
                                             </td>
                                         )
                                     }
-                                    if (header === 'Inclusions' || header === 'Other Charges') {
+                                    if (header === 'Inclussions' || header === 'Other Charges') {
                                         return (
                                             <td key={colIndex} className="px-2 py-1 align-center text-[13px] text-left truncate max-w-[50px]">
                                                 <div className="flex flex-wrap gap-1">

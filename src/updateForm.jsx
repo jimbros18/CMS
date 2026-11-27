@@ -33,9 +33,6 @@ export default function UpdateForm({ data, onFormSubmitted, setUpdateForm, setVi
     const [staff, setStaff] = useState(data.staff?.[0] || {});
     const [lights, setLights] = useState((data.lights || []).map(l => typeof l === 'object' ? l.id : l));
     const [returned, setReturned] = useState(data.returned || []);
-
-    // console.log('xcoffin: ', client["coffin"]);
-    console.log('PLAN: ', client["plan"]);
     
     useEffect(() => {
         const currentCoffin = client["coffin"];
@@ -53,7 +50,7 @@ export default function UpdateForm({ data, onFormSubmitted, setUpdateForm, setVi
             otherCharges,
             payments,
             assistance,
-            staff: staff,
+            staff: [staff],
             lights,
             returned
         };
